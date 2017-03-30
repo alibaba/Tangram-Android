@@ -2,7 +2,7 @@
 
 [English Document](README.md)
 
-Tangram是一个以卡片+组件灵活组合为基础的动态化框架，它基于```RecyclerView```搭建页面，在页面结构化和变更频繁的情况下，能灵活展现界面并根据数据动态调整页面。
+Tangram是一套动态化构建 Native 页面的框架，它包含 Tangram Android、Tangram iOS，管理后台等一些列基础设施。本工程是 Tangram Android 的sdk 项目地址，底层依赖于[vlayout](https://github.com/alibaba/vlayout) 和 [UltraViewPager](https://github.com/alibaba/UltraViewPager)。
 
 # 特点
 
