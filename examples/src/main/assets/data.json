@@ -1,0 +1,448 @@
+[
+  {
+    "id": "banner1",
+    "type": 1,
+    "style": {
+      "aspectRatio": 3.223
+    },
+    "items": [
+      {
+        "bizId":"item1",
+        "type": 110,
+        "msg": "info1"
+      },
+      {
+        "bizId":"item2",
+        "type": 110,
+        "msg": "info2"
+      }
+    ]
+  },
+  {
+    "type": "10",
+    "style": {
+      "indicatorImg1": "https://gw.alicdn.com/tps/TB16RaxLpXXXXbIXFXXXXXXXXXX-14-14.png",
+      "indicatorImg2": "https://gw.alicdn.com/tps/TB1m79uLpXXXXXUXVXXXXXXXXXX-18-16.png",
+      "indicatorGravity": "center",
+      "indicatorPosition": "outside",
+      "indicatorMargin": 10,
+      "indicatorGap": 2,
+      "scrollMarginLeft": 20,
+      "scrollMarginRight": 20,
+      "hGap": 12,
+      "pageRatio": 0.5,
+      "bgColor": "#ffffff"
+    },
+    "items": [
+      {
+        "type": 1,
+        "msg": "info1",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info2",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info3",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info4",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info5",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info6",
+        "style": {
+        }
+      }
+    ]
+  }, {
+    "id": "BuyCate",
+    "style": {
+      "hGap": "15",
+      "vGap": "15",
+      "margin": [null, null, null, null],
+      "padding": ["15", "15", "15", "15"]
+    },
+    "type": 25,
+    "items": [{
+      "title": "A",
+      "type": 199
+    }, {
+      "title": "B",
+      "type": 199
+    }, {
+      "title": "C",
+      "type": 199
+    }, {
+      "title": "D",
+      "type": 199
+    }, {
+      "title": "E",
+      "type": 199
+    }, {
+      "title": "F",
+      "type": 199
+    }, {
+      "title": "G",
+      "type": 199
+    }, {
+      "title": "H",
+      "type": 199
+    }, {
+      "title": "I",
+      "type": 199
+    }, {
+      "title": "G",
+      "type": 199
+    }]
+  },
+  {
+    "type": 1,
+    "style": {
+      "aspectRatio": 3.223
+    },
+    "items": [
+      {
+        "type": 10,
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png"
+      },
+      {
+        "type": 10,
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png"
+      }
+    ]
+  },
+  {
+    "type": 20,
+    "style": {
+      "sticky": "start"
+
+    },
+    "items": [
+      {
+        "type": 1,
+        "msg": "sticky",
+        "style": {
+          "height": 80
+
+        }
+      }
+    ]
+  },
+  {
+    "type": "5",
+    "style": {
+      "aspectRatio": "1.778",
+      "cols": [
+        43.467
+      ],
+      "rows": [
+        43.602
+      ]
+    },
+    "items": [
+      {
+        "type": "10",
+        "action": "xxx",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png",
+        "style": {
+          "margin": "[0,1,0,0]"
+        }
+      },
+      {
+        "type": "10",
+        "action": "xxx",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png",
+        "style": {
+          "margin": "[0,0,1,0]"
+        }
+      },
+      {
+        "type": "10",
+        "action": "xxx",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png",
+        "style": {
+          "margin": "[0,1,0,0]"
+        }
+      },
+      {
+        "type": "10",
+        "action": "xxx",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png",
+        "style": {
+        }
+      }
+    ]
+  },
+  {
+    "type": "2",
+    "style": {
+      "hGap": 10,
+      "vGap": 10,
+      "cols": [
+        35.5
+      ]
+    },
+    "items": [
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      }
+    ]
+  },
+  {
+    "type": "3",
+    "items": [
+      {
+        "type": 1,
+        "msg": "block",
+        "style": {
+          "display": "block"
+        }
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      }
+    ]
+  },
+  {
+    "type": 4,
+    "items": [
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      }
+    ]
+  },
+  {
+    "type": 28,
+    "id": "scrollFixShowOnEnter",
+    "style": {
+      "showType": "showONEnter"
+    },
+    "items": [
+      {
+        "type": 1,
+        "style": {
+          "height": 120
+        },
+        "msg": "showOnEnter"
+      }
+    ]
+  },
+  {
+    "type": 1,
+    "id": "dividerShow",
+    "items": [
+      {
+        "type": 1,
+        "msg": "I am a divider"
+      }
+    ]
+  },
+  {
+    "type": 5,
+    "style": {
+      "bgColor": "#e3e3e3",
+      "cols": [
+        "46.667"
+      ]
+    },
+    "items": [
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      }
+    ]
+  },
+  {
+    "type": 5,
+    "style": {
+      "cols": [
+        40
+      ]
+    },
+    "items": [
+      {
+        "type": 1,
+        "style": {
+          "margin": [
+            4,
+            4,
+            2,
+            0
+          ]
+        }
+      },
+      {
+        "type": 1,
+        "style": {
+          "margin": [
+            0,
+            0,
+            4,
+            0
+          ]
+        }
+      },
+      {
+        "type": 1
+      }
+    ]
+  },
+  {
+    "type": 5,
+    "style": {
+    },
+    "items": [
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      }
+    ]
+  },
+  {
+    "type": "1",
+    "items": [
+      {
+        "type": 1
+      }
+    ]
+  },
+  {
+    "type": "9",
+    "load": "com.tmall.request.test",
+    "style": {
+      "autoExpand": true
+    },
+    "items": [
+    ]
+  },
+  {
+    "type": "4",
+    "style": {
+      "autoExpand": true,
+      "enableColspan": true,
+      "vGap": "2",
+      "hGap": "2"
+    },
+    "items": [
+      {
+        "type": 1,
+        "style": {
+          "colspan": 2
+        }
+      },
+      {
+        "type": 1,
+        "style": {
+          "colspan": 2
+        }
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      },
+      {
+        "type": 1
+      }
+    ]
+  },
+  {
+    "type": 7,
+    "style": {
+      "align": "bottom_left",
+      "x": 200,
+      "y": 100
+    },
+    "items": [
+      {
+        "type": "2",
+        "action": "xxx",
+        "imgUrl": "https://img.alicdn.com/tps/TB11Y5hPVXXXXbaXpXXXXXXXXXX-186-158.png",
+        "style": {
+          "margin": [
+            10,
+            10,
+            10,
+            10
+          ],
+          "height": 100,
+          "width": 100
+        }
+      }
+    ]
+  },
+  {
+    "type": "1",
+    "load": "com.tmall.request.load.more",
+    "loadType": 1,
+    "items": [
+    ]
+  }
+]
