@@ -23,8 +23,6 @@
  */
 
 apply plugin: 'com.android.library'
-apply plugin: "maven"
-apply plugin: 'maven-publish'
 
 ext {
     bintrayRepo = 'Tangram'
@@ -99,7 +97,7 @@ dependencies {
     }
 }
 
-deployConfig = rootProject.file('jcenterInstall.gradle')
+File deployConfig = rootProject.file('jcenterInstall.gradle')
 if (deployConfig.exists()) {
     apply from: rootProject.file('jcenterInstall.gradle')
 }
