@@ -2,7 +2,7 @@
 
 ```
 // gradle
-compile 'com.tmall.android:tangram:1.0.0@aar'
+compile 'com.alibaba.android:tangram-core:1.0.0@aar'
 ```
 
 or
@@ -10,8 +10,8 @@ or
 ```
 // maven
 <dependency>
-  <groupId>com.tmall.android</groupId>
-  <artifactId>tangram</artifactId>
+  <groupId>com.alibaba.android</groupId>
+  <artifactId>tangram-core</artifactId>
   <version>1.0.0</version>
   <type>aar</type>
 </dependency>
@@ -122,4 +122,4 @@ String json = new String(getAssertsFile(this, "data.json"));
         }
 ```
 
-A complete data structure of a page could be found at [Demo]()'s asset。
+A complete data structure of a page could be found at [Demo](https://github.com/alibaba/Tangram-Android/tree/master/examples)'s asset。

@@ -2,7 +2,7 @@
 
 ```
 // gradle
-compile 'com.tmall.android:tangram:1.0.0@aar'
+compile 'com.alibaba.android:tangram-core:1.0.0@aar'
 ```
 
 或者
@@ -10,8 +10,8 @@ compile 'com.tmall.android:tangram:1.0.0@aar'
 ```
 // maven
 <dependency>
-  <groupId>com.tmall.android</groupId>
-  <artifactId>tangram</artifactId>
+  <groupId>com.alibaba.android</groupId>
+  <artifactId>tangram-core</artifactId>
   <version>1.0.0</version>
   <type>aar</type>
 </dependency>
@@ -122,4 +122,4 @@ String json = new String(getAssertsFile(this, "data.json"));
         }
 ```
 
-完整页面的数据结构可参考 [Demo]() 里。
+完整页面的数据结构可参考 [Demo](https://github.com/alibaba/Tangram-Android/tree/master/examples) 里。

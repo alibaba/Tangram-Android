@@ -6,7 +6,7 @@ Tangram是一个以卡片+组件灵活组合为基础的动态化框架，它基
 
 # 特点
 
-- Android iOS 双平台支持，iOS 版本参考开源库 [Tangram-iOS]()。
+- Android iOS 双平台支持，iOS 版本参考开源库 [Tangram-iOS](https://github.com/alibaba/Tangram-iOS)。
 - 通过 json 创建页面视图，并提供了默认的解析器。
 - 可轻松实现页面视图的回收与复用。
 - 框架提供多种默认的布局方式。

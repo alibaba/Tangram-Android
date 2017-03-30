@@ -6,7 +6,7 @@ Tangram is a framework to build native page dynamically based on ```RecyclerView
 
 # Features
 
-- Two platform support (iOS & Android, See [Tangram-iOS]() in Github for iOS Version)
+- Two platform support (iOS & Android, See [Tangram-iOS]https://github.com/alibaba/Tangram-iOS() in Github for iOS Version)
 - Fast Generate View by JSON Data , provide default parser.
 - Easily control the reuseability of views
 - Provide multiple Built-in layouts
