@@ -48,7 +48,7 @@ Branches
 * `{description}`
     * It's ***RECOMMENDED*** to close issue with syntax `#123`, see [the doc](https://help.github.com/articles/closing-issues-via-commit-messages/) for more detail. It's useful for responding issues and release flow.
 
-for example:
+for example:``
 
 * `add new layout helper`
 * `fix #123, make compatible to recyclervew 25.2.0`

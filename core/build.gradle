@@ -26,10 +26,32 @@ apply plugin: 'com.android.library'
 apply plugin: "maven"
 apply plugin: 'maven-publish'
 
+ext {
+    bintrayRepo = 'Tangram'
+    bintrayName = 'Tangram-Android'
+
+    publishedGroupId = GROUP
+    libraryName = ARTIFACT
+    artifact = ARTIFACT
+
+    libraryDescription = 'Tangram is a modular UI solution for building native page dynamically including Tangram for Android, Tangram for iOS and even backend CMS. This project provides the sdk on Android.'
+
+    siteUrl = 'https://github.com/alibaba/Tangram-Android'
+    gitUrl = 'https://github.com/alibaba/Tangram-Android.git'
+
+    libraryVersion = VERSION_NAME
+
+    developerId = 'longerian'
+    developerName = 'longerian'
+    developerEmail = 'xlhongultimate@gmail.com'
+
+    licenseName = 'MIT'
+    licenseUrl = 'https://opensource.org/licenses/MIT'
+    allLicenses = ["MIT"]
+}
+
 def VERSION = System.properties['version'] ?: '10'
 def VERSION_NAME = System.properties['versionName'] ?: '0.1.0'
-def GROUP = 'com.tmall.android'
-def ARTIFACT = 'tangram'
 
 android {
     compileSdkVersion Integer.parseInt(System.properties['compileSdkVersion'] ?: '22')
@@ -63,12 +85,8 @@ configurations.all {
 
 dependencies {
 
-    if (project.hasProperty('vlayoutDevMode')) {
-        compile project(':vlayout')
-    } else {
-        compile('com.alibaba.android:vlayout:1.0.0@aar') {
-            changing = true
-        }
+    compile('com.alibaba.android:vlayout:1.0.3@aar') {
+        changing = true
     }
 
     compile 'com.android.support:recyclerview-v7:23.1.1@aar'
@@ -79,4 +97,14 @@ dependencies {
         transitive true
         exclude group: 'com.android.support', module: 'recyclerview-v7'
     }
+}
+
+deployConfig = rootProject.file('jcenterInstall.gradle')
+if (deployConfig.exists()) {
+    apply from: rootProject.file('jcenterInstall.gradle')
+}
+
+deployConfig = rootProject.file('jcenterDeploy.gradle')
+if (deployConfig.exists()) {
+    apply from: rootProject.file('jcenterDeploy.gradle')
 }

@@ -50,3 +50,6 @@ lint.xml
 config.gradle
 
 deploy.gradle
+
+jcenterDeploy.gradle
+jcenterInstall.gradle
