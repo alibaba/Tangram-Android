@@ -41,5 +41,9 @@ Tangram是一个以卡片+组件灵活组合为基础的动态化框架，它基
 
 详细的介绍文档参考[这里](http://tangram.pingguohe.net/)。
 
+# 贡献代码
+
+在提 Issue 或者 PR 之前，建议先阅读[Contributing Guide](CONTRIBUTING.md)。按照规范提建议。
+
 # 开源许可证
 Tangram 遵循MIT开源许可证协议。

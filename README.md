@@ -40,5 +40,9 @@ See details at [Tutorial](docs/TUTORIAL.md).
 
 See complete [documents](http://tangram.pingguohe.net/) here.
 
+# Contributing
+
+Before you open an issue or create a pull request, please read [Contributing Guide](CONTRIBUTING.md) first.
+
 # LICENSE
 Tangram is available under the MIT license.
