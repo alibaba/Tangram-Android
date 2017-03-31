@@ -48,7 +48,7 @@ android {
 }
 
 dependencies {
-    compile project(':core')
+    compile project(':tangram')
     compile 'com.android.support:recyclerview-v7:21.0.0@aar'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:appcompat-v7:21.0.0'

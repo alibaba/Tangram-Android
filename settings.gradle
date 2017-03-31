@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-include ':core'
+include ':tangram'
 include ':examples'
 
 File configFile = file('./config.gradle')
