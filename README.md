@@ -34,7 +34,7 @@ Tangram is a modular UI solution for building native page dynamically including 
 * Dragable Card
 
 # Get started
-See details at [Tutorial](docs/TUTORIAL.md).
+See details at [Tutorial](docs/Tutorial.md).
 
 # Tangram Documents
 
