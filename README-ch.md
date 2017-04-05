@@ -35,7 +35,7 @@ Tangram是一套动态化构建 Native 页面的框架，它包含 Tangram Andro
 * 悬浮拖动布局卡片
 
 # 接入教程
-详情见[上手教程](docs/TUTORIAL-ch.md)。
+详情见[上手教程](docs/Tutorial-ch.md)。
 
 # Tangram 文档
 
