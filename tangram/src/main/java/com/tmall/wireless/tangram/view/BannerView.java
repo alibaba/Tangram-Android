@@ -257,6 +257,10 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     @Override
     public void postUnBindView(BaseCell cell) {
         recycleView();
+        //clean cell's view info
+        getUltraViewPager().disableAutoScroll();
+        BannerCell bannerCell = (BannerCell) cell;
+        bannerCell.mBannerAdapter =null;
     }
 
     private int getIndicatorGravity(String gravity) {
