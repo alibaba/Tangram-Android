@@ -111,6 +111,14 @@ public class BannerCell extends BaseCell {
         public float getPageWidth(int position) {
             return Float.isNaN(pageWidth) ? 1f : pageWidth;
         }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            if (object instanceof BinderViewHolder) {
+                ((BinderViewHolder) object).unbind();
+            }
+            super.destroyItem(container, position, object);
+        }
     }
 
     public void setAutoScrollInternal(int mAutoScroll_internal) {
