@@ -125,7 +125,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     private ArrayMap<String, Object> bizParaMap = new ArrayMap<>(32);
 
-    private ArrayMap<View, Integer> innerClickMap = new ArrayMap<>();
+    private ArrayMap<Integer, Integer> innerClickMap = new ArrayMap<>();
 
     @Nullable
     public ServiceManager serviceManager;
@@ -156,7 +156,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
             if (service != null) {
                 int pos = this.pos;
                 if (innerClickMap.containsKey(v)) {
-                    pos = innerClickMap.get(v).intValue();
+                    pos = innerClickMap.get(v.hashCode()).intValue();
                 }
                 service.onClick(v, this, pos);
             }
@@ -165,7 +165,12 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     public void setOnClickListener(View view, int eventType) {
         view.setOnClickListener(this);
-        innerClickMap.put(view, Integer.valueOf(eventType));
+        innerClickMap.put(view.hashCode(), Integer.valueOf(eventType));
+    }
+
+    public void clearClickListener(View view, int eventType) {
+        view.setOnClickListener(null);
+        innerClickMap.remove(view.hashCode());
     }
 
     public final void notifyDataChange() {
@@ -286,7 +291,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
      * for compatible
      */
     public void unbindView(@NonNull V view) {
-
+        clearClickListener(view, 0);
     }
 
     /***
