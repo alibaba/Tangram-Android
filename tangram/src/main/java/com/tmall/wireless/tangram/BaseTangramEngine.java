@@ -42,7 +42,11 @@ import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
+import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
+import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
+import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
+import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
@@ -185,6 +189,24 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     public int setVirtualViewTemplate(byte[] data) {
         ViewManager viewManager = getService(ViewManager.class);
         return viewManager.loadBinBufferSync(data);
+    }
+
+    /**
+     * set compiled binary data after engine has been setup, used when load template data dynamically
+     * @param type
+     * @param data
+     */
+    public void registerVirtualViewTemplate(String type, byte[] data) {
+        BaseCellBinderResolver baseCellBinderResolver = getService(BaseCellBinderResolver.class);
+        BaseCardBinderResolver baseCardBinderResolver = getService(BaseCardBinderResolver.class);
+        if (baseCellBinderResolver != null && baseCardBinderResolver != null) {
+            CardResolver cardResolver = baseCardBinderResolver.getDelegate();
+            MVHelper mMVHelper = getService(MVHelper.class);
+            if (cardResolver != null && mMVHelper != null) {
+                cardResolver.register(type, VVCard.class);
+                setVirtualViewTemplate(data);
+            }
+        }
     }
 
 	/**

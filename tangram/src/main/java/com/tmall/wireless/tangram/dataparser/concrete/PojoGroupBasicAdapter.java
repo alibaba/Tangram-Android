@@ -45,7 +45,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.tmall.wireless.tangram.support.CellSupport;
 import com.tmall.wireless.tangram.support.PageDetectorSupport;
-
+import com.tmall.wireless.vaf.framework.ViewManager;
 import java.lang.annotation.Inherited;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -67,6 +67,8 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
     private MVHelper mMvHelper;
 
+    private ViewManager mViewManager;
+
     /*
      * This used to store cell.type <=> itemType mapping, they are not the same!
      * the same cell.type can be different itemTypes for better recycle mechanism
@@ -74,11 +76,13 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     private final SparseArray<String> mId2Types = new SparseArray<>(64);
 
     PojoGroupBasicAdapter(@NonNull Context context, @NonNull VirtualLayoutManager layoutManager,
-        @NonNull BaseCellBinderResolver componentBinderResolver,
-        @NonNull BaseCardBinderResolver cardBinderResolver,
-        @NonNull MVHelper mvHelper) {
+                          @NonNull BaseCellBinderResolver componentBinderResolver,
+                          @NonNull BaseCardBinderResolver cardBinderResolver,
+                          @NonNull MVHelper mvHelper,
+                          @NonNull ViewManager viewManager) {
         super(context, layoutManager, componentBinderResolver, cardBinderResolver);
         this.mMvHelper = mvHelper;
+        this.mViewManager = viewManager;
         setHasStableIds(true);
     }
 
@@ -169,9 +173,10 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     @Override
     public int getItemType(BaseCell item) {
         // if the item is a keyType, which means item.type is not the key
+        int version = mViewManager != null ? mViewManager.getViewVersion(item.stringType) : 0;
         if (!TextUtils.isEmpty(item.typeKey)) {
             // we should use getTypeKey()
-            String typeKey = item.typeKey;
+            String typeKey = item.typeKey + version;
             if (!mStrKeys.containsKey(typeKey)) {
                 int newType = mTypeId.getAndIncrement();
                 mStrKeys.put(typeKey, newType);
@@ -182,13 +187,13 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         } else {
             // otherwise, use item.type as identity key
             // note, this now only be executed in MainThread, atomic not actually needed
-            String stringType = item.stringType;
+            String stringType = item.stringType + version;
             if (!mStrKeys.containsKey(stringType)) {
                 int newType = mTypeId.getAndIncrement();
-                mStrKeys.put(item.stringType, newType);
+                mStrKeys.put(stringType, newType);
                 mId2Types.put(newType, item.stringType);
             }
-            return mStrKeys.get(item.stringType).intValue();
+            return mStrKeys.get(stringType).intValue();
         }
     }
 
