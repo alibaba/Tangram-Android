@@ -30,7 +30,7 @@ import com.tmall.wireless.tangram.core.resolver.ClassResolver;
  * Created by villadora on 15/8/23.
  */
 public class CardResolver extends ClassResolver<Card> {
-    public boolean hasType(int type) {
+    public boolean hasType(String type) {
         return mSparseArray.get(type) != null;
     }
 }

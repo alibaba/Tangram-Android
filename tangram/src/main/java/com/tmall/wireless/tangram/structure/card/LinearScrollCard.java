@@ -84,7 +84,7 @@ public class LinearScrollCard extends Card {
     }
 
     @Override
-    protected void parseStyle(@Nullable JSONObject data) {
+    public void parseStyle(@Nullable JSONObject data) {
         super.parseStyle(data);
         if (data != null) {
             cell.pageWidth = optDoubleParam(LinearScrollCell.KEY_PAGE_WIDTH);
@@ -96,9 +96,9 @@ public class LinearScrollCard extends Card {
                 cell.pageHeight = Style.dp2px(cell.pageHeight);
             }
             cell.defaultIndicatorColor = parseColor(optStringParam(LinearScrollCell.KEY_DEFAULT_INDICATOR_COLOR),
-                    LinearScrollCell.DEFAULT_DEFAULT_INDICATOR_COLOR);
+                LinearScrollCell.DEFAULT_DEFAULT_INDICATOR_COLOR);
             cell.indicatorColor = parseColor(optStringParam(LinearScrollCell.KEY_INDICATOR_COLOR),
-                    LinearScrollCell.DEFAULT_INDICATOR_COLOR);
+                LinearScrollCell.DEFAULT_INDICATOR_COLOR);
             if (data.has(LinearScrollCell.KEY_HAS_INDICATOR)) {
                 cell.hasIndicator = data.optBoolean(LinearScrollCell.KEY_HAS_INDICATOR);
             }

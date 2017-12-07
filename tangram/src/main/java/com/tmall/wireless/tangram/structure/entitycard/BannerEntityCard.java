@@ -25,7 +25,9 @@
 package com.tmall.wireless.tangram.structure.entitycard;
 
 import com.tmall.wireless.tangram.MVHelper;
+import com.tmall.wireless.tangram.MVResolver;
 import com.tmall.wireless.tangram.TangramBuilder;
+import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.structure.BaseCell;
@@ -35,6 +37,7 @@ import com.tmall.wireless.tangram.util.LogUtils;
 import com.tmall.wireless.tangram.util.Utils;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.graphics.Color;
@@ -53,12 +56,13 @@ public class BannerEntityCard extends BannerCell {
 
     /** ----parse for inline card start ----*/
 
-    public int cardType;
+    public String cardType;
 
     @Override
     public void parseWith(@NonNull JSONObject data, @NonNull MVHelper resolver) {
+        this.mCells.clear();
         id = data.optString(Card.KEY_ID, id == null ? "" : id);
-        this.cardType = data.optInt(Card.KEY_TYPE);
+        this.cardType = data.optString(Card.KEY_TYPE);
         // parsing header
         if (Utils.isSupportHeaderFooter(cardType)) {
             JSONObject header = data.optJSONObject(Card.KEY_HEADER);
@@ -71,7 +75,13 @@ public class BannerEntityCard extends BannerCell {
             final int cellLength = componentArray.length();
             for (int i = 0; i < cellLength; i++) {
                 final JSONObject cellData = componentArray.optJSONObject(i);
-                createCell(resolver, cellData, true);
+                BaseCell cell = createCell(resolver, cellData, true);
+                try {
+                    if (cell != null) {
+                        cell.extras.put(MVResolver.KEY_INDEX, cell.pos);
+                    }
+                } catch (JSONException e) {
+                }
             }
         }
         // parsing footer
@@ -87,23 +97,55 @@ public class BannerEntityCard extends BannerCell {
 
     private BaseCell createCell(@NonNull MVHelper resolver, @NonNull JSONObject cellData, boolean appended) {
         if (cellData != null) {
-            final int cellType = cellData.optInt(Card.KEY_TYPE, -1);
-            if (resolver != null && resolver.resolver().getViewClass(cellType) != null) {
-                BaseCell cell;
+            BaseCell cell = null;
+            String cellType = cellData.optString(Card.KEY_TYPE);
+            if ((resolver != null && resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
                 if (resolver.resolver().isCompatibleType(cellType)) {
                     cell = Utils.newInstance(resolver.resolver().getCellClass(cellType));
 
                     //do not display when newInstance failed
                     if (cell == null)
                         return null;
+
+                    cell.serviceManager = serviceManager; // ensure service manager
                 } else {
-                    cell = new BaseCell(cellType);
+                    if (Utils.isCard(cellData)) {
+                        switch (cellType) {
+                            case TangramBuilder.TYPE_CONTAINER_BANNER:
+                                cell = new BannerEntityCard();
+                                break;
+                        }
+                        if (cell != null) {
+                            cell.serviceManager = serviceManager; // ensure service manager
+                            cell.nestedParent = this;
+                            cell.parentId = id;
+                        }
+                    } else {
+                        cell = new BaseCell(cellType);
+                        cell.serviceManager = serviceManager; // ensure service manager
+                        cell.nestedParent = this;
+                        cell.parentId = id;
+                    }
                 }
-                parseCell(resolver, cellData, cell, appended);
-                cell.type = cellType; // ensure cell type
-                cell.serviceManager = serviceManager; // ensure service manager
-                cell.nestedParent = this; //ensure parent
+                if (cell != null) {
+                    parseCell(resolver, cellData, cell, appended);
+                    cell.setStringType(cellType); // ensure cell type
+                }
                 return cell;
+            } else {
+                //support virtual view at layout
+                BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
+                if (componentBinderResolver.has(cellType)) {
+                    cell = new BaseCell(cellType);
+                    cell.serviceManager = serviceManager; // ensure service manager
+                    cell.nestedParent = this;
+                    cell.parentId = id;
+                    parseCell(resolver, cellData, cell, appended);
+                    cell.setStringType(cellType); // ensure cell type
+                    return cell;
+                } else {
+                    return null;
+                }
             }
         }
         return null;
@@ -116,16 +158,24 @@ public class BannerEntityCard extends BannerCell {
             mHeader.parent = null;
             mHeader.nestedParent = this;
             mHeader.parentId = id;
+            try {
+                mHeader.extras.put(MVResolver.KEY_INDEX, mHeader.pos);
+            } catch (JSONException e) {
+            }
         }
     }
 
     protected void parseFooterCell(@NonNull MVHelper resolver, @Nullable JSONObject footer) {
         mFooter = createCell(resolver, footer, false);
         if (mFooter != null) {
-            mFooter.pos = mHeader != null ? getCells().size() + 1: getCells().size();
+            mFooter.pos = mHeader != null ? getCells().size() + 1 : getCells().size();
             mFooter.parent = null;
             mFooter.nestedParent = this;
             mFooter.parentId = id;
+            try {
+                mFooter.extras.put(MVResolver.KEY_INDEX, mFooter.pos);
+            } catch (JSONException e) {
+            }
         }
     }
 
@@ -142,20 +192,19 @@ public class BannerEntityCard extends BannerCell {
         return Collections.unmodifiableList(mCells);
     }
 
-    private boolean addCellInternal(MVHelper MVHelper, BaseCell cell, boolean silent) {
+    private boolean addCellInternal(MVHelper mvHelper, BaseCell cell, boolean silent) {
         if (cell != null) {
             cell.parentId = id;
             cell.parent = null;
             cell.nestedParent = this;
             cell.serviceManager = serviceManager;
-            if (MVHelper != null) {
-                if (MVHelper.isValid(cell, serviceManager)) {
+            if (mvHelper != null) {
+                if (mvHelper.isValid(cell, serviceManager)) {
                     cell.pos = mHeader != null ? this.mCells.size() + 1 : this.mCells.size();
                     if (!silent && mIsActivated) {
                         // do cell added
                         cell.added();
                     }
-
                     this.mCells.add(cell);
                     return true;
                 }
@@ -176,11 +225,19 @@ public class BannerEntityCard extends BannerCell {
             setBgColor(style.bgColor);
         }
         margin = style.margin;
+        if (margin != null) {
+            for (int i = 0; i < margin.length; i++) {
+                if (margin[i] < 0) {
+                    margin[i] = 0;
+                }
+            }
+        }
         if (data != null) {
             setIndicatorRadius(Style.dp2px(data.optDouble(BannerCard.ATTR_INDICATOR_RADIUS)));
             setIndicatorColor(Style.parseColor(data.optString(BannerCard.ATTR_INDICATOR_COLOR, "#00000000")));
             setIndicatorDefaultColor(Style.parseColor(data.optString(BannerCard.ATTR_INDICATOR_DEFAULT_INDICATOR_COLOR, "#00000000")));
             setAutoScrollInternal(data.optInt(BannerCard.ATTR_AUTOSCROLL));
+            setSpecialInterval(data.optJSONObject(BannerCard.ATTR_SPECIAL_INTERVAL));
             setInfinite(data.optBoolean(BannerCard.ATTR_INFINITE));
             setInfiniteMinCount(data.optInt(BannerCard.ATTR_INFINITE_MIN_COUNT));
             setIndicatorFocus(data.optString(BannerCard.ATTR_INDICATOR_FOCUS));
@@ -194,6 +251,7 @@ public class BannerEntityCard extends BannerCell {
             sethGap(Style.dp2px(data.optInt(BannerCard.ATTR_HGAP)));
             itemMargin[0] = Style.dp2px(data.optInt(BannerCard.ATTR_ITEM_MARGIN_LEFT));
             itemMargin[1] = Style.dp2px(data.optInt(BannerCard.ATTR_ITEM_MARGIN_RIGHT));
+            itemRatio = data.optDouble(BannerCard.ATTR_ITEM_RATIO, Double.NaN);
         }
     }
     /** ----parse for inline card end ----*/

@@ -46,6 +46,10 @@ import java.util.regex.Pattern;
  */
 public class Utils {
 
+
+    private static final Pattern REGEX_1 = Pattern.compile("(\\d+)x(\\d+)(_?q\\d+)?(\\.[jpg|png|gif])");
+    private static final Pattern REGEX_2 = Pattern.compile("(\\d+)-(\\d+)(_?q\\d+)?(\\.[jpg|png|gif])");
+
     public static <T> List<T> newArrayList() {
         return new ArrayList<T>();
     }
@@ -69,105 +73,6 @@ public class Utils {
         return map;
     }
 
-    public static <T> T newInstance(Class<T> clz) {
-        if (clz != null) {
-            try {
-                return clz.newInstance();
-            } catch (InstantiationException e) {
-                if (TangramBuilder.isPrintLog())
-                    Log.e("ClassResolver", e.getMessage(), e);
-            } catch (IllegalAccessException e) {
-                if (TangramBuilder.isPrintLog())
-                    Log.e("ClassResolver", e.getMessage(), e);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * the inline card parsed as cell should be assigned a new build-in cell type. The rule is -100 - cardType, which meash their type value is always less than -100.
-     * Tangram framework users should not use these type as a cell type.
-     * @param cardType see card type defined in {@link TangramBuilder}
-     * @return a new build-in cell type
-     */
-    public static int cellizeCard(int cardType) {
-        return -100 - cardType;
-    }
-
-    /**
-     * restore the origin card type from auto generated cell type, see {@link #cellizeCard(int)}
-     * @param cellType the cellized card type
-     * @return origin card type
-     */
-    public static int cardizeCell(int cellType) {
-        return -cellType - 100;
-    }
-
-    /**
-     * determine if the cell json object should be parsed a inline card, which has a key/value of "kind: row".
-     * @param cellData cell json object
-     * @return true, inline card; false, common cell
-     */
-    public static boolean isCellizedCard(JSONObject cellData) {
-        String insType = cellData != null ? cellData.optString("kind") : "";
-        return "row".equalsIgnoreCase(insType);
-    }
-
-    private static SparseBooleanArray supportHeaderFooterTable = new SparseBooleanArray();
-
-    static {
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_SINGLE_COLUMN, true);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_DOUBLE_COLUMN, true);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_TRIPLE_COLUMN, true);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_FOUR_COLUMN, true);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_FIVE_COLUMN, true);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CAROUSEL, true);
-    }
-
-    /**
-     * determine if a card support header and footer. Now only card with type of 1,2,3,4,9,10 supports header and footer
-     * @param type card type
-     * @return true, supports header and footer, false otherwise.
-     */
-    public static boolean isSupportHeaderFooter(int type) {
-        return supportHeaderFooterTable.get(type, false);
-    }
-
-    private static SparseIntArray cardColumnCountTableTable = new SparseIntArray();
-
-    static {
-        cardColumnCountTableTable.put(TangramBuilder.TYPE_SINGLE_COLUMN, 1);
-        cardColumnCountTableTable.put(TangramBuilder.TYPE_DOUBLE_COLUMN, 2);
-        cardColumnCountTableTable.put(TangramBuilder.TYPE_TRIPLE_COLUMN, 3);
-        cardColumnCountTableTable.put(TangramBuilder.TYPE_FOUR_COLUMN, 4);
-        cardColumnCountTableTable.put(TangramBuilder.TYPE_FIVE_COLUMN, 5);
-    }
-
-    public static int getCardColumnCount(int type) {
-        return cardColumnCountTableTable.get(type, 0);
-    }
-
-    private static final Pattern REGEX_1 = Pattern.compile("(\\d+)x(\\d+)(_?q\\d+)?(\\.[jpg|png|gif])");
-    private static final Pattern REGEX_2 = Pattern.compile("(\\d+)-(\\d+)(_?q\\d+)?(\\.[jpg|png|gif])");
-
-    /**
-     * <pre>
-     * parse image ratio from imageurl with regex as follows:
-     * (\d+)-(\d+)(_?q\d+)?(\.[jpg|png|gif])
-     * (\d+)x(\d+)(_?q\d+)?(\.[jpg|png|gif])
-     *
-     * samples urls:
-     * http://img.alicdn.com/tps/i1/TB1x623LVXXXXXZXFXXzo_ZPXXX-372-441.png --> return 372/441
-     * http://img.alicdn.com/tps/i1/TB1P9AdLVXXXXa_XXXXzo_ZPXXX-372-441.png --> return 372/441
-     * http://img.alicdn.com/tps/i1/TB1NZxRLFXXXXbwXFXXzo_ZPXXX-372-441.png --> return 372/441
-     * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100.jpg --> return 100/100
-     * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100q90.jpg --> return 100/100
-     * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100q90.jpg_.webp --> return 100/100
-     * http://img03.taobaocdn.com/tps/i3/T1JYROXuRhXXajR_DD-1680-446.jpg_q50.jpg --> return 1680/446
-     * </pre>
-     * @param imageUrl image url
-     * @return ratio of with to height parsed from url
-     */
     public static float getImageRatio(String imageUrl) {
         if (TextUtils.isEmpty(imageUrl))
             return Float.NaN;
@@ -215,6 +120,8 @@ public class Utils {
         return Float.NaN;
     }
 
+    private static ArrayMap<String, Pair<Integer, Integer>> imageSizeMap = new ArrayMap<>();
+
     /**
      * <pre>
      * parse image ratio from imageurl with regex as follows:
@@ -222,20 +129,25 @@ public class Utils {
      * (\d+)x(\d+)(_?q\d+)?(\.[jpg|png|gif])
      *
      * samples urls:
-     * http://img.alicdn.com/tps/i1/TB1x623LVXXXXXZXFXXzo_ZPXXX-372-441.png --> return 372, 441
-     * http://img.alicdn.com/tps/i1/TB1P9AdLVXXXXa_XXXXzo_ZPXXX-372-441.png --> return 372, 441
-     * http://img.alicdn.com/tps/i1/TB1NZxRLFXXXXbwXFXXzo_ZPXXX-372-441.png --> return 372, 441
-     * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100.jpg --> return 100, 100
-     * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100q90.jpg --> return 100, 100
-     * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100q90.jpg_.webp --> return 100, 100
-     * http://img03.taobaocdn.com/tps/i3/T1JYROXuRhXXajR_DD-1680-446.jpg_q50.jpg --> return 1680, 446
+     * http://img.alicdn.com/tps/i1/TB1x623LVXXXXXZXFXXzo_ZPXXX-372-441.png --> return 372/441
+     * http://img.alicdn.com/tps/i1/TB1P9AdLVXXXXa_XXXXzo_ZPXXX-372-441.png --> return 372/441
+     * http://img.alicdn.com/tps/i1/TB1NZxRLFXXXXbwXFXXzo_ZPXXX-372-441.png --> return 372/441
+     * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100.jpg --> return 100/100
+     * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100q90.jpg --> return 100/100
+     * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100q90.jpg_.webp --> return 100/100
+     * http://img03.taobaocdn.com/tps/i3/T1JYROXuRhXXajR_DD-1680-446.jpg_q50.jpg --> return 1680/446
      * </pre>
      * @param imageUrl image url
-     * @return width and height pair parsed from url
+     * @return ratio of with to height parsed from url
      */
     public static Pair<Integer, Integer> getImageSize(String imageUrl) {
-        if (TextUtils.isEmpty(imageUrl))
+        if (TextUtils.isEmpty(imageUrl)) {
             return null;
+        }
+
+        if (imageSizeMap.get(imageUrl) != null) {
+            return imageSizeMap.get(imageUrl);
+        }
 
         try {
             Matcher matcher = REGEX_1.matcher(imageUrl);
@@ -248,8 +160,9 @@ public class Utils {
                     if (widthStr.length() < 5 && heightStr.length() < 5) {
                         int urlWidth = Integer.parseInt(widthStr);
                         int urlHeight = Integer.parseInt(heightStr);
-
-                        return new Pair<>(urlWidth, urlHeight);
+                        Pair<Integer, Integer> result = new Pair<>(urlWidth, urlHeight);
+                        imageSizeMap.put(imageUrl, result);
+                        return result;
                     }
                 }
             } else {
@@ -261,8 +174,9 @@ public class Utils {
                         if (widthStr.length() < 5 && heightStr.length() < 5) {
                             int urlWidth = Integer.parseInt(widthStr);
                             int urlHeight = Integer.parseInt(heightStr);
-
-                            return new Pair<>(urlWidth, urlHeight);
+                            Pair<Integer, Integer> result = new Pair<>(urlWidth, urlHeight);
+                            imageSizeMap.put(imageUrl, result);
+                            return result;
                         }
                     }
                 }
@@ -272,6 +186,68 @@ public class Utils {
         }
 
         return null;
+    }
+
+    public static <T> T newInstance(Class<T> clz) {
+        if (clz != null) {
+            try {
+                return clz.newInstance();
+            } catch (InstantiationException e) {
+                if (TangramBuilder.isPrintLog())
+                    Log.e("ClassResolver", e.getMessage(), e);
+            } catch (IllegalAccessException e) {
+                if (TangramBuilder.isPrintLog())
+                    Log.e("ClassResolver", e.getMessage(), e);
+            }
+        }
+        return null;
+    }
+
+    public static boolean isCard(JSONObject cellData) {
+        if (cellData != null) {
+            String type = cellData.optString("type");
+            switch (type) {
+                case TangramBuilder.TYPE_CONTAINER_BANNER:
+                case TangramBuilder.TYPE_CONTAINER_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_1C_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_2C_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_3C_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_4C_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_5C_FLOW:
+                    return true;
+                default:
+                    return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private static ArrayMap<String, Boolean> supportHeaderFooterTable = new ArrayMap<>();
+
+    static {
+        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_FLOW, Boolean.TRUE);
+        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_1C_FLOW, Boolean.TRUE);
+        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_2C_FLOW, Boolean.TRUE);
+        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_3C_FLOW, Boolean.TRUE);
+        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_4C_FLOW, Boolean.TRUE);
+        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_5C_FLOW, Boolean.TRUE);
+        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_ON_PLUSN, Boolean.TRUE);
+        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_BANNER, Boolean.TRUE);
+    }
+
+    /**
+     * 只有流式布局(1,2,3,4,9)，和滚动布局(10) 支持header和 footer
+     * @param type
+     * @return
+     */
+    public static boolean isSupportHeaderFooter(String type) {
+        Boolean isSupport = supportHeaderFooterTable.get(type);
+        if (isSupport != null) {
+            return isSupport.booleanValue();
+        } else {
+            return false;
+        }
     }
 
 }

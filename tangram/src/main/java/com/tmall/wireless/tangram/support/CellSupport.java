@@ -86,4 +86,8 @@ public abstract class CellSupport {
     public void onBindViewException(BaseCell cell, View view, Exception e) {
 
     }
+
+    public void onException(String message, Exception e) {
+
+    }
 }

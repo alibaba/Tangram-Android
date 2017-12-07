@@ -30,12 +30,14 @@ import android.support.annotation.Nullable;
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.layout.LinearLayoutHelper;
 import com.tmall.wireless.tangram.MVHelper;
+import com.tmall.wireless.tangram.MVResolver;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.cell.BannerCell;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Collections;
@@ -46,6 +48,7 @@ import java.util.List;
  */
 public class BannerCard extends Card {
     public static final String ATTR_AUTOSCROLL = "autoScroll";
+    public static final String ATTR_SPECIAL_INTERVAL = "specialInterval";
     public static final String ATTR_INFINITE = "infinite";
     public static final String ATTR_INDICATOR_FOCUS = "indicatorImg1";
     public static final String ATTR_INDICATOR_NORMAL = "indicatorImg2";
@@ -59,8 +62,8 @@ public class BannerCard extends Card {
     public static final String ATTR_HGAP = "hGap";
     public static final String ATTR_ITEM_MARGIN_LEFT = "scrollMarginLeft";
     public static final String ATTR_ITEM_MARGIN_RIGHT = "scrollMarginRight";
+    public static final String ATTR_ITEM_RATIO = "itemRatio";
 
-    /**radius  color 这一套indicator和indicatorImg是互斥的**/
     public static final String ATTR_INDICATOR_RADIUS = "indicatorRadius";
     public static final String ATTR_INDICATOR_COLOR = "indicatorColor";
     public static final String ATTR_INDICATOR_DEFAULT_INDICATOR_COLOR = "defaultIndicatorColor";
@@ -82,6 +85,13 @@ public class BannerCard extends Card {
 
             if (!super.getCells().isEmpty()) {
                 cell.mCells.addAll(super.getCells());
+                for (int i = 0, size = cell.mCells.size(); i < size; i++) {
+                    try {
+                        BaseCell item = cell.mCells.get(i);
+                        item.extras.put(MVResolver.KEY_INDEX, item.pos);
+                    } catch (JSONException e) {
+                    }
+                }
                 super.setCells(Collections.<BaseCell>singletonList(cell));
             }
         } catch (Exception e) {
@@ -97,6 +107,10 @@ public class BannerCard extends Card {
             cell.mHeader.parent = this;
             cell.mHeader.parentId = id;
             cell.mHeader.pos = 0;
+            try {
+                cell.mHeader.extras.put(MVResolver.KEY_INDEX, cell.mHeader.pos);
+            } catch (JSONException e) {
+            }
         }
     }
 
@@ -107,6 +121,10 @@ public class BannerCard extends Card {
             cell.mFooter.parent = this;
             cell.mFooter.parentId = id;
             cell.mFooter.pos = cell.mHeader != null ? getCells().size() + 1: getCells().size();
+            try {
+                cell.mFooter.extras.put(MVResolver.KEY_INDEX, cell.mFooter.pos);
+            } catch (JSONException e) {
+            }
         }
     }
 
@@ -123,7 +141,7 @@ public class BannerCard extends Card {
     }
 
     @Override
-    protected void parseStyle(@Nullable JSONObject data) {
+    public void parseStyle(@Nullable JSONObject data) {
         super.parseStyle(data);
         if (data == null)
             return;
@@ -131,6 +149,7 @@ public class BannerCard extends Card {
         cell.setIndicatorColor(Style.parseColor(data.optString(ATTR_INDICATOR_COLOR, "#00000000")));
         cell.setIndicatorDefaultColor(Style.parseColor(data.optString(ATTR_INDICATOR_DEFAULT_INDICATOR_COLOR, "#00000000")));
         cell.setAutoScrollInternal(data.optInt(ATTR_AUTOSCROLL));
+        cell.setSpecialInterval(data.optJSONObject(ATTR_SPECIAL_INTERVAL));
         cell.setInfinite(data.optBoolean(ATTR_INFINITE));
         cell.setInfiniteMinCount(data.optInt(ATTR_INFINITE_MIN_COUNT));
         cell.setIndicatorFocus(data.optString(ATTR_INDICATOR_FOCUS));
@@ -142,6 +161,7 @@ public class BannerCard extends Card {
         cell.setIndicatorHeight(Style.dp2px(data.optInt(ATTR_INDICATOR_HEIGHT)));
         cell.setPageWidth(data.optDouble(ATTR_PAGE_WIDTH));
         cell.sethGap(Style.dp2px(data.optInt(ATTR_HGAP)));
+        cell.itemRatio = data.optDouble(BannerCard.ATTR_ITEM_RATIO, Double.NaN);
         cell.itemMargin[0] = Style.dp2px(data.optInt(ATTR_ITEM_MARGIN_LEFT));
         cell.itemMargin[1] = Style.dp2px(data.optInt(ATTR_ITEM_MARGIN_RIGHT));
         if (style != null) {

@@ -83,18 +83,27 @@ configurations.all {
 
 dependencies {
 
-    compile('com.alibaba.android:vlayout:1.0.3@aar') {
+    compile('com.alibaba.android:vlayout:1.2.6@aar') {
         changing = true
     }
 
     compile 'com.android.support:recyclerview-v7:23.1.1@aar'
     compile 'com.android.support:support-v4:23.1.1@aar'
     compile 'com.android.support:support-annotations:23.1.1'
-    compile 'com.alibaba.android:ultraviewpager:1.0.0@aar'
+    compile 'com.alibaba.android:ultraviewpager:1.0.6.3@aar'
     compile('me.everything:overscroll-decor-android:1.0.1@aar') {
         transitive true
         exclude group: 'com.android.support', module: 'recyclerview-v7'
     }
+    compile('com.alibaba.android:virtualview:1.0.0-SNAPSHOT@aar') {
+        transitive true
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.tmall.android', module: 'tmallandroid_mui'
+        exclude group: 'com.google.android', module: 'support-v7-recyclerview'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+
 }
 
 File deployConfig = rootProject.file('jcenterInstall.gradle')

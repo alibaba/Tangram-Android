@@ -27,6 +27,7 @@ package com.tmall.wireless.tangram.dataparser.concrete;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
@@ -40,12 +41,17 @@ import java.util.Arrays;
 
 public class Style {
 
+    private static final LruCache<String, Integer> colorCache = new LruCache<>(100);
+
     public static final String KEY_BG_COLOR = "bgColor";
 
-    //alias of bgImgUrl
+    public static final String KEY_BACKGROUND_COLOR = "background-color";
+
     public static final String KEY_BG_IMAGE = "bgImage";
 
     public static final String KEY_STYLE_BG_IMAGE = "bgImgUrl";
+
+    public static final String KEY_BACKGROUND_IMAGE = "background-image";
 
     public static final String KEY_MARGIN = "margin";
 
@@ -62,6 +68,8 @@ public class Style {
     public static final String KEY_ZINDEX = "zIndex";
 
     public static final String KEY_ASPECT_RATIO = "aspectRatio";
+
+    public static final String KEY_RATIO = "ratio";
 
     public static final String KEY_ANIMATION_DURATION = "animationDuration";
 
@@ -94,6 +102,7 @@ public class Style {
     /**
      * alias of bgImgUrl
      */
+	@Deprecated
     public String bgImage;
 
     public String bgImgUrl;
@@ -102,6 +111,8 @@ public class Style {
 
     @Nullable
     public JSONObject extras;
+
+    public int overlapOffset;
 
     public int zIndex = 0;
 
@@ -142,8 +153,9 @@ public class Style {
 
         final int len = Math.min(margin.length, this.margin.length);
         System.arraycopy(margin, 0, this.margin, 0, len);
-        if (len < this.margin.length)
+        if (len < this.margin.length) {
             Arrays.fill(this.margin, len, this.margin.length, this.margin[len - 1]);
+        }
 
         this.bgColor = parseColor(DEFAULT_BG_COLOR);
     }
@@ -210,6 +222,10 @@ public class Style {
             forLabel = data.optString(KEY_FOR_LABEL, "");
 
             setBgColor(data.optString(KEY_BG_COLOR, DEFAULT_BG_COLOR));
+            String backgroundColor = data.optString(KEY_BACKGROUND_COLOR);
+            if (!TextUtils.isEmpty(backgroundColor)) {
+                setBgColor(backgroundColor);
+            }
 
             width = data.optInt(KEY_WIDTH, VirtualLayoutManager.LayoutParams.MATCH_PARENT);
             if (width >= 0) {
@@ -224,7 +240,19 @@ public class Style {
             bgImage = data.optString(KEY_BG_IMAGE, "");
             bgImgUrl = data.optString(KEY_STYLE_BG_IMAGE, "");
 
+            String backgroundImage = data.optString(KEY_BACKGROUND_IMAGE, "");
+
+            if (!TextUtils.isEmpty(backgroundImage)) {
+                bgImage = backgroundImage;
+                bgImgUrl = backgroundImage;
+            }
+
             aspectRatio = (float) data.optDouble(KEY_ASPECT_RATIO);
+
+            double ratio = data.optDouble(KEY_RATIO);
+            if (!Double.isNaN(ratio)) {
+                aspectRatio = (float)ratio;
+            }
 
             zIndex = data.optInt(KEY_ZINDEX, 0);
 
@@ -240,8 +268,9 @@ public class Style {
                     }
                 }
 
-                if (size > 0)
+                if (size > 0) {
                     Arrays.fill(margin, size, margin.length, margin[size - 1]);
+                }
             } else {
                 String marginString = data.optString(KEY_MARGIN);
                 if (!TextUtils.isEmpty(marginString)) {
@@ -259,8 +288,9 @@ public class Style {
                     }
                 }
 
-                if (size > 0)
+                if (size > 0) {
                     Arrays.fill(padding, size, padding.length, padding[size - 1]);
+                }
             } else {
                 String paddingString = data.optString(KEY_PADDING);
                 if (!TextUtils.isEmpty(paddingString)) {
@@ -272,10 +302,21 @@ public class Style {
     }
 
     public static int parseColor(String colorString) {
+        return parseColor(colorString, Color.WHITE);
+    }
+
+    public static int parseColor(String colorString, int defaultColor) {
         try {
-            return Color.parseColor(colorString);
+            Integer integer = colorCache.get(colorString);
+            if (integer != null) {
+                return integer.intValue();
+            } else {
+                integer = Color.parseColor(colorString);
+                colorCache.put(colorString, integer);
+                return integer.intValue();
+            }
         } catch (Exception e) {
-            return Color.WHITE;
+            return defaultColor;
         }
     }
 
@@ -291,5 +332,8 @@ public class Style {
         }
         return finalValue;
     }
+
+
+
 
 }

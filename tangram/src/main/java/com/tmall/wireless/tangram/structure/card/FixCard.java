@@ -50,7 +50,7 @@ import static com.alibaba.android.vlayout.layout.ScrollFixLayoutHelper.SHOW_ON_L
 public class FixCard extends OneItemCard {
 
     @Override
-    protected void parseStyle(JSONObject data) {
+    public void parseStyle(JSONObject data) {
         style = new FixStyle();
         if (data != null) {
             style.parseWith(data);
@@ -85,9 +85,9 @@ public class FixCard extends OneItemCard {
         }
 
         fixHelper.setMargin(style.margin[Style.MARGIN_LEFT_INDEX], style.margin[Style.MARGIN_TOP_INDEX],
-                style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
+            style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
         fixHelper.setPadding(style.padding[Style.MARGIN_LEFT_INDEX], style.padding[Style.MARGIN_TOP_INDEX],
-                style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
+            style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
         return fixHelper;
     }
 
@@ -104,11 +104,11 @@ public class FixCard extends OneItemCard {
         String mDefaultShowType = "always";
 
         public static final Map<String, Integer> ALIGN_MAP =
-                Collections.unmodifiableMap(Utils.newMap("top_left", TOP_LEFT, "top_right",
-                        TOP_RIGHT, "bottom_left", BOTTOM_LEFT, "bottom_right", BOTTOM_RIGHT));
+            Collections.unmodifiableMap(Utils.newMap("top_left", TOP_LEFT, "top_right",
+                TOP_RIGHT, "bottom_left", BOTTOM_LEFT, "bottom_right", BOTTOM_RIGHT));
 
         public static final Map<String, Integer> SHOW_TYPE_MAP = Collections.unmodifiableMap(Utils.newMap("showonenter", SHOW_ON_ENTER,
-                "showonleave", SHOW_ON_LEAVE, "always", SHOW_ALWAYS));
+            "showonleave", SHOW_ON_LEAVE, "always", SHOW_ALWAYS));
 
 
         public int alignType = TOP_LEFT;
@@ -145,3 +145,4 @@ public class FixCard extends OneItemCard {
     }
 
 }
+

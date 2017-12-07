@@ -25,9 +25,12 @@
 package com.tmall.wireless.tangram.dataparser.concrete;
 
 import com.alibaba.android.vlayout.LayoutHelper;
+import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.layout.BaseLayoutHelper;
 import com.alibaba.android.vlayout.layout.FixAreaLayoutHelper;
 import com.alibaba.android.vlayout.layout.MarginLayoutHelper;
+
+import android.support.v4.util.ArrayMap;
 import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.TangramBuilder;
@@ -36,8 +39,6 @@ import com.tmall.wireless.tangram.expression.ITangramExprParser;
 import com.tmall.wireless.tangram.expression.TangramExpr;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.entitycard.BannerEntityCard;
-import com.tmall.wireless.tangram.structure.entitycard.EntityCard;
-import com.tmall.wireless.tangram.structure.entitycard.GridEntityCard;
 import com.tmall.wireless.tangram.support.CardSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -102,13 +103,13 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
     public static final int LOAD_TYPE_LOADMORE = 1;
 
     /**
-     * card type
+     * card type, use {@link #stringType} instead
      */
+    @Deprecated
     public int type;
 
-    /**
-     * card id
-     */
+    public String stringType;
+
     @Nullable
     public String id;
 
@@ -119,6 +120,9 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
     protected
     @Nullable
     BaseCell mFooter;
+
+    @NonNull
+    protected ArrayMap<Range<Integer>, Card> mChildren = new ArrayMap<>();
 
     @NonNull
     protected List<BaseCell> mCells = new ArrayList<>();
@@ -200,7 +204,19 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
 
     }
 
+    public void setStringType(String type) {
+        this.stringType = type;
+        try {
+            this.type = Integer.parseInt(type);
+        } catch (NumberFormatException e) {
+        }
+    }
+
     public void parseWith(@NonNull JSONObject data, @NonNull final MVHelper resolver) {
+        parseWith(data, resolver, true);
+    }
+
+    public void parseWith(@NonNull JSONObject data, @NonNull final MVHelper resolver, boolean isParseCell) {
         if (TangramBuilder.isPrintLog()) {
             if (serviceManager == null) {
                 throw new RuntimeException("serviceManager is null when parsing card");
@@ -209,6 +225,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
 
         this.extras = data;
         this.type = data.optInt(KEY_TYPE, type);
+        this.stringType = data.optString(KEY_TYPE);
         id = data.optString(KEY_ID, id == null ? "" : id);
 
         loadMore = data.optInt(KEY_LOAD_TYPE, 0) == LOAD_TYPE_LOADMORE;
@@ -226,14 +243,14 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
 
         maxChildren = data.optInt(KEY_MAX_CHILDREN, maxChildren);
         // parsing header
-        if (Utils.isSupportHeaderFooter(type)) {
+        if (Utils.isSupportHeaderFooter(stringType) && isParseCell) {
             JSONObject header = data.optJSONObject(KEY_HEADER);
             parseHeaderCell(resolver, header);
         }
 
         // parsing body
         JSONArray componentArray = data.optJSONArray(KEY_ITEMS);
-        if (componentArray != null) {
+        if (componentArray != null && isParseCell) {
             final int cellLength = Math.min(componentArray.length(), maxChildren);
             for (int i = 0; i < cellLength; i++) {
                 final JSONObject cellData = componentArray.optJSONObject(i);
@@ -241,7 +258,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
             }
         }
         // parsing footer
-        if (Utils.isSupportHeaderFooter(type)) {
+        if (Utils.isSupportHeaderFooter(stringType) && isParseCell) {
             JSONObject footer = data.optJSONObject(KEY_FOOTER);
             parseFooterCell(resolver, footer);
         }
@@ -254,12 +271,9 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
 
     protected BaseCell createCell(@NonNull MVHelper resolver, @Nullable JSONObject cellData, boolean appended) {
         if (cellData != null) {
-            int cellType = cellData.optInt(KEY_TYPE, -1);
-            if (Utils.isCellizedCard(cellData)) {
-                cellType = Utils.cellizeCard(cellType);
-            }
-            if (getMVHelper() != null && getMVHelper().resolver().getViewClass(cellType) != null) {
-                BaseCell cell;
+            BaseCell cell = null;
+            String cellType = cellData.optString(Card.KEY_TYPE);
+            if ((getMVHelper() != null && getMVHelper().resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
                 if (resolver.resolver().isCompatibleType(cellType)) {
                     cell = Utils.newInstance(resolver.resolver().getCellClass(cellType));
 
@@ -269,25 +283,31 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
 
                     cell.serviceManager = serviceManager; // ensure service manager
                 } else {
-                    if (Utils.isCellizedCard(cellData)) {
-                        switch (Utils.cardizeCell(cellType)) {
-                            case TangramBuilder.TYPE_SINGLE_COLUMN:
-                            case TangramBuilder.TYPE_DOUBLE_COLUMN:
-                            case TangramBuilder.TYPE_TRIPLE_COLUMN:
-                            case TangramBuilder.TYPE_FOUR_COLUMN:
-                            case TangramBuilder.TYPE_FIVE_COLUMN:
-                                cell = new GridEntityCard(cellType);
+                    if (Utils.isCard(cellData)) {
+                        switch (cellType) {
+                            case TangramBuilder.TYPE_CONTAINER_FLOW:
+                            case TangramBuilder.TYPE_CONTAINER_1C_FLOW:
+                            case TangramBuilder.TYPE_CONTAINER_2C_FLOW:
+                            case TangramBuilder.TYPE_CONTAINER_3C_FLOW:
+                            case TangramBuilder.TYPE_CONTAINER_4C_FLOW:
+                            case TangramBuilder.TYPE_CONTAINER_5C_FLOW:
+                                CardResolver cardResolver = serviceManager.getService(CardResolver.class);
+                                Card gridCard = cardResolver.create(cellType);
+                                gridCard.serviceManager = serviceManager;
+                                gridCard.parseWith(cellData, resolver);
+                                addChildCard(gridCard);
                                 break;
-                            case TangramBuilder.TYPE_CAROUSEL:
+                            case TangramBuilder.TYPE_CONTAINER_BANNER:
                                 cell = new BannerEntityCard();
                                 break;
-                            default:
-                                cell = new EntityCard(cellType);
-                                break;
                         }
-                        cell.serviceManager = serviceManager; // ensure service manager
-                        cell.parent = this;
-                        cell.parentId = id;
+                        if (cell != null) {
+                            cell.serviceManager = serviceManager; // ensure service manager
+                            cell.parent = this;
+                            cell.parentId = id;
+                        } else {
+                            return null;
+                        }
                     } else {
                         cell = new BaseCell(cellType);
                         cell.serviceManager = serviceManager; // ensure service manager
@@ -296,10 +316,23 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
                     }
                 }
                 parseCell(resolver, cellData, cell, appended);
-                cell.type = cellType; // ensure cell type
+                cell.setStringType(cellType); // ensure cell type
                 return cell;
+            } else {
+                //support virtual view at layout
+                BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
+                if (componentBinderResolver.has(cellType)) {
+                    cell = new BaseCell(cellType);
+                    cell.serviceManager = serviceManager; // ensure service manager
+                    cell.parent = this;
+                    cell.parentId = id;
+                    parseCell(resolver, cellData, cell, appended);
+                    cell.setStringType(cellType); // ensure cell type
+                    return cell;
+                } else {
+                    return null;
+                }
             }
-            return null;
         }
         return null;
     }
@@ -327,6 +360,10 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
      */
     private LayoutHelper mLayoutHelper = null;
 
+    public LayoutHelper getExistLayoutHelper(){
+        return mLayoutHelper;
+    }
+
     /**
      * whether retain LayoutHelper once it created,
      */
@@ -344,28 +381,28 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
             if (helper instanceof BaseLayoutHelper) {
                 BaseLayoutHelper baseHelper = (BaseLayoutHelper) helper;
                 baseHelper.setBgColor(style.bgColor);
-                if (serviceManager != null && serviceManager.getService(CardSupport.class) != null) {
-                    final CardSupport support = serviceManager.getService(CardSupport.class);
-                    baseHelper.setLayoutViewBindListener(new BindListener(style) {
-                        @Override
-                        public void onBind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
-                            support.onBindBackgroundView(layoutView, Card.this);
-                        }
-                    });
-                    baseHelper.setLayoutViewUnBindListener(new UnbindListener(style) {
-                        @Override
-                        public void onUnbind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
-                            support.onUnbindBackgroundView(layoutView, Card.this);
-                        }
-                    });
-                } else {
-                    if (!TextUtils.isEmpty(style.bgImgUrl)) {
+                if (!TextUtils.isEmpty(style.bgImgUrl)) {
+                    if (serviceManager != null && serviceManager.getService(CardSupport.class) != null) {
+                        final CardSupport support = serviceManager.getService(CardSupport.class);
+                        baseHelper.setLayoutViewBindListener(new BindListener(style) {
+                            @Override
+                            public void onBind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
+                                support.onBindBackgroundView(layoutView, Card.this);
+                            }
+                        });
+                        baseHelper.setLayoutViewUnBindListener(new UnbindListener(style) {
+                            @Override
+                            public void onUnbind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
+                                support.onUnbindBackgroundView(layoutView, Card.this);
+                            }
+                        });
+                    } else {
                         baseHelper.setLayoutViewBindListener(new BindListener(style));
                         baseHelper.setLayoutViewUnBindListener(new UnbindListener(style));
-                    } else {
-                        baseHelper.setLayoutViewBindListener(null);
-                        baseHelper.setLayoutViewUnBindListener(null);
                     }
+                } else {
+                    baseHelper.setLayoutViewBindListener(null);
+                    baseHelper.setLayoutViewUnBindListener(null);
                 }
 
                 if (!Float.isNaN(style.aspectRatio)) {
@@ -408,9 +445,9 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
 
             if (helper instanceof MarginLayoutHelper) {
                 ((MarginLayoutHelper) helper).setMargin(style.margin[Style.MARGIN_LEFT_INDEX], style.margin[Style.MARGIN_TOP_INDEX],
-                        style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
+                    style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
                 ((MarginLayoutHelper) helper).setPadding(style.padding[Style.MARGIN_LEFT_INDEX], style.padding[Style.MARGIN_TOP_INDEX],
-                        style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
+                    style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
             }
         }
 
@@ -421,7 +458,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
         return helper;
     }
 
-    private static class BindListener implements BaseLayoutHelper.LayoutViewBindListener {
+    public static class BindListener implements BaseLayoutHelper.LayoutViewBindListener {
         private Style mStyle;
 
         public BindListener(Style style) {
@@ -438,7 +475,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
         }
     }
 
-    private static class UnbindListener implements BaseLayoutHelper.LayoutViewUnBindListener {
+    public static class UnbindListener implements BaseLayoutHelper.LayoutViewUnBindListener {
         private Style mStyle;
 
         public UnbindListener(Style style) {
@@ -484,6 +521,10 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
         return Collections.unmodifiableList(mCells);
     }
 
+    @NonNull
+    public ArrayMap<Range<Integer>, Card> getChildren() {
+        return mChildren;
+    }
 
     private final SparseBooleanArray pendingDeleteMap = new SparseBooleanArray();
     private final SparseArray<BaseCell> oldMap = new SparseArray<>();
@@ -571,6 +612,30 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
         }
     }
 
+    public void addCells(Card parent, int index, @Nullable List<BaseCell> cells) {
+        if (cells != null) {
+            int i = 0;
+            for (BaseCell cell : cells) {
+                addCellInternal(parent, index + i, cell, false);
+                i++;
+            }
+        }
+
+
+        adjustPendingCells(false);
+
+        if (mPlaceholderCell != null && this.mCells.contains(mPlaceholderCell))
+            this.mCells.remove(mPlaceholderCell);
+
+        if (requirePlaceholderCell()) {
+            this.mCells.add(mPlaceholderCell);
+        }
+    }
+
+    public void removeAllCells(){
+        mCells.clear();
+    }
+
     public boolean removeCell(@Nullable BaseCell cell) {
         if (cell == null) {
             return false;
@@ -601,9 +666,9 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
             cell.parentId = id;
             cell.parent = this;
             cell.serviceManager = serviceManager;
-            MVHelper MVHelper = getMVHelper();
-            if (MVHelper != null) {
-                if (MVHelper.isValid(cell, serviceManager)) {
+            MVHelper mvHelper = getMVHelper();
+            if (mvHelper != null) {
+                if (mvHelper.isValid(cell, serviceManager)) {
                     if (cell.position >= 0 && !TextUtils.isEmpty(load)) {
                         cell.pos = cell.position;
                         mPendingCells.add(cell);
@@ -618,6 +683,40 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
                     }
 
                     this.mCells.add(cell);
+                    if (mFooter != null) {
+                        mFooter.pos = cell.pos + 1;
+                    }
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean addCellInternal(Card parent, int index, @Nullable BaseCell cell, boolean silent) {
+        if (cell != null) {
+            cell.parentId = parent.id;
+            cell.parent = parent;
+            cell.serviceManager = serviceManager;
+            MVHelper mvHelper = getMVHelper();
+            if (mvHelper != null) {
+                if (mvHelper.isValid(cell, serviceManager)) {
+                    if (cell.position >= 0 && !TextUtils.isEmpty(load)) {
+                        cell.pos = cell.position;
+                        mPendingCells.add(cell);
+                        return true;
+                    } else {
+                        //FixMe pos not correct when insert cell
+                        cell.pos = mHeader != null ? this.mCells.size() + 1 : this.mCells.size();
+                    }
+
+                    if (!silent && mIsActivated) {
+                        // do cell added
+                        cell.added();
+                    }
+
+                    this.mCells.add(index, cell);
                     if (mFooter != null) {
                         mFooter.pos = cell.pos + 1;
                     }
@@ -670,23 +769,32 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
         if (TangramBuilder.isPrintLog()) {
             if (mPendingCells.size() > 0 && mInQueueCells.size() > 0) {
                 Preconditions.checkState(mPendingCells.get(0).position >= mInQueueCells.get(mInQueueCells.size() - 1).position
-                        , "Items in pendingQueue must have large position than Items in queue");
+                    , "Items in pendingQueue must have large position than Items in queue");
             }
         }
     }
 
+    public void addChildCard(Card card) {
 
-    public boolean isValid() {
-        return type >= 0 && serviceManager != null;
     }
 
+    public void offsetChildCard(Card anchorCard, int offset) {
+
+    }
+
+    public void clearChildMap() {
+
+    }
+
+    public boolean isValid() {
+        return (!TextUtils.isEmpty(stringType) || type >= 0) && serviceManager != null;
+    }
 
     public final void notifyDataChange() {
         if (serviceManager instanceof Engine) {
             ((Engine) serviceManager).refresh();
         }
     }
-
 
     private void diffCells(@NonNull SparseArray<BaseCell> added, @NonNull SparseArray<BaseCell> removed) {
         if (!mIsActivated) return;
@@ -795,7 +903,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
 
     public boolean requirePlaceholderCell() {
         return mPlaceholderRequired && mPlaceholderCell != null && !TextUtils.isEmpty(load)
-                && (mCells.size() == 0 || (mCells.size() == 1 && mCells.contains(mPlaceholderCell)));
+            && (mCells.size() == 0 || (mCells.size() == 1 && mCells.contains(mPlaceholderCell)));
     }
 
     private MVHelper getMVHelper() {
@@ -867,6 +975,22 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
         return null;
     }
 
+    public Card findChildCardById(String id) {
+        if (!mChildren.isEmpty()) {
+            for (int i = 0, size = mChildren.size(); i < size; i++) {
+                Card card = mChildren.valueAt(i);
+                if (card != null && card.id.equals(id)) {
+                    return card;
+                }
+            }
+        }
+        return null;
+    }
+
+    public ArrayMap<Range<Integer>, Card> getChildrenCards(){
+        return mChildren;
+    }
+
     public static final class PlaceholderCell extends BaseCell {
 
         private int mHeight = 0;
@@ -898,6 +1022,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
             }
 
             this.type = TangramBuilder.TYPE_EXTENDED_VIEW;
+            this.stringType = String.valueOf(TangramBuilder.TYPE_EXTENDED_VIEW);
         }
 
         public void bindView(@NonNull View view) {

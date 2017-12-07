@@ -32,6 +32,7 @@ import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.vaf.framework.ViewManager;
 
 /**
  * Created by villadora on 15/8/24.
@@ -46,10 +47,11 @@ public class PojoAdapterBuilder implements IAdapterBuilder<Card, BaseCell> {
 
         BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
         BaseCardBinderResolver cardBinderResolver = serviceManager.getService(BaseCardBinderResolver.class);
-        MVHelper MVHelper = serviceManager.getService(MVHelper.class);
+        MVHelper mvHelper = serviceManager.getService(MVHelper.class);
+        ViewManager viewManager = serviceManager.getService(ViewManager.class);
 
-        final PojoGroupBasicAdapter adapter = new PojoGroupBasicAdapter(context, layoutManager, componentBinderResolver, cardBinderResolver,
-                MVHelper);
+        final PojoGroupBasicAdapter adapter = new PojoGroupBasicAdapter(context, layoutManager, componentBinderResolver,
+            cardBinderResolver, mvHelper, viewManager);
 
 
         return adapter;

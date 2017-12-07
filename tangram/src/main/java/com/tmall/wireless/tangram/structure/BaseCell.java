@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by mikeafc on 16/4/25.
  */
 public class BaseCell<V extends View> extends ComponentLifecycle implements View.OnClickListener,
-        ITangramExprParser {
+    ITangramExprParser {
     private static AtomicLong sIdGen = new AtomicLong();
 
     public static boolean sIsGenIds = false;
@@ -60,7 +60,13 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     /**
      * cell's type
      */
+    @Deprecated
     public int type;
+
+    /**
+     * cell's type
+     */
+    public String stringType;
 
     /**
      * indicate whether this cell is a cellized card
@@ -136,9 +142,24 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         objectId = sIsGenIds ? sIdGen.getAndIncrement() : 0;
     }
 
+    @Deprecated
     public BaseCell(int type) {
         this.type = type;
+        this.stringType = String.valueOf(type);
         objectId = sIsGenIds ? sIdGen.getAndIncrement() : 0;
+    }
+
+    public BaseCell(String stringType) {
+        setStringType(stringType);
+        objectId = sIsGenIds ? sIdGen.getAndIncrement() : 0;
+    }
+
+    public void setStringType(String type) {
+        stringType = type;
+        try {
+            this.type = Integer.parseInt(type);
+        } catch (NumberFormatException e) {
+        }
     }
 
     public void addBizParam(String key, Object value) {
@@ -190,7 +211,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     public boolean hasParam(String key) {
         return extras.has(key) ||
-                style != null && style.extras != null && style.extras.has(key);
+            style != null && style.extras != null && style.extras.has(key);
     }
 
     public Object optParam(String key) {
@@ -258,6 +279,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     /***
      * for compatible
      */
+    @Deprecated
     public void parseWith(JSONObject data) {
 
     }

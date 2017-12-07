@@ -269,4 +269,8 @@ public abstract class ExposureSupport {
             HashMap<String, Object> extras) {
 
     }
+
+    public void attachUtInfoToView(View targetView, BaseCell baseCell) {
+
+    }
 }

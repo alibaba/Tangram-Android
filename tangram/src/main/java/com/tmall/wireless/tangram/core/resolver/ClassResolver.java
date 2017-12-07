@@ -38,7 +38,7 @@ public abstract class ClassResolver<T> extends BaseResolver<Class<? extends T>, 
     private static final String TAG = "ClassResolver";
 
     @Override
-    public T create(int type) {
+    public T create(String type) {
         Class<? extends T> clz = mSparseArray.get(type);
         if (clz != null) {
             try {

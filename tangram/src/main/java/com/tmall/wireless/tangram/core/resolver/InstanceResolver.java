@@ -30,7 +30,7 @@ package com.tmall.wireless.tangram.core.resolver;
 public abstract class InstanceResolver<T> extends BaseResolver<T, T> {
 
     @Override
-    public T create(int type) {
+    public T create(String type) {
         return mSparseArray.get(type);
     }
 }

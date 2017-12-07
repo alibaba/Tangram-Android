@@ -89,6 +89,9 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
 
     private int mActionEdge = 0;
 
+    //Swipe card when scroll state is idle
+    private boolean isOptMode;
+
     public SwipeItemTouchListener(Context context, GroupBasicAdapter groupBasicAdapter, RecyclerView recyclerView) {
         this.mGroupBasicAdapter = groupBasicAdapter;
         this.recyclerView = recyclerView;
@@ -117,7 +120,7 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
     @Override
     public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
         if ((recyclerView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE) ||
-                !isAttachedToWindow(recyclerView) || !hasAdapter(recyclerView)) {
+            !isAttachedToWindow(recyclerView) || !hasAdapter(recyclerView)) {
             return false;
         }
 
@@ -139,16 +142,16 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
         mSwipeGestureDector.onTouchEvent(motionEvent);
 
         if (motionEvent.getAction() == MotionEvent.ACTION_UP ||
-                motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
+            motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
 
             final boolean reachActionEdge = swipeType == SWIPING_HOR && (Math.abs(mDistanceX) > (mActionEdge > 0 ?
-                    mActionEdge : recyclerView.getWidth() / 3));
+                mActionEdge : recyclerView.getWidth() / 3));
 
             boolean reachTabEdge = false;
             if (mSwipeCardRef != null && mSwipeCardRef.get() != null && swipeType == SWIPING_HOR) {
                 SwipeCard swipeCard = mSwipeCardRef.get();
                 if (swipeCard.getCurrentIndex() == 0 && mDistanceX > 0
-                        || (swipeCard.getCurrentIndex() == swipeCard.getTotalPage() - 1) && mDistanceX < 0) {
+                    || (swipeCard.getCurrentIndex() == swipeCard.getTotalPage() - 1) && mDistanceX < 0) {
                     reachTabEdge = true;
                 }
             }
@@ -180,11 +183,11 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
             ObjectAnimator animator;
             if (reachActionEdge) {
                 animator = ObjectAnimator.ofFloat(view, translation, contentWidth * direction)
-                        .setDuration(ANIMATE_DURATION);
+                    .setDuration(ANIMATE_DURATION);
                 animator.setInterpolator(new AccelerateInterpolator());
             } else {
                 animator = ObjectAnimator.ofFloat(view, translation, 0)
-                        .setDuration(ANIMATE_DURATION);
+                    .setDuration(ANIMATE_DURATION);
                 animator.setInterpolator(new DecelerateInterpolator());
             }
             list.add(animator);
@@ -265,9 +268,9 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
                 float translationX = child.getTranslationX();
                 float translationY = child.getTranslationY();
                 if (x >= (float) child.getLeft() + translationX
-                        && x <= (float) child.getRight() + translationX
-                        && y >= (float) child.getTop() + translationY
-                        && y <= (float) child.getBottom() + translationY) {
+                    && x <= (float) child.getRight() + translationX
+                    && y >= (float) child.getTop() + translationY
+                    && y <= (float) child.getBottom() + translationY) {
                     if (findCanScrollView(child) != null) {
                         return child;
                     }
@@ -281,7 +284,7 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
         if (v instanceof ViewGroup) {
             ViewGroup target = (ViewGroup) v;
             if ((target instanceof UltraViewPager || target instanceof RecyclerView)
-                    && target.getVisibility() == View.VISIBLE) {
+                && target.getVisibility() == View.VISIBLE) {
                 return target;
             } else {
                 for (int i = 0; i < target.getChildCount(); ++i) {
@@ -295,6 +298,13 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
         } else {
             return null;
         }
+    }
+
+    /**
+     * @param open true: swipe card when scroll state is idle
+     */
+    public void setOptMode(boolean open) {
+        this.isOptMode = open;
     }
 
     private static boolean isAttachedToWindow(RecyclerView hostView) {
@@ -313,21 +323,9 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
             if (RecyclerView.SCROLL_STATE_IDLE == newState
-                    && recyclerView != null
-                    && lastMotionEvent != null) {
-                View childView = recyclerView.findChildViewUnder(lastMotionEvent.getX(), lastMotionEvent.getY());
-                if (childView != null) {
-                    int position = layoutManager.getPosition(childView);
-                    currCardIdx = mGroupBasicAdapter.findCardIdxFor(position);
-                    List<Card> groups = mGroupBasicAdapter.getGroups();
-
-                    if (currCardIdx >= groups.size() || currCardIdx < 0) {
-                        Log.e(TAG, "onScroll: group size >= cardIdx");
-                        return;
-                    }
-
-                    currCard = groups.get(currCardIdx);
-                }
+                && recyclerView != null
+                && lastMotionEvent != null) {
+                updateCurrCard();
             }
         }
 
@@ -337,18 +335,43 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
         }
     };
 
+    public void updateCurrCard() {
+        if (recyclerView == null || lastMotionEvent == null) {
+            return;
+        }
+
+        View childView = recyclerView.findChildViewUnder(lastMotionEvent.getX(), lastMotionEvent.getY());
+        if (childView != null) {
+            int position = layoutManager.getPosition(childView);
+            currCardIdx = mGroupBasicAdapter.findCardIdxFor(position);
+            List<Card> groups = mGroupBasicAdapter.getGroups();
+
+            if (currCardIdx >= groups.size() || currCardIdx < 0) {
+                Log.e(TAG, "onScroll: group size >= cardIdx");
+                return;
+            }
+
+            currCard = groups.get(currCardIdx);
+        }
+    }
+
     private class SwipeGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 
-            if (e1 == null || e2 == null) return false;
+            if (e1 == null || e2 == null) {
+                return false;
+            }
 
             lastMotionEvent = e2;
 
             mDistanceX = e2.getX() - e1.getX();
             mDistanceY = e2.getY() - e1.getY();
-            Log.e(TAG, "onScroll: distanceX " + mDistanceX + ", distanceY " + mDistanceY);
+
+            if (!isOptMode) {
+                updateCurrCard();
+            }
 
             if (recyclerView != null && currCard instanceof SwipeCard) {
 
@@ -359,15 +382,12 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
                 if (!isSwiping()) {
                     if (Math.abs(distanceX) > Math.abs(distanceY)) {
                         swipeType = SWIPING_HOR;
-                        Log.e(TAG, "onScroll: hor");
                     } else if (pullFromEndListener != null
-                            && Math.abs(distanceX) < Math.abs(distanceY)
-                            && mDistanceY < 0
-                            && isReadyToPullFromEnd()) {
+                        && Math.abs(distanceX) < Math.abs(distanceY)
+                        && mDistanceY < 0
+                        && isReadyToPullFromEnd()) {
                         swipeType = SWIPING_VER;
-                        Log.e(TAG, "onScroll: ver");
                     } else {
-                        Log.e(TAG, "onScroll: none");
                         return false;
                     }
                 }
@@ -377,11 +397,11 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
                         View child = recyclerView.getChildAt(i);
                         int cidx = mGroupBasicAdapter.findCardIdxFor(layoutManager.getPosition(child));
                         if (cidx == currCardIdx) {
-                            if (!mChildList.contains(child))
+                            if (!mChildList.contains(child)) {
                                 mChildList.add(child);
+                            }
                             final int sign = mDistanceX > 0 ? 1 : -1;
                             child.setTranslationX((float) (sign * 10f * Math.sqrt(Math.abs(mDistanceX))));
-                            Log.e(TAG, "onScroll: translationX");
                         }
                     }
                 } else if (swipeType == SWIPING_VER && mDistanceY < 0) {
@@ -389,8 +409,9 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
                         View child = recyclerView.getChildAt(i);
                         int cidx = mGroupBasicAdapter.findCardIdxFor(layoutManager.getPosition(child));
                         if (cidx == currCardIdx) {
-                            if (!mChildList.contains(child))
+                            if (!mChildList.contains(child)) {
                                 mChildList.add(child);
+                            }
                             final int sign = mDistanceY > 0 ? 1 : -1;
                             if (mDistanceY < -pullFromEndListener.getPullEdge()) {
                                 pullFromEndListener.onReleaseToAction(mDistanceX, mDistanceY);
@@ -398,11 +419,9 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
                                 pullFromEndListener.onPull(mDistanceX, mDistanceY);
                             }
                             child.setTranslationY((float) (sign * 10f * Math.sqrt(Math.abs(mDistanceY))));
-                            Log.e(TAG, "onScroll: translationY");
                         }
                     }
                 } else {
-                    Log.e(TAG, "onScroll: no hanlding");
                     return false;
                 }
 

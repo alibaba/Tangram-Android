@@ -71,8 +71,8 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     private LayoutBinderResolver<L, ? extends LayoutBinder<L>> mCardBinderResolver;
 
     public GroupBasicAdapter(@NonNull final Context context, @NonNull final VirtualLayoutManager layoutManager,
-                             @NonNull ControlBinderResolver<? extends ControlBinder<C, ? extends View>> cellBinderResolver,
-                             @NonNull LayoutBinderResolver<L, ? extends LayoutBinder<L>> cardBinderResolver) {
+        @NonNull ControlBinderResolver<? extends ControlBinder<C, ? extends View>> cellBinderResolver,
+        @NonNull LayoutBinderResolver<L, ? extends LayoutBinder<L>> cardBinderResolver) {
         super(layoutManager);
 
         mContext = Preconditions.checkNotNull(context, "context should not be null");
@@ -213,7 +213,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      */
     @NonNull
     protected List<LayoutHelper> transformCards(@Nullable List<L> cards, final @NonNull List<C> data,
-                                                @NonNull List<Pair<Range<Integer>, L>> rangeCards) {
+        @NonNull List<Pair<Range<Integer>, L>> rangeCards) {
         if (cards == null || cards.size() == 0) {
             return new LinkedList<>();
         }
@@ -226,7 +226,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
             if (card == null) continue;
 
-            final int ctype = getCardType(card);
+            final String ctype = getCardStringType(card);
             List<C> items = getItems(card);
             if (items == null) {
                 // skip card null
@@ -258,13 +258,14 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
     @Override
     public BinderViewHolder<C, ? extends View> onCreateViewHolder(ViewGroup parent, int viewType) {
-        ControlBinder<C, ? extends View> binder = mCompBinderResolver.create(viewType);
+        String cellType = getCellTypeFromItemType(viewType);
+        ControlBinder<C, ? extends View> binder = mCompBinderResolver.create(cellType);
         return createViewHolder(binder, mContext, parent);
     }
 
 
     public abstract <V extends View> BinderViewHolder<C, V> createViewHolder(
-            @NonNull final ControlBinder<C, V> binder, @NonNull final Context context, final ViewGroup parent);
+        @NonNull final ControlBinder<C, V> binder, @NonNull final Context context, final ViewGroup parent);
 
 
     @Override
@@ -350,7 +351,18 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      * @param card
      * @return the type of card
      */
+	@Deprecated
     public abstract int getCardType(L card);
+
+	/**
+     * Get type of card in String type
+     *
+     * @param card
+     * @return the type of card
+     */
+    public abstract String getCardStringType(L card);
+
+    public abstract String getCellTypeFromItemType(int viewType);
 
     /**
      * Find itemType for Cell
@@ -481,6 +493,8 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      */
     abstract public void removeComponent(C component);
 
+    abstract public void insertComponents(int pos, List<C> components);
+
     /**
      * @return total card list
      */
@@ -505,6 +519,5 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     protected void diffGroup(SparseArray<L> added, SparseArray<L> removed) {
 
     }
-
 
 }

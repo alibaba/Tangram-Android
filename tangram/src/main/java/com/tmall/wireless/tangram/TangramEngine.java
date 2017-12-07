@@ -60,13 +60,13 @@ import java.util.List;
  * The core of Tangram used to access data, bind view, register service.
  */
 public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> implements Engine,
-        ITangramExprParser {
+    ITangramExprParser {
 
     private static final int NO_SWIPE = -1;
 
     public TangramEngine(@NonNull Context context,
-                         @NonNull DataParser<JSONArray, Card, BaseCell> dataParser,
-                         @NonNull IAdapterBuilder<Card, ?> adapterBuilder) {
+        @NonNull DataParser<JSONArray, Card, BaseCell> dataParser,
+        @NonNull IAdapterBuilder<Card, ?> adapterBuilder) {
         super(context, dataParser, adapterBuilder);
         this.register(DataParser.class, dataParser);
         mTangramExprSupport = new TangramExprSupport();
@@ -84,6 +84,8 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     private boolean mEnableAutoLoadMore = true;
 
     private boolean mEnableLoadFirstPageCard = true;
+
+    public int scrolledY;
 
     public void enableAutoLoadMore(boolean enableAutoLoadMore) {
         this.mEnableAutoLoadMore = enableAutoLoadMore;
@@ -112,6 +114,15 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         }
 
         view.addOnItemTouchListener(mSwipeItemTouchListener);
+        view.setOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (recyclerView != null) {
+                    scrolledY += dy;
+                }
+            }
+        });
     }
 
     public void setPullFromEndListener(PullFromEndListener listener) {
@@ -122,6 +133,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
     public void setNoScrolling(boolean noScrolling) {
         getLayoutManager().setNoScrolling(noScrolling);
+    }
+
+    public void setEnableOverlapMargin(boolean enable) {
+        getLayoutManager().setEnableMarginOverlapping(enable);
     }
 
     /**
@@ -292,7 +307,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
             @Override
             public boolean isMatch(Card data) {
                 return data.loadMore && data.hasMore && !data.loading
-                        && !TextUtils.isEmpty(data.load);
+                    && !TextUtils.isEmpty(data.load);
             }
         });
 
@@ -306,11 +321,11 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * @return Return the target card.
      */
     public Card findCardById(String id) {
-        MVHelper MVHelper = getService(MVHelper.class);
-        if (MVHelper == null)
+        MVHelper mvHelper = getService(MVHelper.class);
+        if (mvHelper == null)
             return null;
 
-        return MVHelper.resolver().findCardById(id);
+        return mvHelper.resolver().findCardById(id);
     }
 
     /**
@@ -332,6 +347,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 if (!contentView.isComputingLayout()) {
                     //to prevent notify update when recyclerView is in computingLayout  process
                     mGroupBasicAdapter.notifyUpdate(layoutUpdated);
+
+                    if (mSwipeItemTouchListener != null) {
+                        mSwipeItemTouchListener.updateCurrCard();
+                    }
                 }
             }
         };

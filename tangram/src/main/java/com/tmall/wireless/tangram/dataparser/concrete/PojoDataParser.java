@@ -27,15 +27,15 @@ package com.tmall.wireless.tangram.dataparser.concrete;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import android.text.TextUtils;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.SlideCard;
+import com.tmall.wireless.tangram.structure.card.WrapCellCard;
 import com.tmall.wireless.tangram.structure.entitycard.BannerEntityCard;
-import com.tmall.wireless.tangram.structure.entitycard.EntityCard;
-import com.tmall.wireless.tangram.structure.entitycard.GridEntityCard;
 import com.tmall.wireless.tangram.util.LogUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
 import com.tmall.wireless.tangram.util.Utils;
@@ -44,7 +44,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -67,30 +66,33 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
         for (int i = 0; i < size; i++) {
             JSONObject cardData = data.optJSONObject(i);
             if (cardData != null) {
-                final int cardType = cardData.optInt(Card.KEY_TYPE, -1);
-                if (cardType >= 0) {
+                final String cardType = cardData.optString(Card.KEY_TYPE);
+                if (!TextUtils.isEmpty(cardType)) {
                     final Card card = cardResolver.create(cardType);
                     if (card != null) {
                         card.rowId = i;
                         card.serviceManager = serviceManager;
                         card.parseWith(cardData, cellResolver);
-                        card.type = cardType;
+                        card.type = cardData.optInt(Card.KEY_TYPE, -1);
+                        card.stringType = cardType;
                         if (card.isValid()) {
                             if (card instanceof IDelegateCard) {
                                 List<Card> cards = ((IDelegateCard) card).getCards(new CardResolver() {
                                     @Override
-                                    public Card create(int type) {
+                                    public Card create(String type) {
                                         Card c = cardResolver.create(type);
                                         c.serviceManager = serviceManager;
                                         c.id = card.id;
-                                        c.type = type;
+                                        c.setStringType(cardType);
+                                        c.stringType = cardType;
                                         c.rowId = card.rowId;
                                         return c;
                                     }
                                 });
                                 for (Card c : cards) {
-                                    if (c.isValid())
+                                    if (c.isValid()) {
                                         result.add(c);
+                                    }
                                 }
                             } else {
                                 if (card.style.slidable) {
@@ -101,7 +103,16 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
                             }
                         }
                     } else {
-                        LogUtils.w(TAG, "Can not generate cardType: " + cardType);
+                        final Card cellCard = new WrapCellCard();
+                        if (cellCard != null) {
+                            cellCard.rowId = i;
+                            cellCard.serviceManager = serviceManager;
+                            cellCard.parseWith(cardData, cellResolver);
+                            cellCard.setStringType(TangramBuilder.TYPE_CONTAINER_1C_FLOW);
+                            if (cellCard.isValid()) {
+                                result.add(cellCard);
+                            }
+                        }
                     }
                 } else {
                     LogUtils.w(TAG, "Invalid card type when parse JSON data");
@@ -121,7 +132,9 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
 
     @Nullable
     public List<BaseCell> parseComponent(JSONArray data, ServiceManager serviceManager, Card card) {
-        if (data == null) return new ArrayList<>();
+        if (data == null) {
+            return new ArrayList<>();
+        }
 
         final CardResolver cardResolver = serviceManager.getService(CardResolver.class);
         Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
@@ -147,48 +160,52 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
 
     protected BaseCell createCell(@NonNull MVHelper resolver, @Nullable JSONObject cellData, ServiceManager serviceManager) {
         if (cellData != null) {
-            int cellType = cellData.optInt(Card.KEY_TYPE, -1);
-            if (Utils.isCellizedCard(cellData)) {
-                cellType = Utils.cellizeCard(cellType);
-            }
-            if (resolver != null && resolver.resolver().getViewClass(cellType) != null) {
-                BaseCell cell;
+            BaseCell cell = null;
+            String cellType = cellData.optString(Card.KEY_TYPE);
+            if ((resolver != null && resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
                 if (resolver.resolver().isCompatibleType(cellType)) {
                     cell = Utils.newInstance(resolver.resolver().getCellClass(cellType));
 
                     //do not display when newInstance failed
-                    if (cell == null)
+                    if (cell == null) {
                         return null;
+                    }
 
                     cell.serviceManager = serviceManager; // ensure service manager
                 } else {
-                    if (Utils.isCellizedCard(cellData)) {
-                        switch (Utils.cardizeCell(cellType)) {
-                            case TangramBuilder.TYPE_SINGLE_COLUMN:
-                            case TangramBuilder.TYPE_DOUBLE_COLUMN:
-                            case TangramBuilder.TYPE_TRIPLE_COLUMN:
-                            case TangramBuilder.TYPE_FOUR_COLUMN:
-                            case TangramBuilder.TYPE_FIVE_COLUMN:
-                                cell = new GridEntityCard(cellType);
-                                break;
-                            case TangramBuilder.TYPE_CAROUSEL:
+                    if (Utils.isCard(cellData)) {
+                        switch (cellType) {
+                            //TODO support parse inline flow card
+                            case TangramBuilder.TYPE_CONTAINER_BANNER:
                                 cell = new BannerEntityCard();
                                 break;
-                            default:
-                                cell = new EntityCard(cellType);
-                                break;
                         }
-                        cell.serviceManager = serviceManager; // ensure service manager
+                        if (cell != null) {
+                            cell.serviceManager = serviceManager; // ensure service manager
+                        }
                     } else {
                         cell = new BaseCell(cellType);
                         cell.serviceManager = serviceManager; // ensure service manager
                     }
                 }
-                resolver.parseCell(resolver, cell, cellData);
-                cell.type = cellType; // ensure cell type
+                if (cell != null) {
+                    resolver.parseCell(resolver, cell, cellData);
+                    cell.setStringType(cellType); // ensure cell type
+                }
                 return cell;
+            } else {
+                //support virtual view at layout
+                BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
+                if (componentBinderResolver.has(cellType)) {
+                    cell = new BaseCell(cellType);
+                    cell.serviceManager = serviceManager; // ensure service manager
+                    resolver.parseCell(resolver, cell, cellData);
+                    cell.setStringType(cellType); // ensure cell type
+                    return cell;
+                } else {
+                    return null;
+                }
             }
-            return null;
         }
         return null;
     }

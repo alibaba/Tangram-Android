@@ -40,7 +40,7 @@ public class FixLinearScrollCard extends LinearScrollCard {
     private FixCard.FixStyle mFixStyle;
 
     @Override
-    protected void parseStyle(@Nullable JSONObject data) {
+    public void parseStyle(@Nullable JSONObject data) {
         super.parseStyle(data);
         mFixStyle = new FixCard.FixStyle();
         if (data != null) {

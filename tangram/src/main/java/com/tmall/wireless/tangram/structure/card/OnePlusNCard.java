@@ -32,8 +32,10 @@ import com.alibaba.android.vlayout.layout.OnePlusNLayoutHelper;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
+import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.style.ColumnStyle;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class OnePlusNCard extends Card {
@@ -47,13 +49,36 @@ public class OnePlusNCard extends Card {
     }
 
     @Override
-    protected void parseStyle(JSONObject data) {
+    public void parseStyle(JSONObject data) {
         style = new ColumnStyle();
         if (data != null) {
             style.parseWith(data);
         }
     }
 
+    @Override
+    protected void parseHeaderCell(@NonNull MVHelper resolver, @Nullable JSONObject header) {
+        BaseCell mHeader = createCell(resolver, header, true);
+        ensureBlock(mHeader);
+    }
+
+    @Override
+    protected void parseFooterCell(@NonNull MVHelper resolver, @Nullable JSONObject footer) {
+        BaseCell mFooter = createCell(resolver, footer, true);
+        ensureBlock(mFooter);
+    }
+
+    private void ensureBlock(BaseCell cell) {
+        if (cell != null) {
+            if (cell.style.extras == null) {
+                cell.style.extras = new JSONObject();
+            }
+            try {
+                cell.style.extras.put(Style.KEY_DISPLAY, Style.DISPLAY_BLOCK);
+            } catch (JSONException e) {
+            }
+        }
+    }
 
     @Nullable
     @Override
@@ -66,6 +91,16 @@ public class OnePlusNCard extends Card {
         }
 
         layoutHelper.setItemCount(mCells.size());
+        if (mCells.size() == 1) {
+            BaseCell isHeader = mCells.get(0);
+            layoutHelper.setHasHeader(Style.DISPLAY_BLOCK.equalsIgnoreCase(isHeader.optStringParam(Style.KEY_DISPLAY)));
+            layoutHelper.setHasFooter(false);
+        } else if (mCells.size() >= 2) {
+            BaseCell isHeader = mCells.get(0);
+            layoutHelper.setHasHeader(Style.DISPLAY_BLOCK.equalsIgnoreCase(isHeader.optStringParam(Style.KEY_DISPLAY)));
+            BaseCell isFooter = mCells.get(mCells.size() - 1);
+            layoutHelper.setHasFooter(Style.DISPLAY_BLOCK.equalsIgnoreCase(isFooter.optStringParam(Style.KEY_DISPLAY)));
+        }
 
         if (style instanceof ColumnStyle) {
             ColumnStyle columnStyle = (ColumnStyle) style;
@@ -84,9 +119,9 @@ public class OnePlusNCard extends Card {
 
             layoutHelper.setBgColor(columnStyle.bgColor);
             layoutHelper.setMargin(style.margin[Style.MARGIN_LEFT_INDEX], style.margin[Style.MARGIN_TOP_INDEX],
-                    style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
+                style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
             layoutHelper.setPadding(style.padding[Style.MARGIN_LEFT_INDEX], style.padding[Style.MARGIN_TOP_INDEX],
-                    style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
+                style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
         }
 
 

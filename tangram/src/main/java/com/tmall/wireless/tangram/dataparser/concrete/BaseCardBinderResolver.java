@@ -48,20 +48,25 @@ public class BaseCardBinderResolver extends LayoutBinderResolver<Card, BaseLayou
     }
 
     @Override
-    public int type(BaseLayoutBinder gen) {
+    public String type(BaseLayoutBinder gen) {
         throw new UnsupportedOperationException("BaseCardBinderResolver doesn't support check type by controller");
     }
 
-    @Override
-    public BaseLayoutBinder create(int type) {
-        if (mDelegate.hasType(type))
-            return new BaseLayoutBinder();
+    @NonNull
+    public CardResolver getDelegate() {
+        return mDelegate;
+    }
 
+    @Override
+    public BaseLayoutBinder create(String type) {
+        if (mDelegate.hasType(type)) {
+            return new BaseLayoutBinder();
+        }
         return null;
     }
 
     @Override
-    public void register(int type, BaseLayoutBinder gen) {
+    public void register(String type, BaseLayoutBinder gen) {
         throw new UnsupportedOperationException("BaseCardBinderResolver doesn't support register new type");
     }
 }

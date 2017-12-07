@@ -29,13 +29,15 @@ package com.tmall.wireless.tangram.core.resolver;
  */
 public interface Resolver<T, O> {
 
-    int UNKNOWN = -1;
+    String UNKNOWN = "unknown";
 
     int size();
 
-    int type(T gen);
-    
-    O create(int type);
+    String type(T gen);
 
-    void register(int type, T gen);
+    O create(String type);
+
+    void register(String type, T gen);
+
+    boolean has(String type);
 }

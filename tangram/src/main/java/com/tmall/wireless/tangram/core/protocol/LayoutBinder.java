@@ -34,6 +34,6 @@ import com.alibaba.android.vlayout.LayoutHelper;
 public interface LayoutBinder<L> {
 
     @Nullable
-    LayoutHelper getHelper(int type, L data);
+    LayoutHelper getHelper(String type, L data);
 
 }
