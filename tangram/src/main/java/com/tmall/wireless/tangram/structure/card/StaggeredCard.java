@@ -40,7 +40,7 @@ public class StaggeredCard extends Card {
 
 
     @Override
-    protected void parseStyle(@Nullable JSONObject data) {
+    public void parseStyle(@Nullable JSONObject data) {
         style = new StaggeredStyle();
         style.parseWith(data);
     }

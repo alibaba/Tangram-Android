@@ -46,10 +46,10 @@ public class PojoAdapterBuilder implements IAdapterBuilder<Card, BaseCell> {
 
         BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
         BaseCardBinderResolver cardBinderResolver = serviceManager.getService(BaseCardBinderResolver.class);
-        MVHelper MVHelper = serviceManager.getService(MVHelper.class);
+        MVHelper mvHelper = serviceManager.getService(MVHelper.class);
 
         final PojoGroupBasicAdapter adapter = new PojoGroupBasicAdapter(context, layoutManager, componentBinderResolver, cardBinderResolver,
-                MVHelper);
+                mvHelper);
 
 
         return adapter;

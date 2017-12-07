@@ -26,7 +26,6 @@ package com.tmall.wireless.tangram.support;
 
 import com.alibaba.android.vlayout.layout.FixAreaLayoutHelper;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
-import com.tmall.wireless.tangram.structure.entitycard.EntityCard;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -55,32 +54,24 @@ public abstract class CardSupport {
     }
 
     /**
-     * @param imageView
-     * @param card
-     */
-    public void onBindBackgroundView(ImageView imageView, EntityCard card) {
-
-    }
-
-    /**
      * provide a appearAnimator for FixCard, sample animator is as follow:
      *
      * <pre>
 
      new FixViewAnimatorHelper() {
-                 @Override
-                 public ViewPropertyAnimator onGetFixViewAppearAnimator(View fixView) {
-                     int height = fixView.getMeasuredHeight();
-                     fixView.setTranslationY(-height);
-                     return fixView.animate().translationYBy(height).alpha(1.0f).setDuration(500);
-                 }
+    @Override
+    public ViewPropertyAnimator onGetFixViewAppearAnimator(View fixView) {
+    int height = fixView.getMeasuredHeight();
+    fixView.setTranslationY(-height);
+    return fixView.animate().translationYBy(height).alpha(1.0f).setDuration(500);
+    }
 
-                 @Override
-                 public ViewPropertyAnimator onGetFixViewDisappearAnimator(View fixView) {
-                     int height = fixView.getMeasuredHeight();
-                     return fixView.animate().translationYBy(-height).alpha(0.0f).setDuration(500);
-                 }
-             }
+    @Override
+    public ViewPropertyAnimator onGetFixViewDisappearAnimator(View fixView) {
+    int height = fixView.getMeasuredHeight();
+    return fixView.animate().translationYBy(-height).alpha(0.0f).setDuration(500);
+    }
+    }
 
      * </pre>
 

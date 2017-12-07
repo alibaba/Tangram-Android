@@ -30,9 +30,13 @@ import com.tmall.wireless.tangram.core.R;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
+import com.tmall.wireless.tangram.eventbus.BusSupport;
+import com.tmall.wireless.tangram.eventbus.EventContext;
+import com.tmall.wireless.tangram.ext.BannerListener;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.cell.BannerCell;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
+import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Utils;
 
@@ -61,7 +65,7 @@ import java.util.List;
  * Created by mikeafc on 16/1/14.
  */
 public class BannerView extends RelativeLayout implements ViewPager.OnPageChangeListener,
-        ITangramViewLifeCycle {
+    ITangramViewLifeCycle {
     public static final int GRAVITY_LEFT = 0;
     public static final int GRAVITY_CENTER = 1;
     public static final int GRAVITY_RIGHT = 2;
@@ -79,7 +83,17 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
 
     private BaseCell cell;
 
+    private BannerSupport bannerSupport;
+
     private List<BinderViewHolder> mViewHolders = new ArrayList<BinderViewHolder>();
+
+    private int currentItemPos;
+
+    private int lastItemPos = -1;
+
+    private boolean init;
+
+    private int direction; // 1 for right, -1 for left
 
     public BannerView(Context context) {
         this(context, null);
@@ -182,21 +196,53 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+        if (bannerSupport != null) {
+            for (int j = 0; j < bannerSupport.getListeners().size(); j++) {
+                BannerListener listener = bannerSupport.getListeners().get(j);
+                listener.onPageScrolled(currentItemPos, positionOffset, positionOffsetPixels, direction);
+            }
+        }
     }
 
     @Override
     public void onPageSelected(int position) {
+        lastItemPos = currentItemPos;
         mIndicator.setCurrItem(mUltraViewPager.getCurrentItem());
+        currentItemPos = mUltraViewPager.getCurrentItem();
+
+        if (bannerSupport != null) {
+            for (int j = 0; j < bannerSupport.getListeners().size(); j++) {
+                BannerListener listener = bannerSupport.getListeners().get(j);
+                listener.onPageSelected(position);
+            }
+        }
+        if (cell != null && cell.serviceManager != null) {
+            BusSupport busSupport = cell.serviceManager.getService(BusSupport.class);
+            if (busSupport != null) {
+                EventContext eventContext = new EventContext();
+                if (((BannerCell)cell).mCells != null && currentItemPos >= 0
+                    && currentItemPos < ((BannerCell)cell).mCells.size()) {
+                    eventContext.producer = ((BannerCell)cell).mCells.get(currentItemPos);
+                }
+                busSupport.post(BusSupport.obtainEvent(BusSupport.EVENT_ON_EXPOSURE, cell.id, null, eventContext));
+            }
+        }
+
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
-
+        if (bannerSupport != null) {
+            for (int j = 0; j < bannerSupport.getListeners().size(); j++) {
+                BannerListener listener = bannerSupport.getListeners().get(j);
+                listener.onPageScrollStateChanged(state);
+            }
+        }
     }
 
     @Override
     public void cellInited(BaseCell cell) {
+        this.init = (this.cell != cell);
         this.cell = cell;
     }
 
@@ -204,15 +250,13 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     public void postBindView(BaseCell cell) {
         BannerCell bannerCell = (BannerCell) cell;
         bannerCell.initAdapter();
-
         if (cell.style != null)
             setPadding(cell.style.padding[3], cell.style.padding[0], cell.style.padding[1], cell.style.padding[2]);
-
         setBackgroundColor(bannerCell.mBgColor);
         setAdapter(bannerCell.mBannerAdapter);
         getUltraViewPager().setAutoMeasureHeight(true);
         getUltraViewPager().setRatio(bannerCell.mRatio);
-        getUltraViewPager().setAutoScroll(bannerCell.mAutoScrollInternal);
+        getUltraViewPager().setAutoScroll(bannerCell.mAutoScrollInternal, bannerCell.mSpecialInterval);
         getUltraViewPager().getViewPager().setPageMargin(bannerCell.hGap);
         if (bannerCell.mCells.size() <= bannerCell.mInfiniteMinCount) {
             getUltraViewPager().setInfiniteLoop(false);
@@ -242,16 +286,18 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
             getUltraViewPager().getViewPager().setClipToPadding(true);
             getUltraViewPager().getViewPager().setClipChildren(true);
         }
-
         VirtualLayoutManager.LayoutParams layoutParams = (VirtualLayoutManager.LayoutParams) getLayoutParams();
         layoutParams.setMargins(bannerCell.margin[3], bannerCell.margin[0], bannerCell.margin[1], bannerCell.margin[2]);
-
+        getUltraViewPager().setItemRatio(bannerCell.itemRatio);
         updateIndicators(bannerCell.mIndicatorFocus, bannerCell.mIndicatorNor,
-                bannerCell.mIndicatorRadius, bannerCell.mIndicatorColor,
-                bannerCell.mIndicatorDefaultColor);
+            bannerCell.mIndicatorRadius, bannerCell.mIndicatorColor,
+            bannerCell.mIndicatorDefaultColor);
         recycleView();
         bindHeaderView(bannerCell.mHeader);
         bindFooterView(bannerCell.mFooter);
+        if (cell.serviceManager != null) {
+            bannerSupport = cell.serviceManager.getService(BannerSupport.class);
+        }
     }
 
     @Override
@@ -374,9 +420,19 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
                 if (style == STYLE_DOT) {
                     mImageViews[i].setImageDrawable(getGradientDrawable(position == i ? focusColor : norColor, radius));
                 } else if (style == STYLE_IMG){
-                    ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
+                    //ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
                 }
             }
+			if (style == STYLE_IMG) {
+	            if (init) {
+	                for (int i = 0; i < mImageViews.length; i++) {
+	                    ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
+	                }
+	            } else {
+	                ImageUtils.doLoadImageUrl(mImageViews[lastItemPos], norUrl);
+	                ImageUtils.doLoadImageUrl(mImageViews[position], focusUrl);
+				}
+			}
         }
 
         public void setCurrItem(int position) {
@@ -385,7 +441,12 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
                     if (style == STYLE_DOT) {
                         mImageViews[i].setImageDrawable(getGradientDrawable(position == i ? focusColor : norColor, radius));
                     } else if (style == STYLE_IMG){
-                        ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
+                        //ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
+                        if (i == lastItemPos) {
+                            ImageUtils.doLoadImageUrl(mImageViews[i], norUrl);
+                        } else if (i == position) {
+                            ImageUtils.doLoadImageUrl(mImageViews[i], focusUrl);
+                        }
                     }
                 }
             }
@@ -393,9 +454,9 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
 
         private GradientDrawable getGradientDrawable(int color, float radius) {
             GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
-                        new int[]{color, color});
-                gradientDrawable.setShape(GradientDrawable.OVAL);
-                gradientDrawable.setCornerRadius(radius);
+                new int[]{color, color});
+            gradientDrawable.setShape(GradientDrawable.OVAL);
+            gradientDrawable.setCornerRadius(radius);
             return gradientDrawable;
         }
 
@@ -416,12 +477,17 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
             case MotionEvent.ACTION_MOVE:
                 int xDiff = (int) (x - xDown);
                 int yDiff = (int) (y - yDown);
-                //当y轴上滑动的距离大于x轴时认为是页面滑动
+
+                direction = -xDiff;
+
                 if (Math.abs(xDiff) >= Math.abs(yDiff)) {
                     getParent().requestDisallowInterceptTouchEvent(true);
                 } else {
                     getParent().requestDisallowInterceptTouchEvent(false);
                 }
+                break;
+            case MotionEvent.ACTION_UP:
+                direction = 0;
                 break;
         }
 
@@ -435,9 +501,8 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
                 header.setId(R.id.TANGRAM_BANNER_HEADER_ID);
                 RelativeLayout.LayoutParams bodyLp = (LayoutParams) mUltraViewPager.getLayoutParams();
                 bodyLp.addRule(RelativeLayout.BELOW, R.id.TANGRAM_BANNER_HEADER_ID);
-                //为了解决在 item 复用过程中，itemView 的 layoutParams 复用造成 layout 错误,这里要提供一个新的 layoutParams。
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
                 lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
                 lp.bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
@@ -452,9 +517,8 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
             View footer = getViewFromRecycler(cell);
             if (footer != null) {
                 footer.setId(R.id.TANGRAM_BANNER_FOOTER_ID);
-                //为了解决在 item 复用过程中，itemView 的 layoutParams 复用造成 layout 错误,这里要提供一个新的 layoutParams。
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.addRule(RelativeLayout.BELOW, R.id.TANGRAM_BANNER_ID);
                 lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
                 lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];

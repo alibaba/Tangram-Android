@@ -24,6 +24,7 @@
 
 package com.tmall.wireless.tangram.structure.style;
 
+import android.text.TextUtils;
 import com.tmall.wireless.tangram.MVResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 
@@ -51,8 +52,8 @@ public class DelegateStyle extends Style {
                 for (int i = 0, length = layouts.length(); i < length; i++) {
                     JSONObject l = layouts.optJSONObject(i);
                     if (l != null) {
-                        int type = l.optInt(MVResolver.KEY_TYPE, -1);
-                        if (type < 0) continue;
+                        String type = l.optString(MVResolver.KEY_TYPE);
+                        if (TextUtils.isEmpty(type)) continue;
 
                         CardInfo info = new CardInfo();
                         info.type = type;
@@ -67,7 +68,7 @@ public class DelegateStyle extends Style {
 
 
     public static final class CardInfo {
-        public int type;
+        public String type;
         public int itemCount;
         public JSONObject data;
     }

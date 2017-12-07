@@ -25,6 +25,7 @@
 package com.tmall.wireless.tangram;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -34,6 +35,7 @@ import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
 import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
 
 /**
@@ -45,12 +47,12 @@ public class DefaultResolverRegistry {
     final BaseCellBinderResolver mDefaultCellBinderResolver = new BaseCellBinderResolver();
     final BaseCardBinderResolver mDefaultCardBinderResolver = new BaseCardBinderResolver(mDefaultCardResolver);
 
-    SparseArray<ViewHolderCreator> viewHolderMap = new SparseArray<>(64);
+    ArrayMap<String, ViewHolderCreator> viewHolderMap = new ArrayMap<>(64);
 
     MVHelper mMVHelper;
 
-    public void setMVHelper(MVHelper mMVHelper) {
-        this.mMVHelper = mMVHelper;
+    public void setMVHelper(MVHelper mMvHelper) {
+        this.mMVHelper = mMvHelper;
     }
 
     public MVHelper getMVHelper() {
@@ -64,7 +66,7 @@ public class DefaultResolverRegistry {
      * @param viewClz
      * @param <V>
      */
-    public <V extends View> void registerCell(int type, final @NonNull Class<? extends BaseCell> cellClz, final @NonNull Class<V> viewClz) {
+    public <V extends View> void registerCell(String type, final @NonNull Class<? extends BaseCell> cellClz, final @NonNull Class<V> viewClz) {
         registerCell(type, viewClz);
         mMVHelper.resolver().registerCompatible(type, cellClz);
     }
@@ -76,7 +78,7 @@ public class DefaultResolverRegistry {
      * @param viewHolderCreator
      * @param <V>
      */
-    public <V extends View> void registerCell(int type, @NonNull Class<? extends BaseCell> cellClz, @NonNull ViewHolderCreator viewHolderCreator) {
+    public <V extends View> void registerCell(String type, @NonNull Class<? extends BaseCell> cellClz, @NonNull ViewHolderCreator viewHolderCreator) {
         viewHolderMap.put(type, viewHolderCreator);
         registerCell(type, cellClz, viewHolderCreator.viewClz);
     }
@@ -87,13 +89,12 @@ public class DefaultResolverRegistry {
      * @param viewClz
      * @param <V>
      */
-    public <V extends View> void registerCell(int type, final @NonNull Class<V> viewClz) {
+    public <V extends View> void registerCell(String type, final @NonNull Class<V> viewClz) {
         if (viewHolderMap.get(type) == null) {
-            mDefaultCellBinderResolver.register(type, new BaseCellBinder<>(viewClz,
-                    mMVHelper));
+            mDefaultCellBinderResolver.register(type, new BaseCellBinder<>(viewClz, mMVHelper));
         } else {
             mDefaultCellBinderResolver.register(type, new BaseCellBinder<>(viewHolderMap.get(type),
-                    mMVHelper));
+                mMVHelper));
         }
         mMVHelper.resolver().register(type, viewClz);
     }
@@ -103,8 +104,16 @@ public class DefaultResolverRegistry {
      * @param type
      * @param cardClz
      */
-    public void registerCard(int type, Class<? extends Card> cardClz) {
+    public void registerCard(String type, Class<? extends Card> cardClz) {
         mDefaultCardResolver.register(type, cardClz);
+    }
+
+    /**
+     * register item render by virtual view* @param type
+     * */
+    public <V extends View> void registerVirtualView(String type) {
+        mDefaultCellBinderResolver.register(type, new BaseCellBinder<>(type, mMVHelper));
+        registerCard(type, VVCard.class);
     }
 
     public CardResolver getDefaultCardResolver() {

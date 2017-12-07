@@ -34,9 +34,9 @@ import java.util.Map;
  */
 public abstract class BaseResolver<T, O> implements Resolver<T, O> {
 
-    protected Map<T, Integer> mMap = new ArrayMap<>(64);
+    protected ArrayMap<T, String> mMap = new ArrayMap<>(64);
 
-    protected SparseArray<T> mSparseArray = new SparseArray<>(64);
+    protected ArrayMap<String, T> mSparseArray = new ArrayMap<>(64);
 
     @Override
     public int size() {
@@ -44,7 +44,7 @@ public abstract class BaseResolver<T, O> implements Resolver<T, O> {
     }
 
     @Override
-    public int type(T gen) {
+    public String type(T gen) {
         if (mMap.containsKey(gen)) {
             return mMap.get(gen);
         }
@@ -53,8 +53,13 @@ public abstract class BaseResolver<T, O> implements Resolver<T, O> {
 
 
     @Override
-    public void register(int type, T gen) {
-        mMap.put(gen, Integer.valueOf(type));
+    public void register(String type, T gen) {
+        mMap.put(gen, type);
         mSparseArray.put(type, gen);
+    }
+
+    @Override
+    public boolean has(String type) {
+        return mSparseArray.containsKey(type);
     }
 }

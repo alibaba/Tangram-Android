@@ -79,10 +79,8 @@ public class SlideCard extends WrapperCard implements SwipeCard {
     public void switchTo(int index) {
         BusSupport busSupport = serviceManager.getService(BusSupport.class);
         if (busSupport != null) {
-            Log.d("Longer", "switch from " + mIndex);
             storeCache();
             args.put(KEY_INDEX, String.valueOf(index));
-            Log.d("Longer", "switch to " + index);
             busSupport.post(BusSupport.obtainEvent("switchTo", null, args, null));
             mIndex = index;
         }
@@ -91,7 +89,6 @@ public class SlideCard extends WrapperCard implements SwipeCard {
     @Override
     protected void onAdded() {
         super.onAdded();
-        Log.d("Longer", "add slide grid card");
         BusSupport busSupport = serviceManager.getService(BusSupport.class);
         if (busSupport != null) {
             busSupport.register(mSetMeta);
@@ -101,7 +98,6 @@ public class SlideCard extends WrapperCard implements SwipeCard {
     @Override
     protected void onRemoved() {
         super.onRemoved();
-        Log.d("Longer", "remove slide grid card");
         BusSupport busSupport = serviceManager.getService(BusSupport.class);
         if (busSupport != null) {
             busSupport.unregister(mSetMeta);
@@ -114,13 +110,11 @@ public class SlideCard extends WrapperCard implements SwipeCard {
     @Keep
     public void parseMeta(Event event) {
         try {
-            Log.d("Longer", "current meta " + mIndex + " " + mTotalPageCount + " < " + event.sourceId);
             if (mTotalPageCount != Integer.MAX_VALUE) {
                 storeCache();
             }
             mIndex = Integer.parseInt(event.args.get(KEY_INDEX));
             mTotalPageCount = Integer.parseInt(event.args.get(KEY_PAGE_COUNT));
-            Log.d("Longer", "parse meta " + mIndex + " " + mTotalPageCount);
         } catch (Exception e) {
         }
     }

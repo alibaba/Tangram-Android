@@ -25,14 +25,18 @@
 package com.tmall.wireless.tangram.structure.cell;
 
 import com.alibaba.android.vlayout.RecyclablePagerAdapter;
+
+import android.util.SparseIntArray;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.structure.BaseCell;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -40,12 +44,12 @@ import java.util.List;
  */
 public class BannerCell extends BaseCell {
 
-    /**radius  color 这一套indicator和indicatorImg是互斥的**/
     public int mIndicatorRadius;
     public int mIndicatorColor;
     public int mIndicatorDefaultColor;
 
     public int mAutoScrollInternal;
+    public SparseIntArray mSpecialInterval;
     public boolean mInfinite;
     public int mInfiniteMinCount;
     public String mIndicatorFocus;
@@ -61,6 +65,7 @@ public class BannerCell extends BaseCell {
     public int hGap;
     public int[] itemMargin = new int[2];
     public int[] margin = new int[4];
+    public double itemRatio;
 
     public BannerAdapter mBannerAdapter;
     public List<BaseCell> mCells = new ArrayList<>();
@@ -69,6 +74,7 @@ public class BannerCell extends BaseCell {
 
     public void setData(List<BaseCell> cells) {
         initAdapter();
+        this.mCells.clear();
         this.mCells.addAll(cells);
         mBannerAdapter.notifyDataSetChanged();
     }
@@ -123,6 +129,24 @@ public class BannerCell extends BaseCell {
 
     public void setAutoScrollInternal(int mAutoScroll_internal) {
         this.mAutoScrollInternal = mAutoScroll_internal;
+    }
+
+    public void setSpecialInterval(JSONObject jsonObject) {
+        if (jsonObject != null) {
+            this.mSpecialInterval = new SparseIntArray();
+            Iterator<String> itr = jsonObject.keys();
+            while (itr.hasNext()) {
+                String key = itr.next();
+                try {
+                    int index = Integer.parseInt(key);
+                    int value = jsonObject.optInt(key);
+                    if (value > 0) {
+                        this.mSpecialInterval.put(index, value);
+                    }
+                } catch (NumberFormatException e) {
+                }
+            }
+        }
     }
 
     public void setInfinite(boolean mInfinite) {

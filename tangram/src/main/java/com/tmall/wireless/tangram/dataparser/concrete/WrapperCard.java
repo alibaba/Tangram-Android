@@ -29,6 +29,8 @@ import android.support.annotation.Nullable;
 
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.layout.GridLayoutHelper;
+import com.alibaba.android.vlayout.layout.RangeGridLayoutHelper;
+
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.GridCard;
 
@@ -49,6 +51,7 @@ public class WrapperCard extends Card {
         this.mCard.setCells(null);
 
         this.type = mCard.type;
+        this.stringType = mCard.stringType;
         this.id = mCard.id;
         this.loaded = mCard.loaded;
         this.load = mCard.load;
@@ -77,8 +80,8 @@ public class WrapperCard extends Card {
         LayoutHelper layoutHelper = mCard.convertLayoutHelper(oldHelper);
         if (layoutHelper != null) {
             layoutHelper.setItemCount(mCells.size());
-            if (layoutHelper instanceof GridLayoutHelper) {
-                GridLayoutHelper gridHelper = (GridLayoutHelper) layoutHelper;
+            if (layoutHelper instanceof RangeGridLayoutHelper) {
+                RangeGridLayoutHelper gridHelper = (RangeGridLayoutHelper) layoutHelper;
                 gridHelper.setSpanSizeLookup(new GridCard.CellSpanSizeLookup(mCells, gridHelper.getSpanCount()));
             }
         }

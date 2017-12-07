@@ -43,6 +43,8 @@ import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
+import com.tmall.wireless.tangram.support.CellSupport;
+import com.tmall.wireless.tangram.support.PageDetectorSupport;
 
 import java.lang.annotation.Inherited;
 import java.util.Collections;
@@ -63,23 +65,21 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
     private final Map<String, Integer> mStrKeys = new ArrayMap<>(64);
 
-    private MVHelper mMVHelper;
+    private MVHelper mMvHelper;
 
     /*
      * This used to store cell.type <=> itemType mapping, they are not the same!
      * the same cell.type can be different itemTypes for better recycle mechanism
      */
-    private final SparseIntArray mIntKeys = new SparseIntArray(64);
-
-    private final SparseIntArray mId2Types = new SparseIntArray(64);
-
+    private final SparseArray<String> mId2Types = new SparseArray<>(64);
 
     PojoGroupBasicAdapter(@NonNull Context context, @NonNull VirtualLayoutManager layoutManager,
-                          @NonNull BaseCellBinderResolver componentBinderResolver,
-                          @NonNull BaseCardBinderResolver cardBinderResolver,
-                          @NonNull MVHelper MVHelper) {
+        @NonNull BaseCellBinderResolver componentBinderResolver,
+        @NonNull BaseCardBinderResolver cardBinderResolver,
+        @NonNull MVHelper mvHelper) {
         super(context, layoutManager, componentBinderResolver, cardBinderResolver);
-        this.mMVHelper = MVHelper;
+        this.mMvHelper = mvHelper;
+        setHasStableIds(true);
     }
 
     /**
@@ -126,13 +126,21 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         if (idx >= 0) {
             Pair<Range<Integer>, Card> pair = mCards.get(idx);
             pair.second.onBindCell(position - pair.first.getLower(), position, mLastBindPosition < 0 || mLastBindPosition < position);
+            PageDetectorSupport pageDetectorSupport = pair.second.serviceManager
+                .getService(PageDetectorSupport.class);
+            if (pageDetectorSupport != null) {
+                pageDetectorSupport.onBindItem(position, mLastBindPosition < 0 || mLastBindPosition < position, getItemByPosition(position));
+            }
         }
 
         mLastBindPosition = position;
     }
 
     /**
-     * {@inheritDoc}
+     * Get type of card
+     *
+     * @param card
+     * @return the type of card
      */
     @Override
     public int getCardType(Card card) {
@@ -140,16 +148,23 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     }
 
     @Override
-    public BinderViewHolder<BaseCell, ? extends View> onCreateViewHolder(ViewGroup parent, int viewType) {
+    public String getCardStringType(Card card) {
+        return card.stringType;
+    }
+
+    @Override
+    public String getCellTypeFromItemType(int viewType) {
         if (mId2Types.indexOfKey(viewType) < 0) {
             throw new IllegalStateException("Can not found item.type for viewType: " + viewType);
         }
-
-        return super.onCreateViewHolder(parent, mId2Types.get(viewType));
+        return mId2Types.get(viewType);
     }
 
     /**
-     * {@inheritDoc}
+     * Find itemType for Cell
+     *
+     * @param item the cell data
+     * @return itemType as int used for recycled id
      */
     @Override
     public int getItemType(BaseCell item) {
@@ -160,20 +175,20 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
             if (!mStrKeys.containsKey(typeKey)) {
                 int newType = mTypeId.getAndIncrement();
                 mStrKeys.put(typeKey, newType);
-                mId2Types.put(newType, item.type);
+                mId2Types.put(newType, item.stringType);
             }
 
-            return mStrKeys.get(typeKey);
+            return mStrKeys.get(typeKey).intValue();
         } else {
             // otherwise, use item.type as identity key
-            if (mIntKeys.indexOfKey(item.type) < 0) {
-                // note, this now only be executed in MainThread, atomic not actually needed
+            // note, this now only be executed in MainThread, atomic not actually needed
+            String stringType = item.stringType;
+            if (!mStrKeys.containsKey(stringType)) {
                 int newType = mTypeId.getAndIncrement();
-                mIntKeys.put(item.type, newType);
-                mId2Types.put(newType, item.type);
+                mStrKeys.put(item.stringType, newType);
+                mId2Types.put(newType, item.stringType);
             }
-
-            return mIntKeys.get(item.type);
+            return mStrKeys.get(item.stringType).intValue();
         }
     }
 
@@ -191,19 +206,41 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
     @Override
     protected void diffGroup(SparseArray<Card> added, SparseArray<Card> removed) {
-        for(int i = 0, size = removed.size(); i < size; i++) {
+        for (int i = 0, size = removed.size(); i < size; i++) {
             int key = removed.keyAt(i);
             Card card = removed.get(key);
             if (card != null) {
-                card.removed();
+                try {
+                    card.removed();
+                } catch (Exception e) {
+                    if (card.serviceManager != null) {
+                        CellSupport cellSupport = card.serviceManager.getService(CellSupport.class);
+                        if (card.extras != null) {
+                            cellSupport.onException(card.extras.toString(), e);
+                        } else {
+                            cellSupport.onException(card.stringType, e);
+                        }
+                    }
+                }
             }
         }
 
-        for(int i = 0, size = added.size(); i < size; i++) {
+        for (int i = 0, size = added.size(); i < size; i++) {
             int key = added.keyAt(i);
             Card card = added.get(key);
             if (card != null) {
-                card.added();
+                try {
+                    card.added();
+                } catch (Exception e) {
+                    if (card.serviceManager != null) {
+                        CellSupport cellSupport = card.serviceManager.getService(CellSupport.class);
+                        if (card.extras != null) {
+                            cellSupport.onException(card.extras.toString(), e);
+                        } else {
+                            cellSupport.onException(card.stringType, e);
+                        }
+                    }
+                }
             }
         }
     }
@@ -214,7 +251,9 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     @NonNull
     @Override
     protected List<LayoutHelper> transformCards(@Nullable List<Card> cards, @NonNull List<BaseCell> data, @NonNull List<Pair<Range<Integer>, Card>> rangeCards) {
-        if (cards == null) return super.transformCards(cards, data, rangeCards);
+        if (cards == null) {
+            return super.transformCards(cards, data, rangeCards);
+        }
 
         /* record card id, used in {@link #getItems} to clean "forLabel" cards */
         for (Card card : cards) {
@@ -238,7 +277,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
             targetPosition = -1;
         } else {
             for (int i = 0, size = data.size(); i < size; i++) {
-                if (type == data.get(i).type) {
+                if (String.valueOf(type).equals(data.get(i).stringType)) {
                     targetPosition = i;
                     break;
                 }
@@ -254,7 +293,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
             targetPosition = -1;
         } else {
             for (int i = data.size() - 1; i >= 0; i--) {
-                if (type == data.get(i).type) {
+                if (String.valueOf(type).equals(data.get(i).stringType)) {
                     targetPosition = i;
                     break;
                 }
@@ -264,7 +303,9 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     }
 
     public Range<Integer> getCardRange(String id) {
-        if (TextUtils.isEmpty(id)) return Range.create(0, 0);
+        if (TextUtils.isEmpty(id)) {
+            return Range.create(0, 0);
+        }
 
         List<Card> cards = getGroups();
         for (int i = 0, size = cards.size(); i < size; i++) {
@@ -279,8 +320,10 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
     /**
      * remove a component
+     *
      * @param position the position to be removes
      */
+    @Override
     public void removeComponent(int position) {
         if (mData != null) {
             if (position >= 0 && position <= mData.size() - 1) {
@@ -301,7 +344,6 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     }
 
     /**
-     *
      * @param component the component to be removed
      */
     @Override
@@ -314,7 +356,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 if (idx >= 0) {
                     Pair<Range<Integer>, Card> pair = mCards.get(idx);
                     pair.second.removeCellSilently(component);
-                }   
+                }
                 notifyItemRemoved(position);
                 int last = mLayoutManager.findLastVisibleItemPosition();
                 notifyItemRangeChanged(position, last - position);
@@ -322,9 +364,18 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public void insertComponents(int pos, List<BaseCell> components) {
+        if (mData != null && components != null && !components.isEmpty() && pos > 0) {
+            for (int i = 0; i < components.size(); i++) {
+                if ((pos + i) < mData.size()) {
+                    mData.add(pos + i, components.get(i));
+                }
+            }
+        }
+        notifyItemRangeInserted(pos, components.size());
+    }
+
     @Override
     public void destroy() {
         super.destroy();

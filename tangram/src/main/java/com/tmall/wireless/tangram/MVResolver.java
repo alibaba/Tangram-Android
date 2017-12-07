@@ -30,6 +30,7 @@ import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.View;
 
+import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.structure.BaseCell;
@@ -52,15 +53,19 @@ public class MVResolver {
 
     public static final String KEY_BIZ_ID = "bizId";
 
+    public static final String KEY_ID = "id";
+
     public static final String KEY_TYPE_KEY = "typeKey";
 
     public static final String KEY_TYPE_REUSEID = "reuseId";
 
+    public static final String KEY_INDEX = "index";
+
     public static final String KEY_POSITION = "position";
 
-    private SparseArray<Class<? extends View>> typeViewMap = new SparseArray<>(64);
+    private ArrayMap<String, Class<? extends View>> typeViewMap = new ArrayMap<>(64);
 
-    private SparseArray<Class<? extends BaseCell>> typeCellMap = new SparseArray<>(64);
+    private ArrayMap<String, Class<? extends BaseCell>> typeCellMap = new ArrayMap(64);
 
     private ArrayMap<String, Card> idCardMap = new ArrayMap<>();
 
@@ -70,19 +75,25 @@ public class MVResolver {
 
     private ArrayMap<String, View> idViewMap = new ArrayMap<>(128);
 
-    public void register(int type, Class<? extends View> viewClazz) {
+    private ServiceManager mServiceManager;
+
+    public void setServiceManager(ServiceManager serviceManager) {
+        mServiceManager = serviceManager;
+    }
+
+    public void register(String type, Class<? extends View> viewClazz) {
         typeViewMap.put(type, viewClazz);
     }
 
-    public void registerCompatible(int type, Class<? extends BaseCell> cellClazz) {
+    public void registerCompatible(String type, Class<? extends BaseCell> cellClazz) {
         typeCellMap.put(type, cellClazz);
     }
 
-    public boolean isCompatibleType(int type) {
+    public boolean isCompatibleType(String type) {
         return typeCellMap.get(type) != null;
     }
 
-    public Class<? extends BaseCell> getCellClass(int type) {
+    public Class<? extends BaseCell> getCellClass(String type) {
         return typeCellMap.get(type);
     }
 
@@ -123,7 +134,7 @@ public class MVResolver {
         return vmMap.get(view);
     }
 
-    public Class<? extends View> getViewClass(int type) {
+    public Class<? extends View> getViewClass(String type) {
         return typeViewMap.get(type);
     }
 
@@ -131,7 +142,11 @@ public class MVResolver {
         if (json != null) {
             cell.extras = json;
             cell.id = json.optString(KEY_BIZ_ID);
+            if (TextUtils.isEmpty(cell.id) && json.has(KEY_ID)) {
+                cell.id = json.optString(KEY_ID);
+            }
             cell.type = json.optInt(KEY_TYPE);
+            cell.stringType = json.optString(KEY_TYPE);
             cell.typeKey = json.optString(KEY_TYPE_KEY);
             String reuseId = json.optString(KEY_TYPE_REUSEID);
             if (!TextUtils.isEmpty(reuseId)) {
@@ -157,15 +172,12 @@ public class MVResolver {
         Iterator<String> iterator = json.keys();
         while (iterator.hasNext()) {
             String key = iterator.next();
-            try {
-                cell.addBizParam(key, json.get(key));
-            } catch (JSONException e) {
-            }
+            cell.addBizParam(key, json.opt(key));
         }
     }
 
     protected void parseStyle(BaseCell cell, @Nullable JSONObject json) {
-        if (!Utils.isCellizedCard(cell.extras)) {
+        if (!Utils.isCard(cell.extras)) {
             cell.style = new Style();
             if (json != null) {
                 cell.style.parseWith(json);

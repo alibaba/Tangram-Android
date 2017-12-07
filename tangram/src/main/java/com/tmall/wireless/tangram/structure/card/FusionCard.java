@@ -61,7 +61,7 @@ public class FusionCard extends Card implements IDelegateCard {
     }
 
     @Override
-    protected void parseStyle(JSONObject data) {
+    public void parseStyle(JSONObject data) {
         style = new DelegateStyle();
         if (data != null) {
             style.parseWith(data);
@@ -99,7 +99,7 @@ public class FusionCard extends Card implements IDelegateCard {
         if (style instanceof DelegateStyle) {
             DelegateStyle dStyle = (DelegateStyle) this.style;
 
-            final Card anchorCard = cardResolver.create(TangramBuilder.TYPE_SINGLE_COLUMN);
+            final Card anchorCard = cardResolver.create(String.valueOf(TangramBuilder.TYPE_SINGLE_COLUMN));
             final BaseCell emptyCell = new BaseCell(TangramBuilder.TYPE_EMPTY_VIEW);
             if (emptyCell.style != null)
                 emptyCell.style.height = 0;
@@ -107,7 +107,7 @@ public class FusionCard extends Card implements IDelegateCard {
             anchorCard.addCell(emptyCell);
 
 
-            final Card headerCard = cardResolver.create(TangramBuilder.TYPE_STICKY_START);
+            final Card headerCard = cardResolver.create(String.valueOf(TangramBuilder.TYPE_STICKY_START));
             final BaseCell tabCell = mCells.get(0);
             mCells.remove(0);
             // asign header id
@@ -115,17 +115,17 @@ public class FusionCard extends Card implements IDelegateCard {
             headerCard.addCell(tabCell);
 
             final DelegateStyle.CardInfo info = dStyle.cardInfos.get(0);
-            final int cardType = info.type;
-            final Card originalCard = cardResolver.create(info.type);
+            final String cardType = info.type;
+            final Card originalCard = cardResolver.create(String.valueOf(info.type));
 
             // no cell is needed
-            originalCard.type = info.type;
+            originalCard.setStringType(info.type);
             // assign id;
             originalCard.id = id;
             originalCard.parseWith(info.data, cellResolver);
 
             final Card contentCard = new FusionContentCard(originalCard,
-                    (tabCell instanceof SwitchTabHeaderCell) ? (SwitchTabHeaderCell) tabCell : null, 0);
+                (tabCell instanceof SwitchTabHeaderCell) ? (SwitchTabHeaderCell) tabCell : null, 0);
 
             if (viewFactory != null) {
                 View view = viewFactory.create();
@@ -188,7 +188,7 @@ public class FusionCard extends Card implements IDelegateCard {
                         if (indexCache == null) {
                             Card newCard = cardResolver.create(cardType);
                             // no cell is needed
-                            newCard.type = cardType;
+                            newCard.setStringType(cardType);
                             // assign id
                             newCard.id = id;
                             newCard.parseWith(info.data, cellResolver);

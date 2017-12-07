@@ -50,16 +50,23 @@ public class BaseCellBinder<T extends ViewHolderCreator.ViewHolder, V extends Vi
     private ViewHolderCreator<T, V> viewHolderCreator;
 
     @NonNull
-    private MVHelper mMVHelper;
+    private MVHelper mMvHelper;
 
-    public BaseCellBinder(@NonNull Class<V> viewClz, @NonNull MVHelper MVHelper) {
+    private String type;
+
+    public BaseCellBinder(@NonNull Class<V> viewClz, @NonNull MVHelper mvHelper) {
         this.mViewCreator = new ViewCreator<>(viewClz);
-        this.mMVHelper = Preconditions.checkNotNull(MVHelper, "mvHelper should not be null");
+        this.mMvHelper = Preconditions.checkNotNull(mvHelper, "mvHelper should not be null");
     }
 
-    public BaseCellBinder(@NonNull ViewHolderCreator<T, V> viewHolderCreator, @NonNull MVHelper MVHelper) {
+    public BaseCellBinder(@NonNull ViewHolderCreator<T, V> viewHolderCreator, @NonNull MVHelper mvHelper) {
         this.viewHolderCreator = viewHolderCreator;
-        this.mMVHelper = MVHelper;
+        this.mMvHelper = mvHelper;
+    }
+
+    public BaseCellBinder(String type, @NonNull MVHelper mvHelper) {
+        this.type = type;
+        this.mMvHelper = mvHelper;
     }
 
     @NonNull
@@ -68,11 +75,14 @@ public class BaseCellBinder<T extends ViewHolderCreator.ViewHolder, V extends Vi
         V v;
         if (viewHolderCreator != null) {
             v = viewHolderCreator.create(context, parent);
-        } else {
+        } else if (mViewCreator != null) {
             v = mViewCreator.create(context, parent);
+        } else {
+            v = (V) mMvHelper.getVafContext().getContainerService().getContainer(type, false);
         }
-        if (v.getId() <= 0)
+        if (v.getId() <= 0) {
             v.setId(R.id.TANGRAM_VIEW_CONTAINER_ID);
+        }
 
         return v;
     }
@@ -81,11 +91,11 @@ public class BaseCellBinder<T extends ViewHolderCreator.ViewHolder, V extends Vi
     public void mountView(@NonNull BaseCell data, @NonNull V view) {
         // TODO: generate mounter like properties setter
         // delegate to cell
-        mMVHelper.mountView(data, view);
+        mMvHelper.mountView(data, view);
     }
 
     @Override
     public void unmountView(@NonNull BaseCell data, @NonNull V view) {
-        mMVHelper.unMountView(data, view);
+        mMvHelper.unMountView(data, view);
     }
 }

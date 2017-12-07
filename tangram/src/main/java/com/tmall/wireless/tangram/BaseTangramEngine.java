@@ -25,15 +25,18 @@
 package com.tmall.wireless.tangram;
 
 import android.content.Context;
+import android.os.Build.VERSION;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.ChildDrawingOrderCallback;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.alibaba.android.vlayout.LayoutViewFactory;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 import com.alibaba.android.vlayout.extend.InnerRecycledViewPool;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
@@ -44,7 +47,10 @@ import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
 import com.tmall.wireless.tangram.util.Predicate;
+import com.tmall.wireless.vaf.framework.VafContext;
+import com.tmall.wireless.vaf.framework.ViewManager;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -75,8 +81,8 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     private final IAdapterBuilder<C, ?> mAdapterBuilder;
 
     public BaseTangramEngine(@NonNull final Context context,
-            @NonNull final DataParser<T, C, L> dataParser,
-            @NonNull final IAdapterBuilder<C, ?> adapterBuilder) {
+        @NonNull final DataParser<T, C, L> dataParser,
+        @NonNull final IAdapterBuilder<C, ?> adapterBuilder) {
         //noinspection ConstantConditions
         Preconditions.checkArgument(context != null, "context is null");
         this.mContext = context;
@@ -157,6 +163,9 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
         register(RecyclerView.RecycledViewPool.class, mContentView.getRecycledViewPool());
 
         this.mContentView.setAdapter(mGroupBasicAdapter);
+        if (VERSION.SDK_INT < 21) {
+            this.mContentView.setChildDrawingOrderCallback(new DrawingOrderCallback());
+        }
     }
 
     /**
@@ -171,6 +180,14 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
+     * set compiled binary data of virtual views.* @param data
+     * */
+    public int setVirtualViewTemplate(byte[] data) {
+        ViewManager viewManager = getService(ViewManager.class);
+        return viewManager.loadBinBufferSync(data);
+    }
+
+	/**
      * Call this when your activity is ready to destory to clear inner resource.
      */
     public void destroy() {
@@ -188,6 +205,10 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
         BusSupport busSupport = getService(BusSupport.class);
         if (busSupport != null) {
             busSupport.shutdown();
+        }
+        VafContext vafContext = getService(VafContext.class);
+        if (vafContext != null) {
+            vafContext.onDestroy();
         }
     }
 
@@ -245,9 +266,9 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
      */
     public void setData(@Nullable List<C> data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
-        MVHelper MVHelper = (MVHelper) mServices.get(MVHelper.class);
-        if (MVHelper != null)
-            MVHelper.reset();
+        MVHelper mvHelper = (MVHelper) mServices.get(MVHelper.class);
+        if (mvHelper != null)
+            mvHelper.reset();
         this.mGroupBasicAdapter.setData(data);
     }
 
@@ -339,6 +360,96 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
         }
 
         return rs;
+    }
+
+    private class DrawingOrderCallback implements ChildDrawingOrderCallback {
+
+        int[] viewIndex = new int[32];
+
+        int[] zIndex = new int[32];
+
+        private int[] doubleIndex(int[] index) {
+            if (index == null) {
+                return null;
+            }
+            int[] newIndex = new int[index.length * 2];
+            System.arraycopy(index, 0, newIndex, 0, index.length);
+            return newIndex;
+        }
+
+        private void clearIndex(int[] index) {
+            if (index == null) {
+                return;
+            }
+            Arrays.fill(index, 0);
+        }
+
+        int partition(int[] unsortedZIndex, int[] unsortedViewIndex, int low, int high) {
+            int pivot = unsortedZIndex[low];
+            int viewPivot = unsortedViewIndex[low];
+            while (low < high) {
+                while (low < high && unsortedZIndex[high] > pivot) high--;
+                unsortedZIndex[low] = unsortedZIndex[high];
+                unsortedViewIndex[low] = unsortedViewIndex[high];
+                while (low < high && unsortedZIndex[low] <= pivot) low++;
+                unsortedZIndex[high] = unsortedZIndex[low];
+                unsortedViewIndex[high] = unsortedViewIndex[high];
+            }
+            unsortedZIndex[low] = pivot;
+            unsortedViewIndex[low] = viewPivot;
+            return low;
+        }
+
+        void quickSort(int[] unsortedZIndex, int[] unsortedViewIndex, int low, int high){
+            int loc = 0;
+            if (low < high) {
+                loc = partition(unsortedZIndex, unsortedViewIndex, low, high);
+                quickSort(unsortedZIndex, unsortedViewIndex, low, loc - 1);
+                quickSort(unsortedZIndex, unsortedViewIndex, loc + 1, high);
+            }
+        }
+
+        void bubbleSort(int[] unsortedZIndex, int[] unsortedViewIndex, int length) {
+            for (int i = 0; i < length - 1; i++) {
+                for (int j = length - 1; j > i; j--) {
+                    if (unsortedZIndex[j] < unsortedZIndex[j - 1]) {
+                        int temp = unsortedZIndex[j];
+                        unsortedZIndex[j] = unsortedZIndex[j - 1];
+                        unsortedZIndex[j - 1] = temp;
+
+                        temp = unsortedViewIndex[j];
+                        unsortedViewIndex[j] = unsortedViewIndex[j - 1];
+                        unsortedViewIndex[j - 1] = temp;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public int onGetChildDrawingOrder(int childCount, int i) {
+            if (zIndex.length < childCount) {
+                zIndex = doubleIndex(zIndex);
+                viewIndex = doubleIndex(viewIndex);
+            }
+            // check all current zIndex
+            for (int j = 0; j < childCount; j++) {
+                View child = mContentView.getChildAt(j);
+                if (child != null) {
+                    VirtualLayoutManager.LayoutParams layoutParams = (LayoutParams)child.getLayoutParams();
+                    zIndex[j] = layoutParams.zIndex;
+                } else {
+                    zIndex[j] = 0;
+                }
+                viewIndex[j] = j;
+            }
+            // reorder drawing by zIndex
+            bubbleSort(zIndex, viewIndex, childCount);
+
+            int result = viewIndex[i];
+            clearIndex(zIndex);
+            clearIndex(viewIndex);
+            return  result;
+        }
     }
 
 }

@@ -37,7 +37,7 @@ public class BaseLayoutBinder implements LayoutBinder<Card> {
 
     @Nullable
     @Override
-    public LayoutHelper getHelper(int type, Card data) {
+    public LayoutHelper getHelper(String type, Card data) {
         if (data == null) return null;
         return data.getLayoutHelper();
     }

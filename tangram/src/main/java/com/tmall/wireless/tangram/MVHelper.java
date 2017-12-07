@@ -25,13 +25,21 @@
 package com.tmall.wireless.tangram;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+
+import android.os.Build.VERSION;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
+import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.CellRender;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
 import com.tmall.wireless.tangram.support.CellSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 
+import com.tmall.wireless.vaf.framework.VafContext;
+import com.tmall.wireless.vaf.virtualview.core.IContainer;
+import com.tmall.wireless.vaf.virtualview.core.ViewBase;
+import com.tmall.wireless.vaf.virtualview.event.EventData;
+import com.tmall.wireless.vaf.virtualview.event.EventManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -53,24 +61,35 @@ import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_TOP_IN
 public class MVHelper {
     private static final String TAG = "Tangram-MVHelper";
 
-    private MVResolver mMVResolver;
+    private MVResolver mvResolver;
+
+    private VafContext mVafContext;
 
     private ArrayMap<BaseCell, ArrayMap<Method, Object>> methodMap = new ArrayMap<>(128);
     private ArrayMap<Class, Method[]> methodCacheMap = new ArrayMap<>(128);
     private ArrayMap<BaseCell, Method> postBindMap = new ArrayMap<>(128);
     private ArrayMap<BaseCell, Method> postUnBindMap = new ArrayMap<>(128);
     private ArrayMap<BaseCell, Method> cellInitedMap = new ArrayMap<>(128);
+    private ArrayMap<BaseCell, String> cellFlareIdMap = new ArrayMap<>(128);
 
-    public MVHelper(MVResolver MVResolver) {
-        this.mMVResolver = MVResolver;
+    public MVHelper(MVResolver mvResolver) {
+        this.mvResolver = mvResolver;
     }
 
     public MVResolver resolver() {
-        return mMVResolver;
+        return mvResolver;
+    }
+
+    public VafContext getVafContext() {
+        return mVafContext;
+    }
+
+    public void setVafContext(VafContext vafContext) {
+        mVafContext = vafContext;
     }
 
     public void parseCell(MVHelper resolver, BaseCell cell, JSONObject json) {
-        mMVResolver.parseCell(resolver, cell, json);
+        mvResolver.parseCell(resolver, cell, json);
     }
 
     /**
@@ -81,7 +100,8 @@ public class MVHelper {
         postBindMap.clear();
         postUnBindMap.clear();
         cellInitedMap.clear();
-        mMVResolver.reset();
+        cellFlareIdMap.clear();
+        mvResolver.reset();
     }
 
     public boolean isValid(BaseCell cell, ServiceManager serviceManager) {
@@ -96,18 +116,30 @@ public class MVHelper {
 
     public void mountView(BaseCell cell, View view) {
         try {
+            mvResolver.register(getCellUniqueId(cell), cell, view);
             if (cell.serviceManager != null) {
                 CellSupport cellSupport = cell.serviceManager.getService(CellSupport.class);
                 if (cellSupport != null) {
                     cellSupport.bindView(cell, view);
                 }
             }
-            loadMethod(cell, view);
-            initView(cell, view);
-            renderView(cell, view);
-            renderStyle(cell, view);
-            if (resolver().isCompatibleType(cell.type)) {
-                resolver().getCellClass(cell.type).cast(cell).bindView(view);
+            if (view instanceof IContainer) {
+                ViewBase vb = ((IContainer)view).getVirtualView();
+                vb.setVData(cell.extras);
+                if (vb.supportExposure()) {
+                    VafContext context = cell.serviceManager.getService(VafContext.class);
+                    context.getEventManager().emitEvent(
+                        EventManager.TYPE_Exposure, EventData.obtainData(context, vb));
+                }
+                renderStyle(cell, view);
+            } else {
+                loadMethod(cell, view);
+                initView(cell, view);
+                renderView(cell, view);
+                renderStyle(cell, view);
+            }
+            if (resolver().isCompatibleType(cell.stringType)) {
+                resolver().getCellClass(cell.stringType).cast(cell).bindView(view);
             }
             postMountView(cell, view);
             if (cell.serviceManager != null) {
@@ -117,6 +149,7 @@ public class MVHelper {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             if (cell.serviceManager != null) {
                 CellSupport cellSupport = cell.serviceManager.getService(CellSupport.class);
                 if (cellSupport != null) {
@@ -126,7 +159,26 @@ public class MVHelper {
         }
     }
 
+    public String getCellUniqueId(BaseCell cell) {
+        String flareId = cellFlareIdMap.get(cell);
+        if (flareId == null) {
+            String parentId = "";
+            if (cell.parent instanceof Card) {
+                parentId = ((Card) cell.parent).id;
+            } else if (cell.nestedParent instanceof BaseCell) {
+                parentId = ((BaseCell) cell.nestedParent).id;
+            }
+            flareId = String.format("%s_%s", cell.parent == null ? "null" : parentId, cell.pos);
+            cellFlareIdMap.put(cell, flareId);
+        }
+        return flareId;
+    }
+
     public void unMountView(BaseCell cell, View view) {
+        if (view instanceof IContainer) {
+            ViewBase vb = ((IContainer)view).getVirtualView();
+            vb.reset();
+        }
         postUnMountView(cell, view);
         if (cell.serviceManager != null) {
             CellSupport cellSupport = cell.serviceManager.getService(CellSupport.class);
@@ -134,8 +186,8 @@ public class MVHelper {
                 cellSupport.unBindView(cell, view);
             }
         }
-        if (resolver().isCompatibleType(cell.type)) {
-            resolver().getCellClass(cell.type).cast(cell).unbindView(view);
+        if (resolver().isCompatibleType(cell.stringType)) {
+            resolver().getCellClass(cell.stringType).cast(cell).unbindView(view);
         }
     }
 
@@ -163,8 +215,9 @@ public class MVHelper {
             paramClazz = method.getParameterTypes();
 
             if (!method.isAnnotationPresent(CellRender.class) ||
-                    paramClazz == null || paramClazz.length != 1)
+                paramClazz == null || paramClazz.length != 1) {
                 continue;
+            }
 
             if (method.getName().equals("postBindView")) {
                 postBindMap.put(cell, method);
@@ -242,8 +295,9 @@ public class MVHelper {
             }
         }
 
-        if (!paramMap.isEmpty())
+        if (!paramMap.isEmpty()) {
             methodMap.put(cell, paramMap);
+        }
     }
 
     private void initView(BaseCell cell, View view) {
@@ -307,6 +361,16 @@ public class MVHelper {
                 }
 
                 params.mAspectRatio = cell.style.aspectRatio;
+
+                params.zIndex = cell.style.zIndex;
+                if (params.zIndex == 0) {
+                    if (cell.parent != null && cell.parent.style != null) {
+                        params.zIndex = cell.parent.style.zIndex;
+                    }
+                }
+                if (VERSION.SDK_INT >= 21) {
+                    view.setZ(params.zIndex);
+                }
             } else {
                 if (cell.style.height >= 0) {
                     lp.height = cell.style.height;
@@ -320,10 +384,10 @@ public class MVHelper {
 
             if (lp instanceof ViewGroup.MarginLayoutParams) {
                 ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) lp;
-                layoutParams.topMargin = cell.style.margin[MARGIN_TOP_INDEX];
-                layoutParams.leftMargin = cell.style.margin[MARGIN_LEFT_INDEX];
-                layoutParams.bottomMargin = cell.style.margin[MARGIN_BOTTOM_INDEX];
-                layoutParams.rightMargin = cell.style.margin[MARGIN_RIGHT_INDEX];
+                layoutParams.topMargin = cell.style.margin[MARGIN_TOP_INDEX] >= 0 ? cell.style.margin[MARGIN_TOP_INDEX] : 0;
+                layoutParams.leftMargin = cell.style.margin[MARGIN_LEFT_INDEX] >= 0 ? cell.style.margin[MARGIN_LEFT_INDEX] : 0;
+                layoutParams.bottomMargin = cell.style.margin[MARGIN_BOTTOM_INDEX] >= 0 ? cell.style.margin[MARGIN_BOTTOM_INDEX] : 0;
+                layoutParams.rightMargin = cell.style.margin[MARGIN_RIGHT_INDEX] >= 0 ? cell.style.margin[MARGIN_RIGHT_INDEX] : 0;
             }
 
             // reset translation animation before reused
@@ -359,8 +423,8 @@ public class MVHelper {
                 }
             }
         }
-        if (resolver().isCompatibleType(cell.type)) {
-            resolver().getCellClass(cell.type).cast(cell).postBindView(view);
+        if (resolver().isCompatibleType(cell.stringType)) {
+            resolver().getCellClass(cell.stringType).cast(cell).postBindView(view);
         }
     }
 

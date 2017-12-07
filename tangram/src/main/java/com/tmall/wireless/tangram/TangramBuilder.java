@@ -29,6 +29,7 @@ import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
+import com.tmall.wireless.tangram.dataparser.concrete.Cell;
 import com.tmall.wireless.tangram.dataparser.concrete.PojoAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.PojoDataParser;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
@@ -55,7 +56,6 @@ import com.tmall.wireless.tangram.structure.card.StaggeredCard;
 import com.tmall.wireless.tangram.structure.card.StickyCard;
 import com.tmall.wireless.tangram.structure.card.StickyEndCard;
 import com.tmall.wireless.tangram.structure.card.TripleColumnCard;
-import com.tmall.wireless.tangram.structure.view.GridEntityCardView;
 import com.tmall.wireless.tangram.structure.view.SimpleEmptyView;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
 import com.tmall.wireless.tangram.support.TimerSupport;
@@ -63,7 +63,6 @@ import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
 import com.tmall.wireless.tangram.util.TangramViewMetrics;
-import com.tmall.wireless.tangram.util.Utils;
 import com.tmall.wireless.tangram.view.BannerView;
 import com.tmall.wireless.tangram.view.LinearScrollView;
 
@@ -71,6 +70,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ImageView;
+import com.tmall.wireless.vaf.framework.VafContext;
+import com.tmall.wireless.vaf.framework.ViewManager;
 
 /**
  *
@@ -102,78 +103,157 @@ public class TangramBuilder {
     // type start point for extended build-in cellInited
     public static final int START_EXTENDED_CELL_TYPE = 1000;
 
+
     public static final int TYPE_EXTENDED_VIEW = -1;
+
+    protected static final String TYPE_EXTENDED_VIEW_COMPACT = "-1";
 
     public static final int TYPE_EMPTY_VIEW = 0;
 
+    protected static final String TYPE_EMPTY_VIEW_COMPACT = "0";
+
     public static final int TYPE_SIMPLE_IMAGE = 1;
+
+    protected static final String TYPE_SIMPLE_IMAGE_COMPACT = "1";
 
     public static final int TYPE_CAROUSEL_CELL = -2;
 
+    protected static final String TYPE_CAROUSEL_CELL_COMPACT = "-2";
+
     public static final int TYPE_LINEAR_SCROLL_CELL = -3;
+
+    protected static final String TYPE_LINEAR_SCROLL_CELL_COMPACT = "-3";
 
     // cards already in home page
     public static final int TYPE_SINGLE_COLUMN = 1;
 
+    protected static final String TYPE_SINGLE_COLUMN_COMPACT = "1";
+
     public static final int TYPE_DOUBLE_COLUMN = 2;
+
+    protected static final String TYPE_DOUBLE_COLUMN_COMPACT = "2";
 
     public static final int TYPE_TRIPLE_COLUMN = 3;
 
+    protected static final String TYPE_TRIPLE_COLUMN_COMPACT = "3";
+
     public static final int TYPE_FOUR_COLUMN = 4;
+
+    protected static final String TYPE_FOUR_COLUMN_COMPACT = "4";
 
     public static final int TYPE_ONE_PLUS_N = 5;
 
+    protected static final String TYPE_ONE_PLUS_N_COMPACT = "5";
+
     public static final int TYPE_FLOAT = 7;
+
+    protected static final String TYPE_FLOAT_COMPACT = "7";
 
     public static final int TYPE_PIN_BOTTOM = 8;
 
+    protected static final String TYPE_PIN_BOTTOM_COMPACT = "8";
+
     public static final int TYPE_FIVE_COLUMN = 9;
+
+    protected static final String TYPE_FIVE_COLUMN_COMPACT = "9";
 
     public static final int TYPE_CAROUSEL = 10;
 
+    protected static final String TYPE_CAROUSEL_COMPACT = "10";
+
+    public static final int TYPE_MIX = 11;
+
+    protected static final String TYPE_MIX_COMPACT = "11";
+
     public static final int TYPE_STICKY = 20;
+
+    protected static final String TYPE_STICKY_COMPACT = "20";
 
     public static final int TYPE_STICKY_START = 21;
 
+    protected static final String TYPE_STICKY_START_COMPACT = "21";
+
     public static final int TYPE_STICKY_END = 22;
+
+    protected static final String TYPE_STICKY_END_COMPACT = "22";
 
     public static final int TYPE_PIN_TOP = 23;
 
+    protected static final String TYPE_PIN_TOP_COMPACT = "23";
+
     public static final int TYPE_FUSION_TABS = 24;
+
+    protected static final String TYPE_FUSION_TABS_COMPACT = "24";
 
     public static final int TYPE_STAGGER = 25;
 
+    protected static final String TYPE_STAGGER_COMPACT = "25";
+
     public static final int TYPE_FLOW = 27;
+
+    protected static final String TYPE_FLOW_COMPACT = "27";
 
     public static final int TYPE_SCROLL_FIX = 28;
 
+    protected static final String TYPE_SCROLL_FIX_COMPACT = "28";
+
     public static final int TYPE_LINEAR_SCROLL = 29;
 
+    protected static final String TYPE_LINEAR_SCROLL_COMPACT = "29";
+
     public static final int TYPE_SCROLL_FIX_BANNER = 30;
+
+    protected static final String TYPE_SCROLL_FIX_BANNER_COMPACT = "30";
 
     // type start point for extended built-in card
     public static final int START_EXTENDED_CARD_TYPE = 1024;
 
     public static final int TYPE_FIX = START_EXTENDED_CARD_TYPE + 1;
 
+    protected static final String TYPE_FIX_COMPACT = "1025";
+
     public static final int TYPE_GRID = START_EXTENDED_CARD_TYPE + 2;
+
+    protected static final String TYPE_GRID_COMPACT = "1026";
 
     public static final int TYPE_LINEAR = START_EXTENDED_CARD_TYPE + 3;
 
+    protected static final String TYPE_LINEAR_COMPACT = "1027";
+
     public static final int TYPE_X_COLUMN = START_EXTENDED_CARD_TYPE + 9;
 
-    // cellize card type
-    public static final int TYPE_SINGLE_COLUMN_ENTITY = Utils.cellizeCard(TYPE_SINGLE_COLUMN);
+    protected static final String TYPE_X_COLUMN_COMPACT = "1033";
 
-    public static final int TYPE_DOUBLE_COLUMN_ENTITY = Utils.cellizeCard(TYPE_DOUBLE_COLUMN);
+    public static final String TYPE_CONTAINER_FLOW = "container-flow";
 
-    public static final int TYPE_TRIPLE_COLUMN_ENTITY = Utils.cellizeCard(TYPE_TRIPLE_COLUMN);
+    public static final String TYPE_CONTAINER_1C_FLOW = "container-oneColumn";
 
-    public static final int TYPE_FOUR_COLUMN_ENTITY = Utils.cellizeCard(TYPE_FOUR_COLUMN);
+    public static final String TYPE_CONTAINER_2C_FLOW = "container-twoColumn";
 
-    public static final int TYPE_FIVE_COLUMN_ENTITY = Utils.cellizeCard(TYPE_FIVE_COLUMN);
+    public static final String TYPE_CONTAINER_3C_FLOW = "container-threeColumn";
 
-    public static final int TYPE_CAROUSEL_ENTITY = Utils.cellizeCard(TYPE_CAROUSEL);
+    public static final String TYPE_CONTAINER_4C_FLOW = "container-fourColumn";
+
+    public static final String TYPE_CONTAINER_5C_FLOW = "container-fiveColumn";
+
+    public static final String TYPE_CONTAINER_ON_PLUSN = "container-onePlusN";
+
+    public static final String TYPE_CONTAINER_FLOAT = "container-float";
+
+    public static final String TYPE_CONTAINER_BANNER = "container-banner";
+
+    public static final String TYPE_CONTAINER_SCROLL = "container-scroll";
+
+    public static final String TYPE_CONTAINER_STICKY = "container-sticky";
+
+    public static final String TYPE_CONTAINER_WATERFALL = "container-waterfall";
+
+    public static final String TYPE_CONTAINER_FIX = "container-fix";
+
+    public static final String TYPE_CONTAINER_SCROLL_FIX = "container-scrollFix";
+
+    public static final String TYPE_CONTAINER_SCROLL_FIX_BANNER = "container-scrollFixBanner";
+
 
     /**
      * init global Tangram environment.
@@ -182,14 +262,14 @@ public class TangramBuilder {
      * @param imageClazz a custom ImageView class, used to construct an imageView instance.
      */
     public static void init(@NonNull final Context context, IInnerImageSetter innerImageSetter,
-            Class<? extends ImageView> imageClazz) {
+        Class<? extends ImageView> imageClazz) {
         if (sInitialized) {
             return;
         }
         //noinspection ConstantConditions
         Preconditions.checkArgument(context != null, "context should not be null");
         Preconditions
-                .checkArgument(innerImageSetter != null, "innerImageSetter should not be null");
+            .checkArgument(innerImageSetter != null, "innerImageSetter should not be null");
         Preconditions.checkArgument(imageClazz != null, "imageClazz should not be null");
         TangramViewMetrics.initWith(context.getApplicationContext());
         ImageUtils.sImageClass = imageClazz;
@@ -202,54 +282,64 @@ public class TangramBuilder {
      * @param registry
      */
     public static void installDefaultRegistry(@NonNull final DefaultResolverRegistry registry) {
-        /*
-         * register built-in cards & mCells
-         */
-        MVHelper MVHelper = new MVHelper(new MVResolver());
-        registry.setMVHelper(MVHelper);
+            /*
+             * register built-in cards & mCells
+             */
+        MVHelper mvHelper = new MVHelper(new MVResolver());
+        registry.setMVHelper(mvHelper);
 
         // built-in mCells
-        registry.registerCell(TYPE_EXTENDED_VIEW, Card.PlaceholderCell.class,
-                SimpleEmptyView.class);
-        registry.registerCell(TYPE_EMPTY_VIEW, BaseCell.class, SimpleEmptyView.class);
-        registry.registerCell(TYPE_CAROUSEL_CELL, BannerView.class);
-        registry.registerCell(TYPE_SINGLE_COLUMN_ENTITY, GridEntityCardView.class);
-        registry.registerCell(TYPE_DOUBLE_COLUMN_ENTITY, GridEntityCardView.class);
-        registry.registerCell(TYPE_TRIPLE_COLUMN_ENTITY, GridEntityCardView.class);
-        registry.registerCell(TYPE_FOUR_COLUMN_ENTITY, GridEntityCardView.class);
-        registry.registerCell(TYPE_FIVE_COLUMN_ENTITY, GridEntityCardView.class);
-        registry.registerCell(TYPE_CAROUSEL_ENTITY, BannerView.class);
-
-        registry.registerCell(TYPE_LINEAR_SCROLL_CELL, LinearScrollView.class);
+        registry.registerCell(TYPE_EXTENDED_VIEW_COMPACT, Card.PlaceholderCell.class,
+            SimpleEmptyView.class);
+        registry.registerCell(TYPE_EMPTY_VIEW_COMPACT, BaseCell.class, SimpleEmptyView.class);
+        //registry.registerCell(TYPE_SIMPLE_IMAGE_COMPACT, Cell.class, SimpleImgView.class);
+        registry.registerCell(TYPE_CAROUSEL_CELL_COMPACT, BannerView.class);
+        registry.registerCell(TYPE_CONTAINER_BANNER, BannerView.class);
+        registry.registerCell(TYPE_LINEAR_SCROLL_CELL_COMPACT, LinearScrollView.class);
 
         // built-in cards
-        registry.registerCard(TYPE_CAROUSEL, BannerCard.class);
-        registry.registerCard(TYPE_SINGLE_COLUMN, SingleColumnCard.class);
-        registry.registerCard(TYPE_DOUBLE_COLUMN, DoubleColumnCard.class);
-        registry.registerCard(TYPE_TRIPLE_COLUMN, TripleColumnCard.class);
-        registry.registerCard(TYPE_FOUR_COLUMN, FourColumnCard.class);
-        registry.registerCard(TYPE_ONE_PLUS_N, OnePlusNCard.class);
-        registry.registerCard(TYPE_FLOAT, FloatCard.class);
-        registry.registerCard(TYPE_PIN_BOTTOM, PinBottomCard.class);
-        registry.registerCard(TYPE_FIVE_COLUMN, FiveColumnCard.class);
-        registry.registerCard(TYPE_STICKY, StickyCard.class);
-        registry.registerCard(TYPE_STICKY_START, StickyCard.class);
-        registry.registerCard(TYPE_STICKY_END, StickyEndCard.class);
-        registry.registerCard(TYPE_PIN_TOP, PinTopCard.class);
-        registry.registerCard(TYPE_STAGGER, StaggeredCard.class);
+        registry.registerCard(TYPE_CAROUSEL_COMPACT, BannerCard.class);
+        registry.registerCard(TYPE_CONTAINER_BANNER, BannerCard.class);
+        registry.registerCard(TYPE_SINGLE_COLUMN_COMPACT, SingleColumnCard.class);
+        registry.registerCard(TYPE_CONTAINER_1C_FLOW, SingleColumnCard.class);
+        registry.registerCard(TYPE_DOUBLE_COLUMN_COMPACT, DoubleColumnCard.class);
+        registry.registerCard(TYPE_CONTAINER_2C_FLOW, DoubleColumnCard.class);
+        registry.registerCard(TYPE_TRIPLE_COLUMN_COMPACT, TripleColumnCard.class);
+        registry.registerCard(TYPE_CONTAINER_3C_FLOW, TripleColumnCard.class);
+        registry.registerCard(TYPE_FOUR_COLUMN_COMPACT, FourColumnCard.class);
+        registry.registerCard(TYPE_CONTAINER_4C_FLOW, FourColumnCard.class);
+        registry.registerCard(TYPE_ONE_PLUS_N_COMPACT, OnePlusNCard.class);
+        registry.registerCard(TYPE_CONTAINER_ON_PLUSN, OnePlusNCard.class);
+        registry.registerCard(TYPE_FLOAT_COMPACT, FloatCard.class);
+        registry.registerCard(TYPE_CONTAINER_FLOAT, FloatCard.class);
+        registry.registerCard(TYPE_PIN_BOTTOM_COMPACT, PinBottomCard.class);
+        registry.registerCard(TYPE_FIVE_COLUMN_COMPACT, FiveColumnCard.class);
+        registry.registerCard(TYPE_CONTAINER_5C_FLOW, FiveColumnCard.class);
+        registry.registerCard(TYPE_STICKY_COMPACT, StickyCard.class);
+        registry.registerCard(TYPE_CONTAINER_STICKY, StickyCard.class);
+        registry.registerCard(TYPE_STICKY_START_COMPACT, StickyCard.class);
+        registry.registerCard(TYPE_STICKY_END_COMPACT, StickyEndCard.class);
+        registry.registerCard(TYPE_PIN_TOP_COMPACT, PinTopCard.class);
+        registry.registerCard(TYPE_CONTAINER_FIX, FixCard.class);
+        registry.registerCard(TYPE_STAGGER_COMPACT, StaggeredCard.class);
+        registry.registerCard(TYPE_CONTAINER_WATERFALL, StaggeredCard.class);
 
-        registry.registerCard(TYPE_FUSION_TABS, FusionCard.class);
-        registry.registerCard(TYPE_FLOW, FlowCard.class);
-        registry.registerCard(TYPE_SCROLL_FIX, ScrollFixCard.class);
+        registry.registerCard(TYPE_FUSION_TABS_COMPACT, FusionCard.class);
+        registry.registerCard(TYPE_FLOW_COMPACT, FlowCard.class);
+        registry.registerCard(TYPE_CONTAINER_FLOW, FlowCard.class);
+        registry.registerCard(TYPE_SCROLL_FIX_COMPACT, ScrollFixCard.class);
+        registry.registerCard(TYPE_CONTAINER_SCROLL_FIX, ScrollFixCard.class);
 
-        registry.registerCard(TYPE_LINEAR_SCROLL, LinearScrollCard.class);
-        registry.registerCard(TYPE_SCROLL_FIX_BANNER, FixLinearScrollCard.class);
+        registry.registerCard(TYPE_LINEAR_SCROLL_COMPACT, LinearScrollCard.class);
+        registry.registerCard(TYPE_CONTAINER_SCROLL, LinearScrollCard.class);
+        registry.registerCard(TYPE_SCROLL_FIX_BANNER_COMPACT, FixLinearScrollCard.class);
+        registry.registerCard(TYPE_CONTAINER_SCROLL_FIX_BANNER, FixLinearScrollCard.class);
 
         // extend cards
-        registry.registerCard(TYPE_FIX, FixCard.class);
-        registry.registerCard(TYPE_GRID, GridCard.class);
-        registry.registerCard(TYPE_LINEAR, LinearCard.class);
-        registry.registerCard(TYPE_X_COLUMN, ColumnCard.class);
+        registry.registerCard(TYPE_FIX_COMPACT, FixCard.class);
+        registry.registerCard(TYPE_GRID_COMPACT, GridCard.class);
+        registry.registerCard(TYPE_LINEAR_COMPACT, LinearCard.class);
+        registry.registerCard(TYPE_X_COLUMN_COMPACT, ColumnCard.class);
     }
 
     /**
@@ -288,6 +378,7 @@ public class TangramBuilder {
             this.mContext = context;
             this.mDefaultResolverRegistry = registry;
             mMVHelper = registry.getMVHelper();
+            mMVResolver = mMVHelper.resolver();
             mPojoAdapterBuilder = new PojoAdapterBuilder();
         }
 
@@ -298,9 +389,10 @@ public class TangramBuilder {
          * @param viewClz
          * @param <V>
          */
+        @Deprecated
         public <V extends View> void registerCell(int type,
-                @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
-            mDefaultResolverRegistry.registerCell(type, cellClz, viewClz);
+            @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
+            mDefaultResolverRegistry.registerCell(String.valueOf(type), cellClz, viewClz);
         }
 
         /**
@@ -310,10 +402,11 @@ public class TangramBuilder {
          * @param viewHolderCreator
          * @param <V>
          */
+        @Deprecated
         public <V extends View> void registerCell(int type,
-                @NonNull Class<? extends BaseCell> cellClz,
-                @NonNull ViewHolderCreator viewHolderCreator) {
-            mDefaultResolverRegistry.registerCell(type, cellClz, viewHolderCreator);
+            @NonNull Class<? extends BaseCell> cellClz,
+            @NonNull ViewHolderCreator viewHolderCreator) {
+            mDefaultResolverRegistry.registerCell(String.valueOf(type), cellClz, viewHolderCreator);
         }
 
         /**
@@ -322,8 +415,9 @@ public class TangramBuilder {
          * @param viewClz
          * @param <V>
          */
+        @Deprecated
         public <V extends View> void registerCell(int type, @NonNull Class<V> viewClz) {
-            mDefaultResolverRegistry.registerCell(type, viewClz);
+            mDefaultResolverRegistry.registerCell(String.valueOf(type), viewClz);
         }
 
         /**
@@ -331,8 +425,36 @@ public class TangramBuilder {
          * @param type
          * @param cardClz
          */
+        @Deprecated
         public void registerCard(int type, Class<? extends Card> cardClz) {
+            mDefaultResolverRegistry.registerCard(String.valueOf(type), cardClz);
+        }
+
+        public <V extends View> void registerCell(String type,
+            @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
+            mDefaultResolverRegistry.registerCell(type, cellClz, viewClz);
+        }
+
+        public <V extends View> void registerCell(String type,
+            @NonNull Class<? extends BaseCell> cellClz,
+            @NonNull ViewHolderCreator viewHolderCreator) {
+            mDefaultResolverRegistry.registerCell(type, cellClz, viewHolderCreator);
+        }
+
+        public <V extends View> void registerCell(String type, @NonNull Class<V> viewClz) {
+            mDefaultResolverRegistry.registerCell(type, viewClz);
+        }
+
+        public void registerCard(String type, Class<? extends Card> cardClz) {
             mDefaultResolverRegistry.registerCard(type, cardClz);
+        }
+
+        /**
+         * register item render by virtual view
+         * @param type
+         */
+        public <V extends View> void registerVirtualView(String type) {
+            mDefaultResolverRegistry.registerVirtualView(type);
         }
 
         /**
@@ -358,24 +480,47 @@ public class TangramBuilder {
         public TangramEngine build() {
 
             TangramEngine tangramEngine =
-                    new TangramEngine(mContext, new PojoDataParser(), mPojoAdapterBuilder);
+                new TangramEngine(mContext, new PojoDataParser(), mPojoAdapterBuilder);
 
             // register service with default services
             tangramEngine.register(MVHelper.class, mMVHelper);
             tangramEngine
-                    .register(CardResolver.class, mDefaultResolverRegistry.mDefaultCardResolver);
+                .register(CardResolver.class, mDefaultResolverRegistry.mDefaultCardResolver);
             tangramEngine.register(BaseCellBinderResolver.class,
-                    mDefaultResolverRegistry.mDefaultCellBinderResolver);
+                mDefaultResolverRegistry.mDefaultCellBinderResolver);
             tangramEngine.register(BaseCardBinderResolver.class,
-                    mDefaultResolverRegistry.mDefaultCardBinderResolver);
+                mDefaultResolverRegistry.mDefaultCardBinderResolver);
 
             // add other features service
             tangramEngine.register(TimerSupport.class, new TimerSupport());
             tangramEngine.register(BusSupport.class, new BusSupport());
 
+            // add virtual view context
+            VafContext mVafContext = new VafContext(mContext.getApplicationContext());
+            ViewManager mViewManager = mVafContext.getViewManager();
+            mViewManager.init(mContext.getApplicationContext());
+            tangramEngine.register(ViewManager.class, mViewManager);
+            tangramEngine.register(VafContext.class, mVafContext);
+            mMVHelper.setVafContext(mVafContext);
+
+            mMVResolver.setServiceManager(tangramEngine);
+
+            if(callback != null){
+                callback.onBuild(tangramEngine);
+            }
             return tangramEngine;
         }
 
+        BuildCallback callback = null;
+
+        public void setBuildCallback(BuildCallback callback){
+            this.callback = callback;
+        }
+
+    }
+
+    public interface BuildCallback {
+        void onBuild(TangramEngine tangramEngine);
     }
 
 }

@@ -69,7 +69,7 @@ public class StickyCard extends OneItemCard {
     }
 
     @Override
-    protected void parseStyle(JSONObject data) {
+    public void parseStyle(JSONObject data) {
         this.style = new StickyStyle(true);
         if (data != null)
             style.parseWith(data);

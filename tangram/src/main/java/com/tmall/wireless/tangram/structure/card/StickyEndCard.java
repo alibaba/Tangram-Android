@@ -31,7 +31,7 @@ import org.json.JSONObject;
  */
 public class StickyEndCard extends StickyCard {
     @Override
-    protected void parseStyle(JSONObject data) {
+    public void parseStyle(JSONObject data) {
         this.style = new StickyStyle(false);
         if (data != null)
             style.parseWith(data);
