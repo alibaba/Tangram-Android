@@ -2,7 +2,7 @@
 
 ```
 // gradle
-compile 'com.alibaba.android:tangram:2.0.0-SNAPSHOT@aar'
+compile 'com.alibaba.android:tangram:2.0.0@aar'
 ```
 
 或者
@@ -12,7 +12,7 @@ compile 'com.alibaba.android:tangram:2.0.0-SNAPSHOT@aar'
 <dependency>
   <groupId>com.alibaba.android</groupId>
   <artifactId>tangram</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>2.0.0</version>
   <type>aar</type>
 </dependency>
 ```
