@@ -175,11 +175,11 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         if (serviceManager != null) {
             SimpleClickSupport service = serviceManager.getService(SimpleClickSupport.class);
             if (service != null) {
-                int pos = this.pos;
-                if (innerClickMap.containsKey(v)) {
-                    pos = innerClickMap.get(v.hashCode()).intValue();
+                int eventType = this.pos;
+                if (innerClickMap.containsKey(v.hashCode())) {
+                    eventType = innerClickMap.get(v.hashCode()).intValue();
                 }
-                service.onClick(v, this, pos);
+                service.onClick(v, this, eventType);
             }
         }
     }
