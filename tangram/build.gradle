@@ -83,7 +83,7 @@ configurations.all {
 
 dependencies {
 
-    compile('com.alibaba.android:vlayout:1.2.6@aar') {
+    compile('com.alibaba.android:vlayout:1.2.6.1@aar') {
         changing = true
     }
 

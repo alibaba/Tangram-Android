@@ -340,7 +340,11 @@ public class MVHelper {
             ViewGroup.LayoutParams lp = view.getLayoutParams();
 
             if (lp == null || !(lp instanceof VirtualLayoutManager.LayoutParams)) {
-                lp = new VirtualLayoutManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                if (lp == null) {
+                    lp = new VirtualLayoutManager.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                } else {
+                    lp = new VirtualLayoutManager.LayoutParams(lp.width, lp.height);
+                }
                 view.setLayoutParams(lp);
             }
             if (lp instanceof VirtualLayoutManager.LayoutParams) {
