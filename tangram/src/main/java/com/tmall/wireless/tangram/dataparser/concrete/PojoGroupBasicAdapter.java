@@ -47,6 +47,7 @@ import com.tmall.wireless.tangram.support.CellSupport;
 import com.tmall.wireless.tangram.support.PageDetectorSupport;
 import com.tmall.wireless.vaf.framework.ViewManager;
 import java.lang.annotation.Inherited;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
