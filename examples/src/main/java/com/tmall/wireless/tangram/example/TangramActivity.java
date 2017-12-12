@@ -25,6 +25,8 @@
 package com.tmall.wireless.tangram.example;
 
 import com.alibaba.android.vlayout.Range;
+
+import com.libra.Utils;
 import com.squareup.picasso.Picasso;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.TangramEngine;
@@ -36,6 +38,7 @@ import com.tmall.wireless.tangram.example.data.SingleImageView;
 import com.tmall.wireless.tangram.example.data.TestView;
 import com.tmall.wireless.tangram.example.data.TestViewHolder;
 import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
+import com.tmall.wireless.tangram.example.data.VVTEST;
 import com.tmall.wireless.tangram.example.support.SampleClickSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
@@ -44,6 +47,7 @@ import com.tmall.wireless.tangram.support.async.AsyncPageLoader;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 
+import com.tmall.wireless.vaf.framework.VafContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -117,8 +121,12 @@ public class TangramActivity extends Activity {
                 TestViewHolderCell.class,
                 new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TextView.class));
         builder.registerCell(199,SingleImageView.class);
+        builder.registerVirtualView("vvtest");
         //Step 4: new engine
         engine = builder.build();
+        engine.setVirtualViewTemplate(VVTEST.BIN);
+        Utils.setUedScreenWidth(720);
+        VafContext.loadImageLoader(getApplicationContext());
 
         //Step 5: add card load support if you have card that loading cells async
         engine.addCardLoadSupport(new CardLoadSupport(

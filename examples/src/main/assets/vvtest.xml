@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright (c) 2017 Alibaba Group
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
+<FrameLayout
+        flag="flag_exposure|flag_clickable"
+        action="action"
+        layoutWidth="match_parent"
+        layoutHeight="84rp"
+        background="#FFFFFF">
+
+    <NImage
+            layoutWidth="48rp"
+            layoutHeight="48rp"
+            layoutMarginLeft="34rp"
+            layoutGravity="left|v_center"
+            src="${imgUrl}"
+            scaleType="center_crop"
+    />
+    <NText
+            layoutWidth="wrap_content"
+            layoutHeight="wrap_content"
+            layoutMarginLeft="94rp"
+            text="${title}"
+            layoutGravity="left|v_center"
+            textSize="28rp"
+            textColor="#555555"
+    />
+    <NText
+            layoutWidth="wrap_content"
+            layoutHeight="wrap_content"
+            layoutMarginRight="50rp"
+            layoutGravity="right|v_center"
+            textSize="28rp"
+            text="${subtitle}"
+            textColor="${subtitleColor}"/>
+    <NImage
+            layoutWidth="14rp"
+            layoutHeight="30rp"
+            layoutMarginRight="28rp"
+            layoutGravity="right|v_center"
+            src="${arrowImgUrl}"
+            scaleType="center_crop"
+    />
+
+    <NLine
+            layoutWidth="680rp"
+            layoutHeight="1rp"
+            orientation="H"
+            layoutGravity="h_center|bottom"
+            src="${lineImgUrl}"
+            color="#999999"
+    />
+</FrameLayout>
