@@ -78,7 +78,7 @@ public class BaseCellBinder<T extends ViewHolderCreator.ViewHolder, V extends Vi
         } else if (mViewCreator != null) {
             v = mViewCreator.create(context, parent);
         } else {
-            v = (V) mMvHelper.getVafContext().getContainerService().getContainer(type, false);
+            v = (V) mMvHelper.getVafContext().getContainerService().getContainer(type, true);
         }
         if (v.getId() <= 0) {
             v.setId(R.id.TANGRAM_VIEW_CONTAINER_ID);
