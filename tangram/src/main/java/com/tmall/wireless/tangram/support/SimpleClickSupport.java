@@ -118,23 +118,23 @@ public abstract class SimpleClickSupport {
      *
      * @param targetView the view that trigger the click event, not the view respond the cell!
      * @param cell       the corresponding cell
-     * @param type       click event type, defined by developer.
+     * @param eventType       click event type, defined by developer.
      */
-    public void onClick(View targetView, BaseCell cell, int type) {
+    public void onClick(View targetView, BaseCell cell, int eventType) {
         if (cell instanceof Cell) {
-            onClick(targetView, (Cell) cell, type);
+            onClick(targetView, (Cell) cell, eventType);
         } else {
-            onClick(targetView, cell, type, null);
+            onClick(targetView, cell, eventType, null);
         }
     }
 
-    public void onClick(View targetView, Cell cell, int type) {
-        onClick(targetView, cell, type, null);
+    public void onClick(View targetView, Cell cell, int eventType) {
+        onClick(targetView, cell, eventType, null);
     }
 
-    public void onClick(View targetView, BaseCell cell, int type, Map<String, Object> params) {
+    public void onClick(View targetView, BaseCell cell, int eventType, Map<String, Object> params) {
         if (optimizedMode) {
-            defaultClick(targetView, cell, type);
+            defaultClick(targetView, cell, eventType);
         } else {
             if (mOnClickMethods.isEmpty()) {
                 findClickMethods(this.getClass().getMethods());
@@ -148,10 +148,10 @@ public abstract class SimpleClickSupport {
                     OnClickMethod onClickMethod = mOnClickMethods.get(clz);
                     try {
                         if (onClickMethod.paramLength == 3) {
-                            onClickMethod.method.invoke(this, targetView, cell, type);
+                            onClickMethod.method.invoke(this, targetView, cell, eventType);
                             return;
                         } else if (onClickMethod.paramLength == 4) {
-                            onClickMethod.method.invoke(this, targetView, cell, type, params);
+                            onClickMethod.method.invoke(this, targetView, cell, eventType, params);
                             return;
                         }
                     } catch (Exception e) {
@@ -159,11 +159,11 @@ public abstract class SimpleClickSupport {
                     }
                 }
             }
-            defaultClick(targetView, cell, type);
+            defaultClick(targetView, cell, eventType);
         }
     }
 
-    public void defaultClick(View targetView, BaseCell cell, int type) {
+    public void defaultClick(View targetView, BaseCell cell, int eventType) {
 
     }
 
