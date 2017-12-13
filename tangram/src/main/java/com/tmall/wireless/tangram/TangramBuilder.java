@@ -24,6 +24,7 @@
 
 package com.tmall.wireless.tangram;
 
+import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
@@ -374,12 +375,15 @@ public class TangramBuilder {
 
         private IAdapterBuilder mPojoAdapterBuilder;
 
+        private DataParser mDataParser;
+
         protected InnerBuilder(@NonNull final Context context, DefaultResolverRegistry registry) {
             this.mContext = context;
             this.mDefaultResolverRegistry = registry;
             mMVHelper = registry.getMVHelper();
             mMVResolver = mMVHelper.resolver();
             mPojoAdapterBuilder = new PojoAdapterBuilder();
+            mDataParser = new PojoDataParser();
         }
 
         /**
@@ -458,12 +462,22 @@ public class TangramBuilder {
         }
 
         /**
-         * set an custom {@link IAdapterBuilder} to build adapter, the default is {@link PojoAdapterBuilder} which would create a {@link com.tmall.wireless.tangram.dataparser.concrete.PojoGroupBasicAdapter}
+         * set an custom {@link IAdapterBuilder} to build adapter, the default is {@link PojoAdapterBuilder} which
+         * would create a {@link com.tmall.wireless.tangram.dataparser.concrete.PojoGroupBasicAdapter}
          * @param builder custom IadapterBuilder
          */
         public void setAdapterBuilder(@NonNull IAdapterBuilder builder) {
             Preconditions.checkNotNull(builder, "newInnerBuilder should not be null");
             this.mPojoAdapterBuilder = builder;
+        }
+
+        /**
+         * set an custom {@link DataParser}, the default is {@link PojoDataParser}
+         * @param dataParser
+         */
+        public void setDataParser(@NonNull DataParser dataParser) {
+            Preconditions.checkNotNull(dataParser, "newDataParser should not be null");
+            this.mDataParser = dataParser;
         }
 
         public int getCellTypeCount() {
@@ -480,7 +494,7 @@ public class TangramBuilder {
         public TangramEngine build() {
 
             TangramEngine tangramEngine =
-                new TangramEngine(mContext, new PojoDataParser(), mPojoAdapterBuilder);
+                new TangramEngine(mContext, mDataParser, mPojoAdapterBuilder);
 
             // register service with default services
             tangramEngine.register(MVHelper.class, mMVHelper);
