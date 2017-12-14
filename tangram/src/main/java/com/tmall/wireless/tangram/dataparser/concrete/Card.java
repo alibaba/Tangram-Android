@@ -182,7 +182,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
      * serviceManager
      */
     @Nullable
-    protected ServiceManager serviceManager;
+    public ServiceManager serviceManager;
 
 
     // TODO: back store refactor

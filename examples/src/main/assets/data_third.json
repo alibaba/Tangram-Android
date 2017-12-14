@@ -1,0 +1,53 @@
+[
+  {
+    "items": [
+      {
+        "msg": "banner item 0",
+        "type": 110
+      },
+      {
+        "msg": "banner item 1",
+        "type": 110
+      }
+    ],
+    "type": 1000
+  },
+  {
+    "iconList": [
+      {
+        "subTitle": "测试内容10jm",
+        "title": "测试内容7774",
+        "type": 1
+      },
+      {
+        "subTitle": "测试内容10jm",
+        "title": "测试内容7774",
+        "type": 1
+      },
+      {
+        "subTitle": "测试内容10jm",
+        "title": "测试内容7774",
+        "type": 1
+      },
+      {
+        "subTitle": "测试内容10jm",
+        "title": "测试内容7774",
+        "type": 1
+      }
+    ],
+    "type": 2000
+  },
+  {
+    "centerBannerList": [
+      {
+        "msg": "centerBannerList 0",
+        "type": 110
+      },
+      {
+        "msg": "centerBannerList 1",
+        "type": 110
+      }
+    ],
+    "type": 1000
+  }
+]
