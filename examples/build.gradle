@@ -53,4 +53,6 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.android.support:support-annotations:21.0.0'
+
+    compile 'com.google.code.gson:gson:2.8.1'
 }
