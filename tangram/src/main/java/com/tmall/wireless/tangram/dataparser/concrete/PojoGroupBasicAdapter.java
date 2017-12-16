@@ -84,7 +84,8 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         super(context, layoutManager, componentBinderResolver, cardBinderResolver);
         this.mMvHelper = mvHelper;
         this.mViewManager = viewManager;
-        setHasStableIds(true);
+        //if true, this adapter's items have stable IDs, but BaseCell.objectId return 0. So not use.
+        //setHasStableIds(true);
     }
 
     /**
