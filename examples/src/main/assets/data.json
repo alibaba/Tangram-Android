@@ -175,6 +175,60 @@
     ]
   },
   {
+    "type": "10",
+    "style": {
+      "indicatorImg1": "https://gw.alicdn.com/tps/TB16RaxLpXXXXbIXFXXXXXXXXXX-14-14.png",
+      "indicatorImg2": "https://gw.alicdn.com/tps/TB1m79uLpXXXXXUXVXXXXXXXXXX-18-16.png",
+      "indicatorGravity": "center",
+      "indicatorPosition": "outside",
+      "indicatorMargin": 10,
+      "indicatorGap": 2,
+      "scrollMarginLeft": 20,
+      "scrollMarginRight": 20,
+      "hGap": 12,
+      "pageRatio": 0.5,
+      "bgColor": "#ffffff"
+    },
+    "items": [
+      {
+        "type": 1,
+        "msg": "info11",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info12",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info13",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info14",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info15",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info16",
+        "style": {
+        }
+      }
+    ]
+  },
+  {
     "type": "5",
     "style": {
       "aspectRatio": "1.778",

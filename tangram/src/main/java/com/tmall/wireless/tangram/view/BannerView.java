@@ -57,6 +57,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,9 @@ import java.util.List;
  */
 public class BannerView extends RelativeLayout implements ViewPager.OnPageChangeListener,
     ITangramViewLifeCycle {
+
+    private static final String CURRENT_POS = "__current_pos__";
+
     public static final int GRAVITY_LEFT = 0;
     public static final int GRAVITY_CENTER = 1;
     public static final int GRAVITY_RIGHT = 2;
@@ -88,8 +92,6 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     private List<BinderViewHolder> mViewHolders = new ArrayList<BinderViewHolder>();
 
     private int currentItemPos;
-
-    private int lastItemPos = -1;
 
     private boolean init;
 
@@ -206,9 +208,15 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
 
     @Override
     public void onPageSelected(int position) {
-        lastItemPos = currentItemPos;
-        mIndicator.setCurrItem(mUltraViewPager.getCurrentItem());
         currentItemPos = mUltraViewPager.getCurrentItem();
+        mIndicator.setCurrItem(currentItemPos);
+
+        if (cell != null && cell.extras != null) {
+            try {
+                cell.extras.put(CURRENT_POS, currentItemPos);
+            } catch (JSONException e) {
+            }
+        }
 
         if (bannerSupport != null) {
             for (int j = 0; j < bannerSupport.getListeners().size(); j++) {
@@ -289,6 +297,8 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
         VirtualLayoutManager.LayoutParams layoutParams = (VirtualLayoutManager.LayoutParams) getLayoutParams();
         layoutParams.setMargins(bannerCell.margin[3], bannerCell.margin[0], bannerCell.margin[1], bannerCell.margin[2]);
         getUltraViewPager().setItemRatio(bannerCell.itemRatio);
+        currentItemPos = bannerCell.optIntParam(CURRENT_POS);
+        getUltraViewPager().setCurrentItem(currentItemPos);
         updateIndicators(bannerCell.mIndicatorFocus, bannerCell.mIndicatorNor,
             bannerCell.mIndicatorRadius, bannerCell.mIndicatorColor,
             bannerCell.mIndicatorDefaultColor);
@@ -427,10 +437,22 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
 	            if (init) {
 	                for (int i = 0; i < mImageViews.length; i++) {
 	                    ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
-	                }
+                        if (i == currentItemPos) {
+                            mImageViews[i].setTag(R.id.TANGRAM_BANNER_INDICATOR_POS, currentItemPos);
+                        }
+                    }
 	            } else {
-	                ImageUtils.doLoadImageUrl(mImageViews[lastItemPos], norUrl);
-	                ImageUtils.doLoadImageUrl(mImageViews[position], focusUrl);
+                    for (int i = 0; i < mImageViews.length; i++) {
+                        ImageView imageView = mImageViews[i];
+                        if (imageView.getTag(R.id.TANGRAM_BANNER_INDICATOR_POS) == null) {
+                            continue;
+                        } else {
+                            imageView.setTag(R.id.TANGRAM_BANNER_INDICATOR_POS, null);
+                            ImageUtils.doLoadImageUrl(imageView, norUrl);
+                        }
+                    }
+                    mImageViews[currentItemPos].setTag(R.id.TANGRAM_BANNER_INDICATOR_POS, currentItemPos);
+                    ImageUtils.doLoadImageUrl(mImageViews[currentItemPos], focusUrl);
 				}
 			}
         }
@@ -441,14 +463,17 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
                     if (style == STYLE_DOT) {
                         mImageViews[i].setImageDrawable(getGradientDrawable(position == i ? focusColor : norColor, radius));
                     } else if (style == STYLE_IMG){
-                        //ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
-                        if (i == lastItemPos) {
-                            ImageUtils.doLoadImageUrl(mImageViews[i], norUrl);
-                        } else if (i == position) {
-                            ImageUtils.doLoadImageUrl(mImageViews[i], focusUrl);
+                        ImageView imageView = mImageViews[i];
+                        if (imageView.getTag(R.id.TANGRAM_BANNER_INDICATOR_POS) == null) {
+                            continue;
+                        } else {
+                            imageView.setTag(R.id.TANGRAM_BANNER_INDICATOR_POS, null);
+                            ImageUtils.doLoadImageUrl(imageView, norUrl);
                         }
                     }
                 }
+                mImageViews[currentItemPos].setTag(R.id.TANGRAM_BANNER_INDICATOR_POS, currentItemPos);
+                ImageUtils.doLoadImageUrl(mImageViews[currentItemPos], focusUrl);
             }
         }
 
