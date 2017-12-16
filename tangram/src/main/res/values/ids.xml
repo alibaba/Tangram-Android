@@ -30,4 +30,5 @@
     <item name="TANGRAM_BANNER_HEADER_ID" type="id" />
     <item name="TANGRAM_BANNER_FOOTER_ID" type="id" />
     <item name="tk_banner" type="id" />
+    <item name="TANGRAM_BANNER_INDICATOR_POS" type="id"/>
 </resources>
