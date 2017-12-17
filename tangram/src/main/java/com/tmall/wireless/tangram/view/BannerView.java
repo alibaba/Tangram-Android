@@ -124,6 +124,7 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
 
     public void setAdapter(PagerAdapter adapter) {
         mUltraViewPager.setAdapter(adapter);
+        mUltraViewPager.disableAutoScroll();//reset timer when reuse
         mUltraViewPager.setOnPageChangeListener(this);
     }
 
