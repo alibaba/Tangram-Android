@@ -43,9 +43,11 @@ import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
+import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinder;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
+import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -207,6 +209,38 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
                 setVirtualViewTemplate(data);
             }
         }
+    }
+
+    /**
+     * register cell after engine has been created
+     * @param type
+     * @param cellClz
+     * @param viewClz
+     * @param <V>
+     */
+    public <V extends View> void registerCell(String type,
+        @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
+        registerCell(type, viewClz);
+        MVHelper mMVHelper = getService(MVHelper.class);
+        if (mMVHelper != null && mMVHelper.resolver() != null) {
+            mMVHelper.resolver().registerCompatible(type, cellClz);
+        }
+    }
+
+    /**
+     * register cell after engine has been created
+     * @param type
+     * @param viewClz
+     * @param <V>
+     */
+    public <V extends View> void registerCell(String type, @NonNull Class<V> viewClz) {
+        BaseCellBinderResolver baseCellBinderResolver = getService(BaseCellBinderResolver.class);
+        MVHelper mMVHelper = getService(MVHelper.class);
+        if (baseCellBinderResolver != null && mMVHelper != null && mMVHelper.resolver() != null) {
+            baseCellBinderResolver.register(type, new BaseCellBinder<>(viewClz, mMVHelper));
+            mMVHelper.resolver().register(type, viewClz);
+        }
+
     }
 
 	/**

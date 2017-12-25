@@ -24,6 +24,7 @@
 
 package com.tmall.wireless.tangram.structure;
 
+import android.util.SparseArray;
 import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
@@ -137,6 +138,8 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public ServiceManager serviceManager;
 
     public boolean mIsExposed = false;
+
+    private SparseArray<Object> mTag;
 
     public BaseCell() {
         objectId = sIsGenIds ? sIdGen.getAndIncrement() : 0;
@@ -331,5 +334,29 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         } else {
             return extras;
         }
+    }
+
+    /**
+     * bind a tag to baseCell
+     * @param key
+     * @param value
+     */
+    public void setTag(int key, Object value) {
+        if (mTag == null) {
+            mTag = new SparseArray<>();
+        }
+        mTag.put(key, value);
+    }
+
+    /**
+     * get a tag from baseCell
+     * @param key
+     * @return
+     */
+    public Object getTag(int key) {
+        if (mTag != null) {
+            return mTag.get(key);
+        }
+        return null;
     }
 }
