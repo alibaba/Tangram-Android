@@ -227,14 +227,14 @@ public class Style {
                 setBgColor(backgroundColor);
             }
 
-            width = data.optInt(KEY_WIDTH, VirtualLayoutManager.LayoutParams.MATCH_PARENT);
+            double width = data.optDouble(KEY_WIDTH, VirtualLayoutManager.LayoutParams.MATCH_PARENT);
             if (width >= 0) {
-                width = dp2px(width);
+                this.width = dp2px(width);
             }
 
-            height = data.optInt(KEY_HEIGHT, VirtualLayoutManager.LayoutParams.WRAP_CONTENT);
+            double height = data.optDouble(KEY_HEIGHT, VirtualLayoutManager.LayoutParams.WRAP_CONTENT);
             if (height >= 0) {
-                height = dp2px(height);
+                this.height = dp2px(height);
             }
 
             bgImage = data.optString(KEY_BG_IMAGE, "");
