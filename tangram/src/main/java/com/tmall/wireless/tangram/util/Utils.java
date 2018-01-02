@@ -234,6 +234,7 @@ public class Utils {
         supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_5C_FLOW, Boolean.TRUE);
         supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_ON_PLUSN, Boolean.TRUE);
         supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_BANNER, Boolean.TRUE);
+        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_SCROLL, Boolean.TRUE);
     }
 
     /**

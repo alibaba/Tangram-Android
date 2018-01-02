@@ -33,12 +33,14 @@ import android.util.Log;
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.layout.GridLayoutHelper;
 import com.tmall.wireless.tangram.MVHelper;
+import com.tmall.wireless.tangram.MVResolver;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.cell.LinearScrollCell;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Collections;
@@ -69,6 +71,34 @@ public class LinearScrollCard extends Card {
         } catch (Exception e) {
             Log.e(LOG_TAG, Log.getStackTraceString(e));
             setCells(null);
+        }
+    }
+
+    @Override
+    protected void parseHeaderCell(@NonNull MVHelper resolver, @Nullable JSONObject header) {
+        cell.mHeader = createCell(resolver, header, false);
+        if (cell.mHeader != null) {
+            cell.mHeader.parent = this;
+            cell.mHeader.parentId = id;
+            cell.mHeader.pos = 0;
+            try {
+                cell.mHeader.extras.put(MVResolver.KEY_INDEX, cell.mHeader.pos);
+            } catch (JSONException e) {
+            }
+        }
+    }
+
+    @Override
+    protected void parseFooterCell(@NonNull MVHelper resolver, @Nullable JSONObject footer) {
+        cell.mFooter = createCell(resolver, footer, false);
+        if (cell.mFooter != null) {
+            cell.mFooter.parent = this;
+            cell.mFooter.parentId = id;
+            cell.mFooter.pos = cell.mHeader != null ? getCells().size() + 1: getCells().size();
+            try {
+                cell.mFooter.extras.put(MVResolver.KEY_INDEX, cell.mFooter.pos);
+            } catch (JSONException e) {
+            }
         }
     }
 
@@ -107,6 +137,8 @@ public class LinearScrollCard extends Card {
             }
             cell.bgColor = parseColor(data.optString(Style.KEY_BG_COLOR), Color.TRANSPARENT);
             cell.retainScrollState = data.optBoolean(LinearScrollCell.KEY_RETAIN_SCROLL_STATE, true);
+            cell.scrollMarginLeft = Style.dp2px(data.optDouble(LinearScrollCell.KEY_SCROLL_MARGIN_LEFT));
+            cell.scrollMarginRight = Style.dp2px(data.optDouble(LinearScrollCell.KEY_SCROLL_MARGIN_RIGHT));
         }
     }
 
