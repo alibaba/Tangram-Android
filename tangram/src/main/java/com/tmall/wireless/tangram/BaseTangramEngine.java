@@ -205,6 +205,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
             CardResolver cardResolver = baseCardBinderResolver.getDelegate();
             MVHelper mMVHelper = getService(MVHelper.class);
             if (cardResolver != null && mMVHelper != null) {
+                baseCellBinderResolver.register(type, new BaseCellBinder(type, mMVHelper));
                 cardResolver.register(type, VVCard.class);
                 setVirtualViewTemplate(data);
             }

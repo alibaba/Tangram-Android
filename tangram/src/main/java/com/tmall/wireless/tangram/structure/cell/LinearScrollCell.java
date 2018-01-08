@@ -60,10 +60,16 @@ public class LinearScrollCell extends BaseCell {
     public static final String KEY_FOOTER_TYPE = "footerType";
     public static final String KEY_RETAIN_SCROLL_STATE = "retainScrollState";
 
+    public static final String KEY_SCROLL_MARGIN_LEFT = "scrollMarginLeft";
+    public static final String KEY_SCROLL_MARGIN_RIGHT = "scrollMarginRight";
+
     public static final int DEFAULT_DEFAULT_INDICATOR_COLOR = Color.parseColor("#80ffffff");
     public static final int DEFAULT_INDICATOR_COLOR = Color.parseColor("#ffffff");
 
     public List<BaseCell> cells = new ArrayList<BaseCell>();
+
+    public BaseCell mHeader;
+    public BaseCell mFooter;
 
     public double pageWidth = Double.NaN;
     public double pageHeight = Double.NaN;
@@ -73,6 +79,8 @@ public class LinearScrollCell extends BaseCell {
     public String footerType;
     public Adapter adapter;
     public int bgColor = Color.TRANSPARENT;
+    public int scrollMarginLeft;
+    public int scrollMarginRight;
 
     // current distance that responding recycler view has scrolled.
     public int currentDistance = 0;

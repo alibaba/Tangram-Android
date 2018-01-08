@@ -24,10 +24,14 @@
 
 package com.tmall.wireless.tangram.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,6 +45,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.tmall.wireless.tangram.core.R;
+import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
+import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
 import com.tmall.wireless.tangram.ext.HorizontalOverScrollBounceEffectDecoratorExt;
@@ -69,6 +75,8 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
     private int touchSlop;
     private HorizontalOverScrollBounceEffectDecoratorExt overScrollDecorator;
     private boolean enableOverScrollPull;
+
+    private List<BinderViewHolder> mViewHolders = new ArrayList<BinderViewHolder>();
 
     private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -156,6 +164,8 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                     return true;
                 }
                 break;
+            default:
+                break;
         }
 
         return false;
@@ -227,6 +237,18 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
             lm.scrollToPositionWithOffset(position,
                     starts == null || starts.length <= position ? 0 : (int) (starts[position] - lSCell.currentDistance));
         }
+        if (lSCell.scrollMarginLeft > 0 || lSCell.scrollMarginRight > 0) {
+            setPadding(lSCell.scrollMarginLeft, 0, lSCell.scrollMarginRight, 0);
+            setClipToPadding(false);
+            setClipChildren(false);
+        } else {
+            setPadding(0, 0, 0, 0);
+            setClipToPadding(true);
+            setClipChildren(true);
+        }
+        recycleView(lSCell);
+        bindHeaderView(lSCell.mHeader);
+        bindFooterView(lSCell.mFooter);
     }
 
     /**
@@ -267,6 +289,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         recyclerView.setAdapter(null);
 
         lSCell = null;
+        recycleView(cell);
     }
 
     private void setViewColor(View view, int color) {
@@ -303,6 +326,66 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
             ArrayMap<String, String> params = new ArrayMap<String, String>();
             params.put("offset", String.valueOf(offset));
             busSupport.post(BusSupport.obtainEvent("onOverScroll", null, params, null));
+        }
+    }
+
+    private void bindHeaderView(BaseCell cell) {
+        if (cell != null) {
+            View header = getViewFromRecycler(cell);
+            if (header != null) {
+                header.setId(R.id.TANGRAM_BANNER_HEADER_ID);
+                //为了解决在 item 复用过程中，itemView 的 layoutParams 复用造成 layout 错误,这里要提供一个新的 layoutParams。
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
+                lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
+                lp.bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
+                lp.rightMargin = cell.style.margin[Style.MARGIN_RIGHT_INDEX];
+                addView(header, 0, lp);
+            }
+        }
+    }
+
+    private void bindFooterView(BaseCell cell) {
+        if (cell != null) {
+            View footer = getViewFromRecycler(cell);
+            if (footer != null) {
+                footer.setId(R.id.TANGRAM_BANNER_FOOTER_ID);
+                //为了解决在 item 复用过程中，itemView 的 layoutParams 复用造成 layout 错误,这里要提供一个新的 layoutParams。
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
+                lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
+                lp.bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
+                lp.rightMargin = cell.style.margin[Style.MARGIN_RIGHT_INDEX];
+                addView(footer, lp);
+            }
+        }
+    }
+
+    private View getViewFromRecycler(@NonNull BaseCell cell) {
+        GroupBasicAdapter adapter = cell.serviceManager.getService(GroupBasicAdapter.class);
+        RecyclerView.RecycledViewPool pool = cell.serviceManager.getService(RecyclerView.RecycledViewPool.class);
+        int itemViewType = adapter.getItemType(cell);
+        BinderViewHolder holder = (BinderViewHolder) pool.getRecycledView(itemViewType);
+        if (holder == null) {
+            holder = (BinderViewHolder) adapter.createViewHolder(this, itemViewType);
+        }
+        holder.bind(cell);
+        mViewHolders.add(holder);
+        return holder.itemView;
+    }
+
+    private void recycleView(@NonNull BaseCell cell) {
+        if (!mViewHolders.isEmpty()) {
+            RecyclerView.RecycledViewPool pool = cell.serviceManager.getService(RecyclerView.RecycledViewPool.class);
+            for (int i = 0, size = mViewHolders.size(); i < size; i++) {
+                BinderViewHolder viewHolder = mViewHolders.get(i);
+                viewHolder.unbind();
+                removeView(viewHolder.itemView);
+                pool.putRecycledView(viewHolder);
+            }
+            mViewHolders.clear();
         }
     }
 }
