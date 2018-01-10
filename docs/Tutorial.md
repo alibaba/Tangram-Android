@@ -1,5 +1,7 @@
 ## 1.Import dependency
 
+Find the lastest version from [release notes](https://github.com/alibaba/Tangram-Android/releases), such as:
+
 ```
 // gradle
 compile 'com.alibaba.android:tangram:2.0.0@aar'
