@@ -4,7 +4,7 @@ Find the lastest version from [release notes](https://github.com/alibaba/Tangram
 
 ```
 // gradle
-compile 'com.alibaba.android:tangram:2.0.0@aar'
+compile 'com.alibaba.android:tangram:2.0.5@aar'
 ```
 
 or
@@ -14,7 +14,7 @@ or
 <dependency>
   <groupId>com.alibaba.android</groupId>
   <artifactId>tangram</artifactId>
-  <version>2.0.0</version>
+  <version>2.0.5</version>
   <type>aar</type>
 </dependency>
 ```
