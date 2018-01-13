@@ -97,9 +97,75 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public String id;
 
     /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String action;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String pageParam;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String ctrClickParam;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String ctrName;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String scm;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String spm;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String syncIds;
+
+    /**
      * the natural position this cell in its parent
      */
     public int pos;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String title;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String subTitle;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public int titleColor = -1;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public int subTitleColor = -1;
 
     /**
      * position that assigned from server side
@@ -131,6 +197,18 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public JSONObject extras = new JSONObject();
 
     private ArrayMap<String, Object> bizParaMap = new ArrayMap<>(32);
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public String imgUrl;
+
+    /**
+     * do not use it, would be removed in future
+     */
+    @Deprecated
+    public float urlRatio = Float.NaN;
 
     private ArrayMap<Integer, Integer> innerClickMap = new ArrayMap<>();
 
