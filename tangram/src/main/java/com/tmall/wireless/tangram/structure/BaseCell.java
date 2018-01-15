@@ -99,44 +99,32 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public String action;
+    //@Deprecated
+    //public String action;
 
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public String pageParam;
+    //@Deprecated
+    //public String pageParam;
 
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public String ctrClickParam;
+    //@Deprecated
+    //public String scm;
 
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public String ctrName;
+    //@Deprecated
+    //public String spm;
 
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public String scm;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    @Deprecated
-    public String spm;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    @Deprecated
-    public String syncIds;
+    //@Deprecated
+    //public String syncIds;
 
     /**
      * the natural position this cell in its parent
@@ -146,26 +134,26 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public String title;
+    //@Deprecated
+    //public String title;
 
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public String subTitle;
+    //@Deprecated
+    //public String subTitle;
 
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public int titleColor = -1;
+    //@Deprecated
+    //public int titleColor = -1;
 
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public int subTitleColor = -1;
+    //@Deprecated
+    //public int subTitleColor = -1;
 
     /**
      * position that assigned from server side
@@ -201,14 +189,14 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public String imgUrl;
+    //@Deprecated
+    //public String imgUrl;
 
     /**
      * do not use it, would be removed in future
      */
-    @Deprecated
-    public float urlRatio = Float.NaN;
+    //@Deprecated
+    //public float urlRatio = Float.NaN;
 
     private ArrayMap<Integer, Integer> innerClickMap = new ArrayMap<>();
 
@@ -296,64 +284,79 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     }
 
     public Object optParam(String key) {
-        if (extras.has(key))
+        if (extras.has(key)) {
             return extras.opt(key);
-        if (style != null && style.extras != null)
+        }
+        if (style != null && style.extras != null) {
             return style.extras.opt(key);
+        }
         return null;
     }
 
     public long optLongParam(String key) {
-        if (extras.has(key))
+        if (extras.has(key)) {
             return extras.optLong(key);
-        if (style != null && style.extras != null)
+        }
+        if (style != null && style.extras != null) {
             return style.extras.optLong(key);
+        }
         return 0;
     }
 
     public int optIntParam(String key) {
-        if (extras.has(key))
+        if (extras.has(key)) {
             return extras.optInt(key);
-        if (style != null && style.extras != null)
+        }
+        if (style != null && style.extras != null) {
             return style.extras.optInt(key);
+        }
         return 0;
     }
 
     public String optStringParam(String key) {
-        if (extras.has(key))
+        if (extras.has(key)) {
             return extras.optString(key);
-        if (style != null && style.extras != null)
+        }
+        if (style != null && style.extras != null) {
             return style.extras.optString(key);
+        }
         return "";
     }
 
     public double optDoubleParam(String key) {
-        if (extras.has(key))
+        if (extras.has(key)) {
             return extras.optDouble(key);
-        if (style != null && style.extras != null)
+        }
+        if (style != null && style.extras != null) {
             return style.extras.optDouble(key);
+        }
         return Double.NaN;
     }
 
     public boolean optBoolParam(String key) {
-        if (extras.has(key))
+        if (extras.has(key)) {
             return extras.optBoolean(key);
+        }
         return style != null && style.extras != null && style.extras.optBoolean(key);
     }
 
     public JSONObject optJsonObjectParam(String key) {
-        if (extras.has(key))
+        if (extras.has(key)) {
             return extras.optJSONObject(key);
-        if (style != null && style.extras != null)
+        }
+        if (style != null && style.extras != null) {
             return style.extras.optJSONObject(key);
+        }
         return null;
     }
 
     public JSONArray optJsonArrayParam(String key) {
-        if (extras.has(key))
+        if (extras.has(key)) {
             return extras.optJSONArray(key);
-        if (style != null && style.extras != null)
+        }
+        if (style != null && style.extras != null) {
             return style.extras.optJSONArray(key);
+        }
         return null;
     }
 
