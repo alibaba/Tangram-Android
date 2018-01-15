@@ -144,3 +144,8 @@ deployConfig = rootProject.file('jcenterDeploy.gradle')
 if (deployConfig.exists()) {
     apply from: rootProject.file('jcenterDeploy.gradle')
 }
+
+deployConfig = rootProject.file('deploy.gradle')
+if (deployConfig.exists()) {
+    apply from: rootProject.file('deploy.gradle')
+}
