@@ -359,6 +359,24 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
+     * Remove a card at target card position
+     * @param position the position of card in group
+     */
+    public void removeData(int position) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+        this.mGroupBasicAdapter.removeGroup(position);
+    }
+
+    /**
+     * Remove the target card from list
+     * @param data Target card
+     */
+    public void removeData(C data) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+        this.mGroupBasicAdapter.removeGroup(data);
+    }
+
+    /**
      * Parse original data with type {@link T} into model data list with type {@link C}
      * @param data Original data.
      * @return Parsed data list.
