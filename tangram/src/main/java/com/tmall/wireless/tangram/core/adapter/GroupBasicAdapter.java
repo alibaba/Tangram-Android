@@ -344,6 +344,16 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
         return -1;
     }
 
+    /**
+     *
+     * @param cell cell object
+     * @return the card index of given cell object
+     */
+    public int findCardIdxFor(C cell) {
+        int position = mData.indexOf(cell);
+        return findCardIdxFor(position);
+    }
+
 
     /**
      * Get type of card

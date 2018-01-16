@@ -277,6 +277,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         return layoutHelpers;
     }
 
+    @Deprecated
     public int findFirstPositionOfCell(int type) {
         List<BaseCell> data = getComponents();
         int targetPosition = -1;
@@ -293,6 +294,23 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         return targetPosition;
     }
 
+    public int findFirstPositionOfCell(String type) {
+        List<BaseCell> data = getComponents();
+        int targetPosition = -1;
+        if (type == null || data == null || data.isEmpty()) {
+            targetPosition = -1;
+        } else {
+            for (int i = 0, size = data.size(); i < size; i++) {
+                if (type.equals(data.get(i).stringType)) {
+                    targetPosition = i;
+                    break;
+                }
+            }
+        }
+        return targetPosition;
+    }
+
+    @Deprecated
     public int findLastPositionOfCell(int type) {
         List<BaseCell> data = getComponents();
         int targetPosition = -1;
@@ -301,6 +319,22 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         } else {
             for (int i = data.size() - 1; i >= 0; i--) {
                 if (String.valueOf(type).equals(data.get(i).stringType)) {
+                    targetPosition = i;
+                    break;
+                }
+            }
+        }
+        return targetPosition;
+    }
+
+    public int findLastPositionOfCell(String type) {
+        List<BaseCell> data = getComponents();
+        int targetPosition = -1;
+        if (type == null || data == null || data.isEmpty()) {
+            targetPosition = -1;
+        } else {
+            for (int i = data.size() - 1; i >= 0; i--) {
+                if (type.equals(data.get(i).stringType)) {
                     targetPosition = i;
                     break;
                 }
