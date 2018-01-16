@@ -31,8 +31,8 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
-import android.widget.ImageView;
 
+import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.tmall.wireless.tangram.dataparser.DataParser;
@@ -497,4 +497,37 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         }
         return null;
     }
+
+    /**
+     * A high performance method to insert cells. TODO handle nested card
+     * @param insertPosition the position to be inserted, note that new data will start from position + 1
+     * @param data new cell data list
+     */
+    public void insertComponents(int insertPosition, List<BaseCell> data) {
+        int newItemSize = data != null ? data.size() : 0;
+        if (newItemSize > 0) {
+            BaseCell insertCell = mGroupBasicAdapter.getItemByPosition(insertPosition);
+            int cardIdx = mGroupBasicAdapter.findCardIdxFor(insertPosition);
+            Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
+            card.addCells(card, card.getCells().indexOf(insertCell) + 1, data);
+            List<LayoutHelper> layoutHelpers = getLayoutManager().getLayoutHelpers();
+            if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                    LayoutHelper layoutHelper = layoutHelpers.get(i);
+                    int start = layoutHelper.getRange().getLower();
+                    int end = layoutHelper.getRange().getUpper();
+                    if (end < insertPosition) {
+                        //do nothing
+                    } else if (start <= insertPosition && insertPosition <= end) {
+                        layoutHelper.setItemCount(layoutHelper.getItemCount() + newItemSize);
+                        layoutHelper.setRange(start, end + newItemSize);
+                    } else if (insertPosition < start) {
+                        layoutHelper.setRange(start + newItemSize, end + newItemSize);
+                    }
+                }
+                mGroupBasicAdapter.insertComponents(insertPosition, data);
+            }
+        }
+    }
+
 }

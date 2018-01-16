@@ -425,18 +425,17 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
             int newItemSize = components.size();
             if (mCards != null) {
                 List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
-                int clickPos = pos -1;
                 for (int i = 0, size = mCards.size(); i < size; i++) {
                     Pair<Range<Integer>, Card> pair = mCards.get(i);
-                    int start = pair.first.getLower().intValue();
-                    int end = pair.first.getUpper().intValue();
-                    if (end < clickPos) {
+                    int start = pair.first.getLower();
+                    int end = pair.first.getUpper();
+                    if (end < pos) {
                         //do nothing
                         newCards.add(pair);
-                    } else if (start <= clickPos && clickPos <= end) {
+                    } else if (start <= pos && pos <= end) {
                         Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end + newItemSize), pair.second);
                         newCards.add(newPair);
-                    } else if (clickPos < start) {
+                    } else if (pos < start) {
                         Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
                         newCards.add(newPair);
                     }
@@ -444,14 +443,15 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 mCards.clear();
                 mCards.addAll(newCards);
             }
+            int insertPosition = pos + 1;
             for (int i = 0; i < newItemSize; i++) {
-                if ((pos + i) < mData.size()) {
-                    mData.add(pos + i, components.get(i));
+                if ((insertPosition + i) < mData.size()) {
+                    mData.add(insertPosition + i, components.get(i));
                 } else {
                     mData.add(components.get(i));
                 }
             }
-            notifyItemRangeInserted(pos, newItemSize);
+            notifyItemRangeInserted(pos + 1, newItemSize);
         }
     }
 

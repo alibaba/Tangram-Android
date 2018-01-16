@@ -299,7 +299,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Insert original data to Tangram at target position.
+     * Insert original data to Tangram at target position. This method will introduce page reload by notifyDataSetChanged().
      * @param position Target insert position.
      * @param data Original data with type {@link T}.
      */
@@ -310,7 +310,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Replace original data to Tangram at target position
+     * Replace original data to Tangram at target position. This method will introduce page reload by notifyDataSetChanged().
      * @param position Target insert position.
      * @param data Original data with type {@link T}.
      */
@@ -333,7 +333,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Append parsed data list with type {@link C} in Tangram
+     * Append parsed data list with type {@link C} in Tangram. This method will introduce page reload by notifyDataSetChanged().
      * @param data Parsed data list.
      */
     public void appendData(@Nullable List<C> data) {
@@ -342,7 +342,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Insert parsed data to Tangram at target position
+     * Insert parsed data to Tangram at target position. This method will introduce page reload by notifyDataSetChanged().
      * @param position Target insert position.
      * @param data Parsed data list.
      */
@@ -352,7 +352,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Replace original data to Tangram at target position
+     * Replace original data to Tangram at target position. This method will introduce page reload by notifyDataSetChanged().
      * @param position Target replace position.
      * @param data Parsed data list.
      */
@@ -362,7 +362,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Remove a card at target card position
+     * Remove a card at target card position. This method will introduce page reload by notifyDataSetChanged().
      * @param position the position of card in group
      */
     public void removeData(int position) {
@@ -371,7 +371,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Remove the target card from list
+     * Remove the target card from list. This method will introduce page reload by notifyDataSetChanged().
      * @param data Target card
      */
     public void removeData(C data) {
