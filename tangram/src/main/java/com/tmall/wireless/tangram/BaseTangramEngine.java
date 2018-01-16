@@ -31,10 +31,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ChildDrawingOrderCallback;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.alibaba.android.vlayout.LayoutViewFactory;
+import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 import com.alibaba.android.vlayout.extend.InnerRecycledViewPool;
@@ -45,6 +47,7 @@ import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinder;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
+import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
@@ -80,15 +83,15 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
 
     private final VirtualLayoutManager mLayoutManager;
 
-    protected GroupBasicAdapter<C, ?> mGroupBasicAdapter;
+    protected GroupBasicAdapter<C, L> mGroupBasicAdapter;
 
     private final DataParser<T, C, L> mDataParser;
 
-    private final IAdapterBuilder<C, ?> mAdapterBuilder;
+    private final IAdapterBuilder<C, L> mAdapterBuilder;
 
     public BaseTangramEngine(@NonNull final Context context,
         @NonNull final DataParser<T, C, L> dataParser,
-        @NonNull final IAdapterBuilder<C, ?> adapterBuilder) {
+        @NonNull final IAdapterBuilder<C, L> adapterBuilder) {
         //noinspection ConstantConditions
         Preconditions.checkArgument(context != null, "context is null");
         this.mContext = context;
@@ -374,6 +377,76 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     public void removeData(C data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
         this.mGroupBasicAdapter.removeGroup(data);
+    }
+
+    /**
+     *
+     * @param card
+     * @return card ragne of given instance
+     */
+    public Range<Integer> getCardRange(Card card) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+        return this.mGroupBasicAdapter.getCardRange(card);
+    }
+
+    /**
+     * Get card range by id
+     * @param id card id
+     * @return range instance
+     */
+    public Range<Integer> getCardRange(String id) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+        return this.mGroupBasicAdapter.getCardRange(id);
+    }
+
+    /**
+     *
+     * @param position cell's adapter position
+     * @return the card index of given cell's position
+     */
+    public int findCardIdxFor(int position) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+        return this.mGroupBasicAdapter.findCardIdxFor(position);
+    }
+
+    /**
+     *
+     * @param cell cell object
+     * @return the card index of given cell object
+     */
+    public int findCardIdxFor(L cell) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+        return this.mGroupBasicAdapter.findCardIdxFor(cell);
+    }
+
+    /**
+     *
+     * @param id card id
+     * @return card instance
+     */
+    public Card getCardById(String id) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+        return this.mGroupBasicAdapter.getCardById(id);
+    }
+
+    /**
+     *
+     * @param type cell's type
+     * @return last appearance position
+     */
+    public int findLastPositionOfCell(String type) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+        return this.mGroupBasicAdapter.findLastPositionOfCell(type);
+    }
+
+    /**
+     *
+     * @param type cell's type
+     * @return first appearance position
+     */
+    public int findFirstPositionOfCell(String type) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+        return this.mGroupBasicAdapter.findFirstPositionOfCell(type);
     }
 
     /**

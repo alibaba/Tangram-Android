@@ -294,6 +294,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         return targetPosition;
     }
 
+    @Override
     public int findFirstPositionOfCell(String type) {
         List<BaseCell> data = getComponents();
         int targetPosition = -1;
@@ -327,6 +328,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         return targetPosition;
     }
 
+    @Override
     public int findLastPositionOfCell(String type) {
         List<BaseCell> data = getComponents();
         int targetPosition = -1;
@@ -343,6 +345,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         return targetPosition;
     }
 
+    @Override
     public Card getCardById(String id) {
         List<Card> cards = getGroups();
         for (int i = 0, size = cards.size(); i < size; i++) {
@@ -353,6 +356,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         return null;
     }
 
+    @Override
     public Range<Integer> getCardRange(String id) {
         if (TextUtils.isEmpty(id)) {
             return Range.create(0, 0);
