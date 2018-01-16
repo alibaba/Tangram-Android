@@ -343,6 +343,16 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
         return targetPosition;
     }
 
+    public Card getCardById(String id) {
+        List<Card> cards = getGroups();
+        for (int i = 0, size = cards.size(); i < size; i++) {
+            if (cards.get(i).id.equals(id)) {
+                return cards.get(i);
+            }
+        }
+        return null;
+    }
+
     public Range<Integer> getCardRange(String id) {
         if (TextUtils.isEmpty(id)) {
             return Range.create(0, 0);
