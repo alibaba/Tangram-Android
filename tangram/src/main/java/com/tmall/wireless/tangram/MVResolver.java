@@ -152,6 +152,7 @@ public class MVResolver {
             if (!TextUtils.isEmpty(reuseId)) {
                 cell.typeKey = reuseId;
             }
+			cell.position = json.optInt(KEY_POSITION, -1);
             parseBizParams(cell, json);
             cell.parseWith(json);
             cell.parseWith(json, resolver);

@@ -388,10 +388,10 @@ public class MVHelper {
 
             if (lp instanceof ViewGroup.MarginLayoutParams) {
                 ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) lp;
-                layoutParams.topMargin = cell.style.margin[MARGIN_TOP_INDEX] >= 0 ? cell.style.margin[MARGIN_TOP_INDEX] : 0;
-                layoutParams.leftMargin = cell.style.margin[MARGIN_LEFT_INDEX] >= 0 ? cell.style.margin[MARGIN_LEFT_INDEX] : 0;
-                layoutParams.bottomMargin = cell.style.margin[MARGIN_BOTTOM_INDEX] >= 0 ? cell.style.margin[MARGIN_BOTTOM_INDEX] : 0;
-                layoutParams.rightMargin = cell.style.margin[MARGIN_RIGHT_INDEX] >= 0 ? cell.style.margin[MARGIN_RIGHT_INDEX] : 0;
+                layoutParams.topMargin = cell.style.margin[MARGIN_TOP_INDEX];
+                layoutParams.leftMargin = cell.style.margin[MARGIN_LEFT_INDEX];
+                layoutParams.bottomMargin = cell.style.margin[MARGIN_BOTTOM_INDEX];
+                layoutParams.rightMargin = cell.style.margin[MARGIN_RIGHT_INDEX];
             }
 
             // reset translation animation before reused

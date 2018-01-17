@@ -344,6 +344,16 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
         return -1;
     }
 
+    /**
+     *
+     * @param cell cell object
+     * @return the card index of given cell object
+     */
+    public int findCardIdxFor(C cell) {
+        int position = mData.indexOf(cell);
+        return findCardIdxFor(position);
+    }
+
 
     /**
      * Get type of card
@@ -354,7 +364,35 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 	@Deprecated
     public abstract int getCardType(L card);
 
-	/**
+    /**
+     * Get card range by id
+     * @param id card id
+     * @return range instance
+     */
+    public abstract Range<Integer> getCardRange(String id);
+
+    /**
+     *
+     * @param id card id
+     * @return card instance
+     */
+    public abstract Card getCardById(String id);
+
+    /**
+     *
+     * @param type cell's type
+     * @return last appearance position
+     */
+    public abstract int findLastPositionOfCell(String type);
+
+    /**
+     *
+     * @param type cell's type
+     * @return first appearance position
+     */
+    public abstract int findFirstPositionOfCell(String type);
+
+    /**
      * Get type of card in String type
      *
      * @param card
@@ -362,6 +400,11 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      */
     public abstract String getCardStringType(L card);
 
+    /**
+     * Get Tangram cell type from recyclerView's item type
+     * @param viewType
+     * @return cell type in Tangram
+     */
     public abstract String getCellTypeFromItemType(int viewType);
 
     /**

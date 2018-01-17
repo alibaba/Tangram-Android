@@ -66,7 +66,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
     public TangramEngine(@NonNull Context context,
         @NonNull DataParser<JSONArray, Card, BaseCell> dataParser,
-        @NonNull IAdapterBuilder<Card, ?> adapterBuilder) {
+        @NonNull IAdapterBuilder<Card, BaseCell> adapterBuilder) {
         super(context, dataParser, adapterBuilder);
         this.register(DataParser.class, dataParser);
         mTangramExprSupport = new TangramExprSupport();
