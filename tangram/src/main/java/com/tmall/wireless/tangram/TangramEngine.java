@@ -51,7 +51,9 @@ import com.tmall.wireless.tangram.util.Predicate;
 
 import org.json.JSONArray;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -501,15 +503,26 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     /**
      * A high performance method to insert cells. TODO handle nested card
      * @param insertPosition the position to be inserted, note that new data will start from position + 1
-     * @param data new cell data list
+     * @param data new cell data
      */
-    public void insertComponents(int insertPosition, List<BaseCell> data) {
-        int newItemSize = data != null ? data.size() : 0;
-        if (newItemSize > 0) {
+    public void insertComponent(int insertPosition, BaseCell data) {
+        List<BaseCell> list = new ArrayList<>();
+        list.add(data);
+        insertComponents(insertPosition, list);
+    }
+
+    /**
+     * A high performance method to insert cells. TODO handle nested card
+     * @param insertPosition the position to be inserted, note that new data will start from position + 1
+     * @param list new cell data list
+     */
+    public void insertComponents(int insertPosition, List<BaseCell> list) {
+        int newItemSize = list != null ? list.size() : 0;
+        if (newItemSize > 0 && mGroupBasicAdapter != null) {
             BaseCell insertCell = mGroupBasicAdapter.getItemByPosition(insertPosition);
             int cardIdx = mGroupBasicAdapter.findCardIdxFor(insertPosition);
             Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
-            card.addCells(card, card.getCells().indexOf(insertCell) + 1, data);
+            card.addCells(card, card.getCells().indexOf(insertCell) + 1, list);
             List<LayoutHelper> layoutHelpers = getLayoutManager().getLayoutHelpers();
             if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
                 for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
@@ -525,9 +538,70 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                         layoutHelper.setRange(start + newItemSize, end + newItemSize);
                     }
                 }
-                mGroupBasicAdapter.insertComponents(insertPosition, data);
+                mGroupBasicAdapter.insertComponents(insertPosition, list);
             }
         }
+    }
+
+    /**
+     * Remove cell at target position. TODO handle nested card
+     * @param position
+     */
+    public void removeComponent(int position) {
+        if (mGroupBasicAdapter != null) {
+            BaseCell removeCell = mGroupBasicAdapter.getItemByPosition(position);
+            removeComponent(removeCell);
+        }
+    }
+
+    /**
+     * Remove target cell. TODO handle nested card, cell in staggered, cell in onePlusN
+     * @param data
+     */
+    public void removeComponent(BaseCell data) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (data != null && mGroupBasicAdapter != null && layoutManager != null) {
+            int removePosition = mGroupBasicAdapter.getPositionByItem(data);
+            int cardIdx = mGroupBasicAdapter.findCardIdxFor(removePosition);
+            Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
+            card.removeCellSilently(data);
+            List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+            LayoutHelper emptyLayoutHelper = null;
+            if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                    LayoutHelper layoutHelper = layoutHelpers.get(i);
+                    int start = layoutHelper.getRange().getLower();
+                    int end = layoutHelper.getRange().getUpper();
+                    if (end < removePosition) {
+                        //do nothing
+                    } else if (start <= removePosition && removePosition <= end) {
+                        int itemCount = layoutHelper.getItemCount() - 1;
+                        if (itemCount > 0) {
+                            layoutHelper.setItemCount(itemCount);
+                            layoutHelper.setRange(start, end - 1);
+                        } else {
+                            emptyLayoutHelper = layoutHelper;
+                        }
+                    } else if (removePosition < start) {
+                        layoutHelper.setRange(start - 1, end - 1);
+                    }
+                }
+                if (emptyLayoutHelper != null) {
+                    final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
+                    newLayoutHelpers.remove(emptyLayoutHelper);
+                    layoutManager.setLayoutHelpers(newLayoutHelpers, false);
+                }
+                mGroupBasicAdapter.removeComponent(data);
+            }
+        }
+    }
+
+    /**
+     * Remove all cells in a card.
+     * @param group
+     */
+    public void removeComponents(Card group) {
+
     }
 
 }
