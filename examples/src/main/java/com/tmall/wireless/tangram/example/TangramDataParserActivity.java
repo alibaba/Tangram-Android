@@ -109,7 +109,6 @@ public class TangramDataParserActivity extends Activity {
         engine = builder.build();
         engine.setVirtualViewTemplate(VVTEST.BIN);
         Utils.setUedScreenWidth(720);
-        VafContext.loadImageLoader(getApplicationContext());
 
         //Step 5: add card load support if you have card that loading cells async
         engine.addCardLoadSupport(new CardLoadSupport(
