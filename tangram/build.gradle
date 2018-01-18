@@ -91,7 +91,7 @@ dependencies {
             exclude group: 'com.android.support', module: 'support-annotations'
         }
     } else {
-        compile('com.alibaba.android:vlayout:1.2.8@aar') {
+        compile('com.alibaba.android:vlayout:1.2.9@aar') {
             changing = true
         }
     }
@@ -123,7 +123,7 @@ dependencies {
             exclude group: 'com.android.support', module: 'support-annotations'
         }
     } else {
-        compile('com.alibaba.android:virtualview:1.0.5@aar') {
+        compile('com.alibaba.android:virtualview:1.0.6@aar') {
             transitive true
             exclude group: 'com.android.support', module: 'appcompat-v7'
             exclude group: 'com.tmall.android', module: 'tmallandroid_mui'
