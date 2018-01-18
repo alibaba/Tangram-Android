@@ -24,18 +24,22 @@
 
 package com.tmall.wireless.tangram;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.TextUtils;
-import android.util.Pair;
-import android.view.View;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Pair;
+import android.view.View;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
@@ -49,13 +53,7 @@ import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.Predicate;
-
 import org.json.JSONArray;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created by villadora on 15/8/24.
@@ -502,6 +500,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
+     * NOTE new API
      * A high performance method to insert cells. TODO handle nested card
      * @param insertPosition the position to be inserted, note that new data will start from position + 1
      * @param data new cell data
@@ -513,6 +512,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
+     * NOTE new API
      * A high performance method to insert cells. TODO handle nested card
      * @param insertPosition the position to be inserted, note that new data will start from position + 1
      * @param list new cell data list
@@ -545,6 +545,26 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
+     * NOTE new API
+     * @param insertIdx the index to be inserted, note that new group will start from index + 1
+     * @param group a group of data
+     */
+    public void insertComponent(int insertIdx, Card group) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (group != null && mGroupBasicAdapter != null && layoutManager != null) {
+            List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+            final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
+            LayoutHelper insertedLayoutHelper = group.getLayoutHelper();
+            insertedLayoutHelper.setItemCount(group.getCells().size());
+            newLayoutHelpers.add(insertIdx + 1, insertedLayoutHelper);
+            layoutManager.setLayoutHelpers(newLayoutHelpers);
+            mGroupBasicAdapter.insertComponents(insertIdx, group);
+        }
+
+    }
+
+    /**
+     * NOTE new API
      * Remove cell at target position. TODO handle nested card
      * @param position
      */
@@ -556,6 +576,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
+     * NOTE new API
      * Remove target cell. TODO handle nested card, cell in staggered, cell in onePlusN
      * @param data
      */
@@ -598,6 +619,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
+     * NOTE new API
      * Remove all cells in a card.
      * @param group
      */

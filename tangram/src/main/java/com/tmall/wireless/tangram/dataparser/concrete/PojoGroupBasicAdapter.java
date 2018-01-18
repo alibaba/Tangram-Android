@@ -418,7 +418,9 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 mCards.clear();
                 mCards.addAll(newCards);
                 mData.remove(component);
-                notifyItemRangeChanged(removePosition, 1);
+                notifyItemRemoved(removePosition);
+                int last = mLayoutManager.findLastVisibleItemPosition();
+                notifyItemRangeChanged(removePosition, last - removePosition);
             }
         }
     }
@@ -449,6 +451,8 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
             mCards.addAll(newCards);
             mData.removeAll(group.getCells());
             notifyItemRangeRemoved(removePosition, removeItemCount);
+            int last = mLayoutManager.findLastVisibleItemPosition();
+            notifyItemRangeChanged(removePosition, last - removePosition);
         }
     }
 
@@ -485,6 +489,43 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 }
             }
             notifyItemRangeInserted(pos + 1, newItemSize);
+        }
+    }
+
+    @Override
+    public void insertComponents(int idx, Card group) {
+        if (mCards != null && group != null) {
+            List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
+            int newItemSize = group.getCells().size();
+            int lastEnd = 0;
+            int insertPosition = 0;
+            for (int i = 0, size = mCards.size(); i < size; i++) {
+                Pair<Range<Integer>, Card> pair = mCards.get(i);
+                int start = pair.first.getLower();
+                int end = pair.first.getUpper();
+                if (i <= idx) {
+                    //do nothing
+                    newCards.add(pair);
+                    if (i == idx) {
+                        insertPosition = end;
+                    }
+                    lastEnd = end;
+                } else if (i == idx + 1) {
+                    Pair<Range<Integer>, Card> insertPair = new Pair<>(Range.create(lastEnd, lastEnd + newItemSize), group);
+                    newCards.add(insertPair);
+                    Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
+                    newCards.add(newPair);
+                    lastEnd = end + newItemSize;
+                } else {
+                    Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
+                    newCards.add(newPair);
+                    lastEnd = end;
+                }
+            }
+            mCards.clear();
+            mCards.addAll(newCards);
+            mData.addAll(insertPosition, group.getCells());
+            notifyItemRangeInserted(insertPosition, newItemSize);
         }
     }
 
