@@ -306,7 +306,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     /**
      *
      * @param card
-     * @return card ragne of given instance
+     * @return card range of given instance
      */
     public Range<Integer> getCardRange(Card card) {
         if (card == null) return Range.create(0, 1);
@@ -317,6 +317,20 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
         } else {
             return Range.create(0, 1);
         }
+    }
+
+    /**
+     *
+     * @param card
+     * @return card index of given instance
+     */
+    public int findCardIdxForCard(L card) {
+        for (int i = 0, size = mCards.size(); i < size; i++) {
+            if (mCards.get(i).second == card) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -535,6 +549,12 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      * @param component the component to be removed
      */
     abstract public void removeComponent(C component);
+
+    /**
+     *
+     * @param group a group of components to be removed.
+     */
+    abstract public void removeComponents(L group);
 
     /**
      * Do not call this method directly. It's not designed for users.

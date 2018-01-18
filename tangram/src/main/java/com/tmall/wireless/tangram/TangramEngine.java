@@ -28,6 +28,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
@@ -601,7 +602,34 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * @param group
      */
     public void removeComponents(Card group) {
-
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (group != null && mGroupBasicAdapter != null && layoutManager != null) {
+            int cardIdx = mGroupBasicAdapter.findCardIdxForCard(group);
+            List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+            LayoutHelper emptyLayoutHelper = null;
+            int removeItemCount = 0;
+            if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                    LayoutHelper layoutHelper = layoutHelpers.get(i);
+                    int start = layoutHelper.getRange().getLower();
+                    int end = layoutHelper.getRange().getUpper();
+                    if (i < cardIdx) {
+                        // do nothing
+                    } else if (i == cardIdx) {
+                        removeItemCount = layoutHelper.getItemCount();
+                        emptyLayoutHelper = layoutHelper;
+                    } else {
+                        layoutHelper.setRange(start - removeItemCount, end - removeItemCount);
+                    }
+                }
+                if (emptyLayoutHelper != null) {
+                    final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
+                    newLayoutHelpers.remove(emptyLayoutHelper);
+                    layoutManager.setLayoutHelpers(newLayoutHelpers, false);
+                }
+                mGroupBasicAdapter.removeComponents(group);
+            }
+        }
     }
 
 }
