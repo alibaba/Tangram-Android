@@ -530,12 +530,75 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     }
 
     @Override
-    public void replaceComponent(BaseCell oldComponent, BaseCell newComponent) {
-        if (mData != null && oldComponent != null && newComponent != null) {
-            int index = mData.indexOf(oldComponent);
+    public void replaceComponent(List<BaseCell> oldComponent, List<BaseCell> newComponent) {
+        if (mData != null && oldComponent != null && newComponent != null && oldComponent.size() > 0 && newComponent.size() > 0) {
+            int index = mData.indexOf(oldComponent.get(0));
             if (index >= 0) {
-                mData.set(index, newComponent);
-                notifyItemChanged(index);
+                if (mCards != null) {
+                    List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
+                    int diff = 0;
+                    for (int i = 0, size = mCards.size(); i < size; i++) {
+                        Pair<Range<Integer>, Card> pair = mCards.get(i);
+                        int start = pair.first.getLower();
+                        int end = pair.first.getUpper();
+                        if (end < index) {
+                            //do nothing
+                            newCards.add(pair);
+                        } else if (start <= index && index < end) {
+                            diff = newComponent.size() - oldComponent.size();
+                            Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end + diff), pair.second);
+                            newCards.add(newPair);
+                        } else if (index < start) {
+                            Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + diff, end + diff), pair.second);
+                            newCards.add(newPair);
+                        }
+                    }
+                    mCards.clear();
+                    mCards.addAll(newCards);
+                }
+                mData.removeAll(oldComponent);
+                mData.addAll(index, newComponent);
+                int oldSize = oldComponent.size();
+                int newSize = newComponent.size();
+                notifyItemRangeChanged(index, Math.max(oldSize, newSize));
+            }
+        }
+    }
+
+    @Override
+    public void replaceComponent(Card oldGroup, Card newGroup) {
+        if (mData != null && mCards != null && oldGroup != null && newGroup != null) {
+            List<BaseCell> oldComponent = oldGroup.getCells();
+            List<BaseCell> newComponent = newGroup.getCells();
+            int index = mData.indexOf(oldComponent.get(0));
+            if (index >= 0) {
+                if (mCards != null) {
+                    List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
+                    int diff = 0;
+                    for (int i = 0, size = mCards.size(); i < size; i++) {
+                        Pair<Range<Integer>, Card> pair = mCards.get(i);
+                        int start = pair.first.getLower();
+                        int end = pair.first.getUpper();
+                        if (end < index) {
+                            //do nothing
+                            newCards.add(pair);
+                        } else if (start <= index && index < end) {
+                            diff = newComponent.size() - oldComponent.size();
+                            Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end + diff), newGroup);
+                            newCards.add(newPair);
+                        } else if (index < start) {
+                            Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + diff, end + diff), pair.second);
+                            newCards.add(newPair);
+                        }
+                    }
+                    mCards.clear();
+                    mCards.addAll(newCards);
+                }
+                mData.removeAll(oldComponent);
+                mData.addAll(index, newComponent);
+                int oldSize = oldComponent.size();
+                int newSize = newComponent.size();
+                notifyItemRangeChanged(index, Math.max(oldSize, newSize));
             }
         }
     }

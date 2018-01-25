@@ -25,6 +25,7 @@
 package com.tmall.wireless.tangram;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -561,6 +562,13 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
             layoutManager.setLayoutHelpers(newLayoutHelpers);
             mGroupBasicAdapter.insertComponents(insertIdx, group);
         }
+    }
+
+    /**
+     * NOTE new API, use this to replace {@link BaseTangramEngine#appendData(List)} and {@link BaseTangramEngine#appendData(Object)}
+     * @param groups new group to be append at tail.
+     */
+    public void appendWith(List<Card> groups) {//TODO
 
     }
 
@@ -682,7 +690,47 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
             int cardIdx = mGroupBasicAdapter.findCardIdxFor(replacePosition);
             Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
             card.replaceCell(oldOne, newOne);
-            mGroupBasicAdapter.replaceComponent(oldOne, newOne);
+            mGroupBasicAdapter.replaceComponent(Arrays.asList(oldOne), Arrays.asList(newOne));
+        }
+    }
+
+    /**
+     * NOTE new API
+     * Replace parent card's children.
+     * @param parent
+     * @param cells
+     */
+    public void replace(Card parent, List<BaseCell> cells) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (parent != null && cells != null && cells.size() > 0 && mGroupBasicAdapter != null && layoutManager != null) {
+            Card card = parent;
+            List<BaseCell> oldChildren = new ArrayList<>(parent.getCells());
+            if (oldChildren.size() == cells.size()) {
+                card.setCells(cells);
+                mGroupBasicAdapter.replaceComponent(oldChildren, cells);
+            } else {
+                List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+                int cardIdx = mGroupBasicAdapter.findCardIdxForCard(parent);
+                int diff = 0;
+                if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                    for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                        LayoutHelper layoutHelper = layoutHelpers.get(i);
+                        int start = layoutHelper.getRange().getLower();
+                        int end = layoutHelper.getRange().getUpper();
+                        if (i < cardIdx) {
+                            // do nothing
+                        } else if (i == cardIdx) {
+                            diff = cells.size() - layoutHelper.getItemCount();
+                            layoutHelper.setItemCount(cells.size());
+                            layoutHelper.setRange(start, end + diff);
+                        } else {
+                            layoutHelper.setRange(start + diff, end + diff);
+                        }
+                    }
+                    card.setCells(cells);
+                    mGroupBasicAdapter.replaceComponent(oldChildren, cells);
+                }
+            }
         }
     }
 
@@ -693,7 +741,24 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * @param newOne
      */
     public void replace(Card oldOne, Card newOne) {
-
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (oldOne != null && newOne != null && mGroupBasicAdapter != null && layoutManager != null) {
+            List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+            int cardIdx = mGroupBasicAdapter.findCardIdxForCard(oldOne);
+            int diff = 0;
+            if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                final List<LayoutHelper> newLayoutHelpers = new LinkedList<>();
+                for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                    LayoutHelper layoutHelper = layoutHelpers.get(i);
+                    if (i == cardIdx) {
+                        layoutHelper = newOne.getLayoutHelper();
+                    }
+                    newLayoutHelpers.add(layoutHelper);
+                }
+                layoutManager.setLayoutHelpers(newLayoutHelpers, false);
+                mGroupBasicAdapter.replaceComponent(oldOne, newOne);
+            }
+        }
     }
 
 

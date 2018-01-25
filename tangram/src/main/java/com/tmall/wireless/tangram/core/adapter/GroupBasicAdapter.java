@@ -575,7 +575,14 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      * @param oldComponent the old component to be replaced
      * @param newComponent the new component
      */
-    abstract public void replaceComponent(C oldComponent, C newComponent);
+    abstract public void replaceComponent(List<C> oldComponent, List<C> newComponent);
+
+    /**
+     * !!! Do not call this method directly. It's not designed for users.
+     * @param oldGroup the old group to be replaced
+     * @param newGroup the new group
+     */
+    abstract public void replaceComponent(L oldGroup, L newGroup);
 
     /**
      * @return total card list
