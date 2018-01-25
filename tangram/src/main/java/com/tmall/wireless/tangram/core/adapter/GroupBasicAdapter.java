@@ -568,7 +568,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      * @param idx the group index to be inserted
      * @param group
      */
-    abstract public void insertComponents(int idx, L group);
+    abstract public void insertBatchComponents(int idx, List<L> group);
 
     /**
      * !!! Do not call this method directly. It's not designed for users.

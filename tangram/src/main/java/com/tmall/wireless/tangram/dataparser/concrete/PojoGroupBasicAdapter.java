@@ -492,38 +492,61 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     }
 
     @Override
-    public void insertComponents(int idx, Card group) {
+    public void insertBatchComponents(int idx, List<Card> group) {
         if (mCards != null && group != null) {
+
             List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
-            int newItemSize = group.getCells().size();
+            List<BaseCell> newData = new ArrayList<>();
+            int newItemSize = 0;
             int lastEnd = 0;
             int insertPosition = 0;
-            for (int i = 0, size = mCards.size(); i < size; i++) {
-                Pair<Range<Integer>, Card> pair = mCards.get(i);
-                int start = pair.first.getLower();
-                int end = pair.first.getUpper();
-                if (i <= idx) {
-                    //do nothing
-                    newCards.add(pair);
-                    if (i == idx) {
-                        insertPosition = end;
+
+            if (idx >= 0 && idx < mCards.size()) {
+                for (int i = 0, size = mCards.size(); i < size; i++) {
+                    Pair<Range<Integer>, Card> pair = mCards.get(i);
+                    int start = pair.first.getLower();
+                    int end = pair.first.getUpper();
+                    if (i < idx) {
+                        //do nothing
+                        newCards.add(pair);
+                        lastEnd = end;
+                    } else if (i == idx) {
+                        insertPosition = start;
+                        for (int j = 0, gs = group.size(); j < gs; j++) {
+                            Card newGroup = group.get(j);
+                            int childrenSize = newGroup.getCells().size();
+                            newItemSize += childrenSize;
+                            Pair<Range<Integer>, Card> insertPair = new Pair<>(Range.create(lastEnd, lastEnd + childrenSize), newGroup);
+                            newCards.add(insertPair);
+                            newData.addAll(newGroup.getCells());
+                            lastEnd = lastEnd + childrenSize;
+                        }
+                        Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
+                        newCards.add(newPair);
+                        lastEnd = end + newItemSize;
+                    } else {
+                        Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
+                        newCards.add(newPair);
+                        lastEnd = end;
                     }
-                    lastEnd = end;
-                } else if (i == idx + 1) {
-                    Pair<Range<Integer>, Card> insertPair = new Pair<>(Range.create(lastEnd, lastEnd + newItemSize), group);
+                }
+            } else {
+                newCards.addAll(mCards);
+                lastEnd = mCards.get(mCards.size() - 1).first.getUpper();
+                insertPosition = lastEnd;
+                for (int j = 0, gs = group.size(); j < gs; j++) {
+                    Card newGroup = group.get(j);
+                    int childrenSize = newGroup.getCells().size();
+                    newItemSize += childrenSize;
+                    Pair<Range<Integer>, Card> insertPair = new Pair<>(Range.create(lastEnd, lastEnd + childrenSize), newGroup);
                     newCards.add(insertPair);
-                    Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
-                    newCards.add(newPair);
-                    lastEnd = end + newItemSize;
-                } else {
-                    Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
-                    newCards.add(newPair);
-                    lastEnd = end;
+                    newData.addAll(newGroup.getCells());
+                    lastEnd = lastEnd + childrenSize;
                 }
             }
             mCards.clear();
             mCards.addAll(newCards);
-            mData.addAll(insertPosition, group.getCells());
+            mData.addAll(insertPosition, newData);
             notifyItemRangeInserted(insertPosition, newItemSize);
         }
     }

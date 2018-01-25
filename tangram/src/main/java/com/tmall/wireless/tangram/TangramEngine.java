@@ -507,9 +507,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * @param data new cell data
      */
     public void insertWith(int insertPosition, BaseCell data) {
-        List<BaseCell> list = new ArrayList<>();
-        list.add(data);
-        insertWith(insertPosition, list);
+        insertWith(insertPosition, Arrays.asList(data));
     }
 
 
@@ -548,19 +546,25 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
     /**
      * NOTE new API
-     * @param insertIdx the index to be inserted, note that new group will start from index + 1
+     * @param insertIdx the index to be inserted
      * @param group a group of data
      */
-    public void insertWith(int insertIdx, Card group) {
+    public void insertBatchWith(int insertIdx, Card group) {
+        insertBatchWith(insertIdx, Arrays.asList(group));
+    }
+
+    public void insertBatchWith(int insertIdx, List<Card> groups) {
         VirtualLayoutManager layoutManager = getLayoutManager();
-        if (group != null && mGroupBasicAdapter != null && layoutManager != null) {
+        if (groups != null && groups.size() > 0 && mGroupBasicAdapter != null && layoutManager != null) {
             List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
-            final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
-            LayoutHelper insertedLayoutHelper = group.getLayoutHelper();
-            insertedLayoutHelper.setItemCount(group.getCells().size());
-            newLayoutHelpers.add(insertIdx + 1, insertedLayoutHelper);
-            layoutManager.setLayoutHelpers(newLayoutHelpers);
-            mGroupBasicAdapter.insertComponents(insertIdx, group);
+            final List<LayoutHelper> newLayoutHelpers = new ArrayList<>(layoutHelpers);
+            List<LayoutHelper> insertedLayoutHelpers = new ArrayList<>();
+            for (int i = 0, size = groups.size(); i < size; i++) {
+                insertedLayoutHelpers.add(groups.get(i).getLayoutHelper());
+            }
+            newLayoutHelpers.addAll(insertIdx, insertedLayoutHelpers);
+            layoutManager.setLayoutHelpers(newLayoutHelpers, false);
+            mGroupBasicAdapter.insertBatchComponents(insertIdx, groups);
         }
     }
 
@@ -568,8 +572,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * NOTE new API, use this to replace {@link BaseTangramEngine#appendData(List)} and {@link BaseTangramEngine#appendData(Object)}
      * @param groups new group to be append at tail.
      */
-    public void appendWith(List<Card> groups) {//TODO
-
+    public void appendBatchWith(List<Card> groups) {
+        if (mGroupBasicAdapter != null) {
+            insertBatchWith(mGroupBasicAdapter.getGroups().size(), groups);
+        }
     }
 
     /**
