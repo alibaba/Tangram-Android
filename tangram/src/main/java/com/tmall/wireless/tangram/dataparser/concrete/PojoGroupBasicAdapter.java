@@ -458,7 +458,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
     @Override
     public void insertComponents(int pos, List<BaseCell> components) {
-        if (mData != null && components != null && !components.isEmpty() && pos > 0) {
+        if (mData != null && components != null && !components.isEmpty() && pos >= 0) {
             int newItemSize = components.size();
             if (mCards != null) {
                 List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
@@ -480,15 +480,14 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 mCards.clear();
                 mCards.addAll(newCards);
             }
-            int insertPosition = pos + 1;
             for (int i = 0; i < newItemSize; i++) {
-                if ((insertPosition + i) < mData.size()) {
-                    mData.add(insertPosition + i, components.get(i));
+                if ((pos + i) < mData.size()) {
+                    mData.add(pos + i, components.get(i));
                 } else {
                     mData.add(components.get(i));
                 }
             }
-            notifyItemRangeInserted(pos + 1, newItemSize);
+            notifyItemRangeInserted(pos, newItemSize);
         }
     }
 

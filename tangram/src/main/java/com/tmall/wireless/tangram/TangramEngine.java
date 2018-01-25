@@ -503,7 +503,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     /**
      * NOTE new API
      * A high performance method to insert cells. TODO handle nested card
-     * @param insertPosition the position to be inserted, note that new data will start from position + 1
+     * @param insertPosition the position to be inserted.
      * @param data new cell data
      */
     public void insertWith(int insertPosition, BaseCell data) {
@@ -516,7 +516,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     /**
      * NOTE new API
      * A high performance method to insert cells. TODO handle nested card
-     * @param insertPosition the position to be inserted, note that new data will start from position + 1
+     * @param insertPosition the position to be inserted
      * @param list new cell data list
      */
     public void insertWith(int insertPosition, List<BaseCell> list) {
@@ -525,7 +525,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
             BaseCell insertCell = mGroupBasicAdapter.getItemByPosition(insertPosition);
             int cardIdx = mGroupBasicAdapter.findCardIdxFor(insertPosition);
             Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
-            card.addCells(card, card.getCells().indexOf(insertCell) + 1, list);
+            card.addCells(card, card.getCells().indexOf(insertCell), list);
             List<LayoutHelper> layoutHelpers = getLayoutManager().getLayoutHelpers();
             if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
                 for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
@@ -628,7 +628,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
-     * NOTE new APi
+     * NOTE new API
      * Remove all cells in a card with target index
      * @param removeIdx target card's index
      */
@@ -696,7 +696,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
     /**
      * NOTE new API
-     * Replace parent card's children.
+     * Replace parent card's children. Cells' size should be equal with parent's children size.
      * @param parent
      * @param cells
      */
@@ -736,7 +736,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
     /**
      * NOTE new API
-     * Replace card one by one.
+     * Replace card one by one. New one's children size should be equal with old one's children size.
      * @param oldOne
      * @param newOne
      */
@@ -745,7 +745,6 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         if (oldOne != null && newOne != null && mGroupBasicAdapter != null && layoutManager != null) {
             List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
             int cardIdx = mGroupBasicAdapter.findCardIdxForCard(oldOne);
-            int diff = 0;
             if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
                 final List<LayoutHelper> newLayoutHelpers = new LinkedList<>();
                 for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
