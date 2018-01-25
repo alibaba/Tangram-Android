@@ -551,23 +551,31 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     abstract public void removeComponent(C component);
 
     /**
-     *
+     * !!! Do not call this method directly. It's not designed for users.
      * @param group a group of components to be removed.
      */
     abstract public void removeComponents(L group);
 
     /**
-     * Do not call this method directly. It's not designed for users.
+     * !!! Do not call this method directly. It's not designed for users.
      * @param pos the component position to be inserted
      * @param components
      */
     abstract public void insertComponents(int pos, List<C> components);
 
     /**
+     * !!! Do not call this method directly. It's not designed for users.
      * @param idx the group index to be inserted
      * @param group
      */
     abstract public void insertComponents(int idx, L group);
+
+    /**
+     * !!! Do not call this method directly. It's not designed for users.
+     * @param oldComponent the old component to be replaced
+     * @param newComponent the new component
+     */
+    abstract public void replaceComponent(C oldComponent, C newComponent);
 
     /**
      * @return total card list

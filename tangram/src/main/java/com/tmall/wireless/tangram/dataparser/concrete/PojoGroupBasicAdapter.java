@@ -530,6 +530,17 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     }
 
     @Override
+    public void replaceComponent(BaseCell oldComponent, BaseCell newComponent) {
+        if (mData != null && oldComponent != null && newComponent != null) {
+            int index = mData.indexOf(oldComponent);
+            if (index >= 0) {
+                mData.set(index, newComponent);
+                notifyItemChanged(index);
+            }
+        }
+    }
+
+    @Override
     public void destroy() {
         super.destroy();
         for (int i = 0, size = mCards.size(); i < size; i++) {

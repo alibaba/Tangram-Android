@@ -505,10 +505,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * @param insertPosition the position to be inserted, note that new data will start from position + 1
      * @param data new cell data
      */
-    public void insertComponent(int insertPosition, BaseCell data) {
+    public void insertWith(int insertPosition, BaseCell data) {
         List<BaseCell> list = new ArrayList<>();
         list.add(data);
-        insertComponents(insertPosition, list);
+        insertWith(insertPosition, list);
     }
 
     /**
@@ -517,7 +517,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * @param insertPosition the position to be inserted, note that new data will start from position + 1
      * @param list new cell data list
      */
-    public void insertComponents(int insertPosition, List<BaseCell> list) {
+    public void insertWith(int insertPosition, List<BaseCell> list) {
         int newItemSize = list != null ? list.size() : 0;
         if (newItemSize > 0 && mGroupBasicAdapter != null) {
             BaseCell insertCell = mGroupBasicAdapter.getItemByPosition(insertPosition);
@@ -549,7 +549,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * @param insertIdx the index to be inserted, note that new group will start from index + 1
      * @param group a group of data
      */
-    public void insertComponent(int insertIdx, Card group) {
+    public void insertWith(int insertIdx, Card group) {
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (group != null && mGroupBasicAdapter != null && layoutManager != null) {
             List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
@@ -568,10 +568,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * Remove cell at target position. TODO handle nested card
      * @param position
      */
-    public void removeComponent(int position) {
+    public void removeBy(int position) {
         if (mGroupBasicAdapter != null) {
             BaseCell removeCell = mGroupBasicAdapter.getItemByPosition(position);
-            removeComponent(removeCell);
+            removeBy(removeCell);
         }
     }
 
@@ -580,7 +580,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * Remove target cell. TODO handle nested card, cell in staggered, cell in onePlusN
      * @param data
      */
-    public void removeComponent(BaseCell data) {
+    public void removeBy(BaseCell data) {
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (data != null && mGroupBasicAdapter != null && layoutManager != null) {
             int removePosition = mGroupBasicAdapter.getPositionByItem(data);
@@ -619,11 +619,25 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
+     * NOTE new APi
+     * Remove all cells in a card with target index
+     * @param removeIdx target card's index
+     */
+    public void removeBatchBy(int removeIdx) {
+        if (mGroupBasicAdapter != null) {
+            Pair<Range<Integer>, Card> cardPair = mGroupBasicAdapter.getCardRange(removeIdx);
+            if (cardPair != null) {
+                removeBatchBy(cardPair.second);
+            }
+        }
+    }
+
+    /**
      * NOTE new API
      * Remove all cells in a card.
      * @param group
      */
-    public void removeComponents(Card group) {
+    public void removeBatchBy(Card group) {
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (group != null && mGroupBasicAdapter != null && layoutManager != null) {
             int cardIdx = mGroupBasicAdapter.findCardIdxForCard(group);
@@ -653,5 +667,33 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
             }
         }
     }
+
+    /**
+     * NOTE new API
+     * Replace cell one by one.
+     * @param oldOne
+     * @param newOne
+     */
+    public void replace(BaseCell oldOne, BaseCell newOne) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (oldOne != null && newOne != null && mGroupBasicAdapter != null && layoutManager != null) {
+            int replacePosition = mGroupBasicAdapter.getPositionByItem(oldOne);
+            int cardIdx = mGroupBasicAdapter.findCardIdxFor(replacePosition);
+            Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
+            card.replaceCell(oldOne, newOne);
+            mGroupBasicAdapter.replaceComponent(oldOne, newOne);
+        }
+    }
+
+    /**
+     * NOTE new API
+     * Replace card one by one.
+     * @param oldOne
+     * @param newOne
+     */
+    public void replace(Card oldOne, Card newOne) {
+
+    }
+
 
 }
