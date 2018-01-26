@@ -590,7 +590,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * Remove cell at target position. TODO handle nested card
      * @param position
      */
-    public void removeBy(int position) {
+    protected void removeBy(int position) {
         if (mGroupBasicAdapter != null) {
             if (position < mGroupBasicAdapter.getItemCount() && position >= 0) {
                 BaseCell removeCell = mGroupBasicAdapter.getItemByPosition(position);
@@ -604,7 +604,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * Remove target cell. TODO handle nested card, cell in staggered, cell in onePlusN
      * @param data
      */
-    public void removeBy(BaseCell data) {
+    protected void removeBy(BaseCell data) {
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (data != null && mGroupBasicAdapter != null && layoutManager != null) {
             int removePosition = mGroupBasicAdapter.getPositionByItem(data);
@@ -649,7 +649,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * Remove all cells in a card with target index
      * @param removeIdx target card's index
      */
-    public void removeBatchBy(int removeIdx) {
+    protected void removeBatchBy(int removeIdx) {
         if (mGroupBasicAdapter != null) {
             Pair<Range<Integer>, Card> cardPair = mGroupBasicAdapter.getCardRange(removeIdx);
             if (cardPair != null) {
@@ -663,7 +663,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * Remove all cells in a card.
      * @param group
      */
-    public void removeBatchBy(Card group) {
+    protected void removeBatchBy(Card group) {
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (group != null && mGroupBasicAdapter != null && layoutManager != null) {
             int cardIdx = mGroupBasicAdapter.findCardIdxForCard(group);
