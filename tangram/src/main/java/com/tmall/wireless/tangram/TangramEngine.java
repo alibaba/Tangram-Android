@@ -520,6 +520,9 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     public void insertWith(int insertPosition, List<BaseCell> list) {
         int newItemSize = list != null ? list.size() : 0;
         if (newItemSize > 0 && mGroupBasicAdapter != null) {
+            if (insertPosition >= mGroupBasicAdapter.getItemCount()) {
+                insertPosition = mGroupBasicAdapter.getItemCount() - 1;
+            }
             BaseCell insertCell = mGroupBasicAdapter.getItemByPosition(insertPosition);
             int cardIdx = mGroupBasicAdapter.findCardIdxFor(insertPosition);
             Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
@@ -562,7 +565,11 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
             for (int i = 0, size = groups.size(); i < size; i++) {
                 insertedLayoutHelpers.add(groups.get(i).getLayoutHelper());
             }
-            newLayoutHelpers.addAll(insertIdx, insertedLayoutHelpers);
+            if (insertIdx >= layoutHelpers.size()) {
+                newLayoutHelpers.addAll(insertedLayoutHelpers);
+            } else {
+                newLayoutHelpers.addAll(insertIdx, insertedLayoutHelpers);
+            }
             layoutManager.setLayoutHelpers(newLayoutHelpers, false);
             mGroupBasicAdapter.insertBatchComponents(insertIdx, groups);
         }
@@ -585,8 +592,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      */
     public void removeBy(int position) {
         if (mGroupBasicAdapter != null) {
-            BaseCell removeCell = mGroupBasicAdapter.getItemByPosition(position);
-            removeBy(removeCell);
+            if (position < mGroupBasicAdapter.getItemCount() && position >= 0) {
+                BaseCell removeCell = mGroupBasicAdapter.getItemByPosition(position);
+                removeBy(removeCell);
+            }
         }
     }
 
@@ -599,36 +608,38 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (data != null && mGroupBasicAdapter != null && layoutManager != null) {
             int removePosition = mGroupBasicAdapter.getPositionByItem(data);
-            int cardIdx = mGroupBasicAdapter.findCardIdxFor(removePosition);
-            Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
-            card.removeCellSilently(data);
-            List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
-            LayoutHelper emptyLayoutHelper = null;
-            if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
-                for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
-                    LayoutHelper layoutHelper = layoutHelpers.get(i);
-                    int start = layoutHelper.getRange().getLower();
-                    int end = layoutHelper.getRange().getUpper();
-                    if (end < removePosition) {
-                        //do nothing
-                    } else if (start <= removePosition && removePosition <= end) {
-                        int itemCount = layoutHelper.getItemCount() - 1;
-                        if (itemCount > 0) {
-                            layoutHelper.setItemCount(itemCount);
-                            layoutHelper.setRange(start, end - 1);
-                        } else {
-                            emptyLayoutHelper = layoutHelper;
+            if (removePosition >= 0) {
+                int cardIdx = mGroupBasicAdapter.findCardIdxFor(removePosition);
+                Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
+                card.removeCellSilently(data);
+                List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+                LayoutHelper emptyLayoutHelper = null;
+                if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                    for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                        LayoutHelper layoutHelper = layoutHelpers.get(i);
+                        int start = layoutHelper.getRange().getLower();
+                        int end = layoutHelper.getRange().getUpper();
+                        if (end < removePosition) {
+                            //do nothing
+                        } else if (start <= removePosition && removePosition <= end) {
+                            int itemCount = layoutHelper.getItemCount() - 1;
+                            if (itemCount > 0) {
+                                layoutHelper.setItemCount(itemCount);
+                                layoutHelper.setRange(start, end - 1);
+                            } else {
+                                emptyLayoutHelper = layoutHelper;
+                            }
+                        } else if (removePosition < start) {
+                            layoutHelper.setRange(start - 1, end - 1);
                         }
-                    } else if (removePosition < start) {
-                        layoutHelper.setRange(start - 1, end - 1);
                     }
+                    if (emptyLayoutHelper != null) {
+                        final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
+                        newLayoutHelpers.remove(emptyLayoutHelper);
+                        layoutManager.setLayoutHelpers(newLayoutHelpers, false);
+                    }
+                    mGroupBasicAdapter.removeComponent(data);
                 }
-                if (emptyLayoutHelper != null) {
-                    final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
-                    newLayoutHelpers.remove(emptyLayoutHelper);
-                    layoutManager.setLayoutHelpers(newLayoutHelpers, false);
-                }
-                mGroupBasicAdapter.removeComponent(data);
             }
         }
     }
@@ -693,10 +704,12 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (oldOne != null && newOne != null && mGroupBasicAdapter != null && layoutManager != null) {
             int replacePosition = mGroupBasicAdapter.getPositionByItem(oldOne);
-            int cardIdx = mGroupBasicAdapter.findCardIdxFor(replacePosition);
-            Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
-            card.replaceCell(oldOne, newOne);
-            mGroupBasicAdapter.replaceComponent(Arrays.asList(oldOne), Arrays.asList(newOne));
+            if (replacePosition >= 0) {
+                int cardIdx = mGroupBasicAdapter.findCardIdxFor(replacePosition);
+                Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
+                card.replaceCell(oldOne, newOne);
+                mGroupBasicAdapter.replaceComponent(Arrays.asList(oldOne), Arrays.asList(newOne));
+            }
         }
     }
 

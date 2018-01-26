@@ -472,7 +472,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                     } else if (start <= pos && pos < end) {
                         Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end + newItemSize), pair.second);
                         newCards.add(newPair);
-                    } else if (pos < start) {
+                    } else if (pos <= start) {
                         Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
                         newCards.add(newPair);
                     }
@@ -570,7 +570,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                             diff = newComponent.size() - oldComponent.size();
                             Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end + diff), pair.second);
                             newCards.add(newPair);
-                        } else if (index < start) {
+                        } else if (index <= start) {
                             Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + diff, end + diff), pair.second);
                             newCards.add(newPair);
                         }
@@ -608,7 +608,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                             diff = newComponent.size() - oldComponent.size();
                             Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end + diff), newGroup);
                             newCards.add(newPair);
-                        } else if (index < start) {
+                        } else if (index <= start) {
                             Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + diff, end + diff), pair.second);
                             newCards.add(newPair);
                         }
