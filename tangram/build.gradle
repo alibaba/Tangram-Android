@@ -24,20 +24,40 @@
 
 apply plugin: 'com.android.library'
 
+buildscript {
+    repositories {
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.0'
+    }
+}
+
+repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
+    jcenter()
+    mavenLocal()
+}
+
 ext {
     bintrayRepo = 'Tangram'
     bintrayName = 'Tangram-Android'
 
-    publishedGroupId = GROUP
-    libraryName = ARTIFACT
-    artifact = ARTIFACT
+    publishedGroupId = project.hasProperty('GROUP') ? GROUP : ''
+    libraryName = project.hasProperty('ARTIFACT') ? ARTIFACT : ''
+    artifact = project.hasProperty('ARTIFACT') ? ARTIFACT : ''
 
     libraryDescription = 'Tangram is a modular UI solution for building native page dynamically including Tangram for Android, Tangram for iOS and even backend CMS. This project provides the sdk on Android.'
 
     siteUrl = 'https://github.com/alibaba/Tangram-Android'
     gitUrl = 'https://github.com/alibaba/Tangram-Android.git'
 
-    libraryVersion = VERSION_NAME
+    libraryVersion = project.hasProperty('VERSION_NAME') ? VERSION_NAME : ''
 
     developerId = 'longerian'
     developerName = 'longerian'
