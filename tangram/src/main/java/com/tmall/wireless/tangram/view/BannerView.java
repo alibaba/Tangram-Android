@@ -222,7 +222,7 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
         if (bannerSupport != null) {
             for (int j = 0; j < bannerSupport.getListeners().size(); j++) {
                 BannerListener listener = bannerSupport.getListeners().get(j);
-                listener.onPageSelected(position);
+                listener.onPageSelected(currentItemPos);
             }
         }
         if (cell != null && cell.serviceManager != null) {
