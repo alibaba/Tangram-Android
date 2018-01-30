@@ -570,7 +570,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
             } else {
                 newLayoutHelpers.addAll(insertIdx, insertedLayoutHelpers);
             }
-            layoutManager.setLayoutHelpers(newLayoutHelpers, false);
+            layoutManager.setLayoutHelpers(newLayoutHelpers);
             mGroupBasicAdapter.insertBatchComponents(insertIdx, groups);
         }
     }
@@ -636,7 +636,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                     if (emptyLayoutHelper != null) {
                         final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
                         newLayoutHelpers.remove(emptyLayoutHelper);
-                        layoutManager.setLayoutHelpers(newLayoutHelpers, false);
+                        layoutManager.setLayoutHelpers(newLayoutHelpers);
                     }
                     mGroupBasicAdapter.removeComponent(data);
                 }
@@ -687,7 +687,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 if (emptyLayoutHelper != null) {
                     final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
                     newLayoutHelpers.remove(emptyLayoutHelper);
-                    layoutManager.setLayoutHelpers(newLayoutHelpers, false);
+                    layoutManager.setLayoutHelpers(newLayoutHelpers);
                 }
                 mGroupBasicAdapter.removeComponents(group);
             }
@@ -773,7 +773,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                     }
                     newLayoutHelpers.add(layoutHelper);
                 }
-                layoutManager.setLayoutHelpers(newLayoutHelpers, false);
+                layoutManager.setLayoutHelpers(newLayoutHelpers);
                 mGroupBasicAdapter.replaceComponent(oldOne, newOne);
             }
         }
