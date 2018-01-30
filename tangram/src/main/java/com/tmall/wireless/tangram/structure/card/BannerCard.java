@@ -143,8 +143,9 @@ public class BannerCard extends Card {
     @Override
     public void parseStyle(@Nullable JSONObject data) {
         super.parseStyle(data);
-        if (data == null)
+        if (data == null) {
             return;
+        }
         cell.setIndicatorRadius(Style.dp2px(data.optDouble(ATTR_INDICATOR_RADIUS)));
         cell.setIndicatorColor(Style.parseColor(data.optString(ATTR_INDICATOR_COLOR, "#00000000")));
         cell.setIndicatorDefaultColor(Style.parseColor(data.optString(ATTR_INDICATOR_DEFAULT_INDICATOR_COLOR, "#00000000")));

@@ -151,6 +151,8 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
                     mIndicator.setGravity(Gravity.RIGHT);
                 }
                 break;
+            default:
+                break;
         }
     }
 
@@ -180,8 +182,9 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     }
 
     public void setIndicatorMargin(int indicatorMargin) {
-        if (indicatorMargin > 0)
+        if (indicatorMargin > 0) {
             this.mIndicatorMargin = indicatorMargin;
+        }
     }
 
     public void setIndicatorHeight(int indicatorHeight) {
@@ -259,8 +262,9 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     public void postBindView(BaseCell cell) {
         BannerCell bannerCell = (BannerCell) cell;
         bannerCell.initAdapter();
-        if (cell.style != null)
+        if (cell.style != null) {
             setPadding(cell.style.padding[3], cell.style.padding[0], cell.style.padding[1], cell.style.padding[2]);
+        }
         setBackgroundColor(bannerCell.mBgColor);
         setAdapter(bannerCell.mBannerAdapter);
         getUltraViewPager().setAutoMeasureHeight(true);
@@ -317,10 +321,12 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     }
 
     private int getIndicatorGravity(String gravity) {
-        if ("left".equals(gravity))
+        if ("left".equals(gravity)) {
             return BannerView.GRAVITY_LEFT;
-        if ("right".equals(gravity))
+        }
+        if ("right".equals(gravity)) {
             return BannerView.GRAVITY_RIGHT;
+        }
         return BannerView.GRAVITY_CENTER;
     }
 
@@ -343,8 +349,9 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
         }
 
         public void updateIndicators(String focusUrl, String norUrl, int radius, int focusColor, int norColor) {
-            if (mUltraViewPager.getAdapter() == null)
+            if (mUltraViewPager.getAdapter() == null) {
                 return;
+            }
 
             this.focusUrl = focusUrl;
             this.norUrl = norUrl;
@@ -421,10 +428,12 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
                 LinearLayout.LayoutParams layoutParams = (LayoutParams) mImageViews[i].getLayoutParams();
                 if (style == STYLE_IMG || style == STYLE_DOT) {
                     layoutParams.setMargins(0, mIndicatorMargin, mIndicatorGap, mIndicatorMargin);
-                    if (width > 0)
+                    if (width > 0) {
                         layoutParams.width = width;
-                    if (height > 0)
+                    }
+                    if (height > 0) {
                         layoutParams.height = height;
+                    }
                 } else {
                     layoutParams.setMargins(0, 0, 0, 0);
                 }
@@ -514,6 +523,8 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
                 break;
             case MotionEvent.ACTION_UP:
                 direction = 0;
+                break;
+            default:
                 break;
         }
 
