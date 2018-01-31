@@ -206,7 +206,6 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     @Override
     public void onPageSelected(int position) {
         currentItemPos = mUltraViewPager.getCurrentItem();
-        Log.d("Longer", "onPageSelected " + position + " " + currentItemPos);
         mIndicator.setCurrItem(currentItemPos);
 
         if (cell != null && cell.extras != null) {
@@ -691,7 +690,6 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     private int getNextItemIndex() {
         int nextIndex = mUltraViewPager.getNextItem();
-        Log.d("Longer", "next Index " + nextIndex);
         return nextIndex;
     }
 

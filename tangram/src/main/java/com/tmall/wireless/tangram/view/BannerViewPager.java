@@ -117,9 +117,9 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
             }
         }
 
-        //if (!pagerAdapter.isEnableMultiScr()) {
-        //    return;
-        //}
+        if (!pagerAdapter.isEnableMultiScr()) {
+            return;
+        }
 
         int pageLength = getMeasuredWidth();
 
