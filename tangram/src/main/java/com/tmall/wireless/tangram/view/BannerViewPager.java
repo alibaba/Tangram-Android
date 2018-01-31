@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.tmall.ultraviewpager.UltraViewPagerAdapter;
@@ -60,7 +61,10 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
         if (child == null) {
             return;
         }
-        for (int i = 0; i < getChildCount(); i++) {
+        int childCount = getChildCount();
+        Log.d("Longer", "measure banner view pager child Count " + childCount);
+
+        for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
             if ((view.getPaddingLeft() != itemMarginLeft ||
                 view.getPaddingTop() != itemMarginTop ||
@@ -79,13 +83,13 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
 
         if (!Double.isNaN(itemRatio)) {
             int itemHeight = (int) (childWidth / itemRatio);
-            for (int i = 0, childCount = getChildCount(); i < childCount; i++) {
+            for (int i = 0; i < childCount; i++) {
                 View view = getChildAt(i);
                 view.measure(MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY));
             }
         } else {
-            for (int i = 0, childCount = getChildCount(); i < childCount; i++) {
+            for (int i = 0; i < childCount; i++) {
                 View view = getChildAt(i);
                 if (pagerAdapter.getPageWidth(getCurrentItem()) != 1) {
                     view.measure(MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
@@ -102,7 +106,7 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
         if (!Float.isNaN(ratio)) {
             heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) (getMeasuredWidth() / ratio), MeasureSpec.EXACTLY);
             setMeasuredDimension(widthMeasureSpec, heightMeasureSpec);
-            for (int i = 0, childCount = getChildCount(); i < childCount; i++) {
+            for (int i = 0; i < childCount; i++) {
                 View view = getChildAt(i);
                 view.measure(MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY), heightMeasureSpec);
             }
@@ -131,6 +135,11 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
             setOffscreenPageLimit(offscreen);
             requestLayout();
         }
+    }
+
+    @Override
+    public PagerAdapter getAdapter() {
+        return super.getAdapter() == null ? null : ((UltraViewPagerAdapter) super.getAdapter()).getAdapter();
     }
 
     @Override

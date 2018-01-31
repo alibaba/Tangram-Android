@@ -24,13 +24,28 @@
 
 package com.tmall.wireless.tangram.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 
-import android.util.Log;
+import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
+import android.support.annotation.NonNull;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.AttributeSet;
+import android.util.Pair;
 import android.util.SparseIntArray;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import com.tmall.ultraviewpager.TimerHandler;
-import com.tmall.ultraviewpager.UltraViewPager.ScrollMode;
-import com.tmall.ultraviewpager.UltraViewPagerView;
 import com.tmall.wireless.tangram.core.R;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
@@ -44,33 +59,12 @@ import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
 import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Utils;
-
-import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.util.AttributeSet;
-import android.util.Pair;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import org.json.JSONException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by mikeafc on 16/1/14.
  */
-public class BannerView extends RelativeLayout implements ViewPager.OnPageChangeListener,
+public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListener,
     ITangramViewLifeCycle {
 
     private static final String CURRENT_POS = "__current_pos__";
@@ -82,7 +76,6 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     private boolean isIndicatorOutside;
     private BannerViewPager mUltraViewPager;
     private BannerIndicator mIndicator;
-    private LayoutParams mIndicatorLayoutParams;
 
     private int mIndicatorHeight = ViewGroup.LayoutParams.WRAP_CONTENT;
     private int mIndicatorGap = Style.dp2px(6);
@@ -125,10 +118,7 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
         mUltraViewPager.setId(R.id.TANGRAM_BANNER_ID);
         mIndicator = new BannerIndicator(getContext());
         addView(mUltraViewPager);
-        mIndicatorLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
-            RelativeLayout.LayoutParams.WRAP_CONTENT);
-        mIndicatorLayoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.TANGRAM_BANNER_ID);
-        addView(mIndicator, mIndicatorLayoutParams);
+        addView(mIndicator);
         mIndicator.setPadding(mIndicatorGap, 0, 0, 0);
     }
 
@@ -170,22 +160,10 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     public void setIndicatorPos(String isInside) {
         if ("inside".equals(isInside)) {
             isIndicatorOutside = false;
-            if (Build.VERSION.SDK_INT >= 17) {
-                mIndicatorLayoutParams.removeRule(RelativeLayout.BELOW);
-            }
-            mIndicatorLayoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.TANGRAM_BANNER_ID);
         } else if ("outside".equals(isInside)) {
             isIndicatorOutside = true;
-            if (Build.VERSION.SDK_INT >= 17) {
-                mIndicatorLayoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
-            }
-            mIndicatorLayoutParams.addRule(RelativeLayout.BELOW, R.id.TANGRAM_BANNER_ID);
         } else {
             isIndicatorOutside = false;
-            if (Build.VERSION.SDK_INT >= 17) {
-                mIndicatorLayoutParams.removeRule(RelativeLayout.BELOW);
-            }
-            mIndicatorLayoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.TANGRAM_BANNER_ID);
         }
     }
 
@@ -336,12 +314,51 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     }
 
     @Override
+    public LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new LayoutParams(getContext(), attrs);
+    }
+
+    @Override
+    protected LayoutParams generateLayoutParams(ViewGroup.LayoutParams lp) {
+        return new LayoutParams(lp);
+    }
+
+    @Override
+    protected LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    }
+
+    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (!Float.isNaN(ratio)) {
             int widthSize = MeasureSpec.getSize(widthMeasureSpec);
             heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) (widthSize / ratio), MeasureSpec.EXACTLY);
         }
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        mUltraViewPager.measure(widthMeasureSpec, heightMeasureSpec);
+        mIndicator.measure(widthMeasureSpec, heightMeasureSpec);
+
+        int measureWidth = mUltraViewPager.getMeasuredWidth();
+        int measureHeight = mUltraViewPager.getMeasuredHeight();
+        if (isIndicatorOutside) {
+            int indicatorHeight = mIndicator.getMeasuredHeight();
+            setMeasuredDimension(measureWidth, measureHeight + indicatorHeight);
+        } else {
+            setMeasuredDimension(measureWidth, measureHeight);
+        }
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        int measureWidth = mUltraViewPager.getMeasuredWidth();
+        int measureHeight = mUltraViewPager.getMeasuredHeight();
+        int indicatorHeight = mIndicator.getMeasuredHeight();
+
+        mUltraViewPager.layout(0, 0, measureWidth, measureHeight);
+        if (isIndicatorOutside) {
+            mIndicator.layout(0, measureHeight, measureWidth, measureHeight + indicatorHeight);
+        } else {
+            mIndicator.layout(0, measureHeight - indicatorHeight, measureWidth, measureHeight);
+        }
     }
 
     private int getIndicatorGravity(String gravity) {
@@ -449,7 +466,7 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
             }
             int position = mUltraViewPager.getCurrentItem();
             for (int i = 0; i < mImageViews.length; i++) {
-                LinearLayout.LayoutParams layoutParams = (LayoutParams) mImageViews[i].getLayoutParams();
+                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) mImageViews[i].getLayoutParams();
                 if (style == STYLE_IMG || style == STYLE_DOT) {
                     layoutParams.setMargins(0, mIndicatorMargin, mIndicatorGap, mIndicatorMargin);
                     if (width > 0) {
@@ -558,15 +575,15 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
         if (cell != null) {
             View header = getViewFromRecycler(cell);
             if (header != null) {
-                header.setId(R.id.TANGRAM_BANNER_HEADER_ID);
-                RelativeLayout.LayoutParams bodyLp = (LayoutParams) mUltraViewPager.getLayoutParams();
-                bodyLp.addRule(RelativeLayout.BELOW, R.id.TANGRAM_BANNER_HEADER_ID);
-                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-                lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
-                lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
-                lp.bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
-                lp.rightMargin = cell.style.margin[Style.MARGIN_RIGHT_INDEX];
+                ViewGroup.LayoutParams lp = header.getLayoutParams();
+                if (lp == null || !(lp instanceof LayoutParams)) {
+                    lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
+                ((LayoutParams) lp).topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
+                ((LayoutParams) lp).leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
+                ((LayoutParams) lp).bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
+                ((LayoutParams) lp).rightMargin = cell.style.margin[Style.MARGIN_RIGHT_INDEX];
                 addView(header, lp);
             }
         }
@@ -576,14 +593,15 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
         if (cell != null) {
             View footer = getViewFromRecycler(cell);
             if (footer != null) {
-                footer.setId(R.id.TANGRAM_BANNER_FOOTER_ID);
-                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-                lp.addRule(RelativeLayout.BELOW, R.id.TANGRAM_BANNER_ID);
-                lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
-                lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
-                lp.bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
-                lp.rightMargin = cell.style.margin[Style.MARGIN_RIGHT_INDEX];
+                ViewGroup.LayoutParams lp = footer.getLayoutParams();
+                if (lp == null || !(lp instanceof LayoutParams)) {
+                    lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                }
+                ((LayoutParams) lp).topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
+                ((LayoutParams) lp).leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
+                ((LayoutParams) lp).bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
+                ((LayoutParams) lp).rightMargin = cell.style.margin[Style.MARGIN_RIGHT_INDEX];
                 addView(footer, lp);
             }
         }
@@ -687,6 +705,26 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
             mUltraViewPager.setCurrentItemFake(nextPage, true);
         }
         return isChange;
+    }
+
+    public static class LayoutParams extends MarginLayoutParams {
+
+        public LayoutParams(Context c, AttributeSet attrs) {
+            super(c, attrs);
+        }
+
+        public LayoutParams(int width, int height) {
+            super(width, height);
+        }
+
+        public LayoutParams(@NonNull ViewGroup.LayoutParams source) {
+            super(source);
+        }
+
+        public LayoutParams(@NonNull ViewGroup.MarginLayoutParams source) {
+            super(source);
+        }
+
     }
 
 }
