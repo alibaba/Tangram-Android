@@ -25,7 +25,12 @@
 package com.tmall.wireless.tangram.view;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
-import com.tmall.ultraviewpager.UltraViewPager;
+
+import android.util.Log;
+import android.util.SparseIntArray;
+import com.tmall.ultraviewpager.TimerHandler;
+import com.tmall.ultraviewpager.UltraViewPager.ScrollMode;
+import com.tmall.ultraviewpager.UltraViewPagerView;
 import com.tmall.wireless.tangram.core.R;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
@@ -74,7 +79,8 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     public static final int GRAVITY_CENTER = 1;
     public static final int GRAVITY_RIGHT = 2;
 
-    private UltraViewPager mUltraViewPager;
+    private boolean isIndicatorOutside;
+    private BannerViewPager mUltraViewPager;
     private BannerIndicator mIndicator;
     private LayoutParams mIndicatorLayoutParams;
 
@@ -84,6 +90,8 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
 
     private float xDown;
     private float yDown;
+
+    private float ratio = Float.NaN;
 
     private BaseCell cell;
 
@@ -96,6 +104,8 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     private boolean init;
 
     private int direction; // 1 for right, -1 for left
+
+    private TimerHandler timer;
 
     public BannerView(Context context) {
         this(context, null);
@@ -111,21 +121,22 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     }
 
     private void init() {
-        mUltraViewPager = new UltraViewPager(getContext());
+        mUltraViewPager = new BannerViewPager(getContext());
         mUltraViewPager.setId(R.id.TANGRAM_BANNER_ID);
         mIndicator = new BannerIndicator(getContext());
         addView(mUltraViewPager);
-        addView(mIndicator, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        mIndicatorLayoutParams = (LayoutParams) mIndicator.getLayoutParams();
+        mIndicatorLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
+            RelativeLayout.LayoutParams.WRAP_CONTENT);
         mIndicatorLayoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.TANGRAM_BANNER_ID);
+        addView(mIndicator, mIndicatorLayoutParams);
         mIndicator.setPadding(mIndicatorGap, 0, 0, 0);
     }
 
     public void setAdapter(PagerAdapter adapter) {
         mUltraViewPager.setAdapter(adapter);
-        mUltraViewPager.disableAutoScroll();//reset timer when reuse
-        mUltraViewPager.setOnPageChangeListener(this);
+        disableAutoScroll();//reset timer when reuse
+        mUltraViewPager.removeOnPageChangeListener(this);
+        mUltraViewPager.addOnPageChangeListener(this);
     }
 
     public void updateIndicators(String focusUrl, String norUrl, int radius, int focusColor, int norColor) {
@@ -158,16 +169,19 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
 
     public void setIndicatorPos(String isInside) {
         if ("inside".equals(isInside)) {
+            isIndicatorOutside = false;
             if (Build.VERSION.SDK_INT >= 17) {
                 mIndicatorLayoutParams.removeRule(RelativeLayout.BELOW);
             }
             mIndicatorLayoutParams.addRule(RelativeLayout.ALIGN_BOTTOM, R.id.TANGRAM_BANNER_ID);
         } else if ("outside".equals(isInside)) {
+            isIndicatorOutside = true;
             if (Build.VERSION.SDK_INT >= 17) {
                 mIndicatorLayoutParams.removeRule(RelativeLayout.ALIGN_BOTTOM);
             }
             mIndicatorLayoutParams.addRule(RelativeLayout.BELOW, R.id.TANGRAM_BANNER_ID);
         } else {
+            isIndicatorOutside = false;
             if (Build.VERSION.SDK_INT >= 17) {
                 mIndicatorLayoutParams.removeRule(RelativeLayout.BELOW);
             }
@@ -196,7 +210,7 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     }
 
 
-    public UltraViewPager getUltraViewPager() {
+    public BannerViewPager getUltraViewPager() {
         return mUltraViewPager;
     }
 
@@ -268,13 +282,14 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
         setBackgroundColor(bannerCell.mBgColor);
         setAdapter(bannerCell.mBannerAdapter);
         getUltraViewPager().setAutoMeasureHeight(true);
+        this.ratio = bannerCell.mRatio;
         getUltraViewPager().setRatio(bannerCell.mRatio);
-        getUltraViewPager().setAutoScroll(bannerCell.mAutoScrollInternal, bannerCell.mSpecialInterval);
-        getUltraViewPager().getViewPager().setPageMargin(bannerCell.hGap);
+        setAutoScroll(bannerCell.mAutoScrollInternal, bannerCell.mSpecialInterval);
+        getUltraViewPager().setPageMargin(bannerCell.hGap);
         if (bannerCell.mCells.size() <= bannerCell.mInfiniteMinCount) {
-            getUltraViewPager().setInfiniteLoop(false);
+            setInfiniteLoop(false);
         } else {
-            getUltraViewPager().setInfiniteLoop(bannerCell.mInfinite);
+            setInfiniteLoop(bannerCell.mInfinite);
         }
         setIndicatorGravity(getIndicatorGravity(bannerCell.mIndicatorGravity));
         setIndicatorPos(bannerCell.mIndicatorPos);
@@ -291,13 +306,13 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
         int indicatorHeight = bannerCell.mIndicatorHeight;
         setIndicatorHeight(indicatorHeight);
         if (bannerCell.itemMargin[0] > 0 || bannerCell.itemMargin[1] > 0) {
-            getUltraViewPager().setScrollMargin(bannerCell.itemMargin[0], bannerCell.itemMargin[1]);
-            getUltraViewPager().getViewPager().setClipToPadding(false);
-            getUltraViewPager().getViewPager().setClipChildren(false);
+            setScrollMargin(bannerCell.itemMargin[0], bannerCell.itemMargin[1]);
+            getUltraViewPager().setClipToPadding(false);
+            getUltraViewPager().setClipChildren(false);
         } else {
-            getUltraViewPager().setScrollMargin(0, 0);
-            getUltraViewPager().getViewPager().setClipToPadding(true);
-            getUltraViewPager().getViewPager().setClipChildren(true);
+            setScrollMargin(0, 0);
+            getUltraViewPager().setClipToPadding(true);
+            getUltraViewPager().setClipChildren(true);
         }
         VirtualLayoutManager.LayoutParams layoutParams = (VirtualLayoutManager.LayoutParams) getLayoutParams();
         layoutParams.setMargins(bannerCell.margin[3], bannerCell.margin[0], bannerCell.margin[1], bannerCell.margin[2]);
@@ -318,6 +333,15 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
     @Override
     public void postUnBindView(BaseCell cell) {
         recycleView();
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (!Float.isNaN(ratio)) {
+            int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) (widthSize / ratio), MeasureSpec.EXACTLY);
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     private int getIndicatorGravity(String gravity) {
@@ -440,7 +464,6 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
                 if (style == STYLE_DOT) {
                     mImageViews[i].setImageDrawable(getGradientDrawable(position == i ? focusColor : norColor, radius));
                 } else if (style == STYLE_IMG){
-                    //ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
                 }
             }
 			if (style == STYLE_IMG) {
@@ -590,6 +613,80 @@ public class BannerView extends RelativeLayout implements ViewPager.OnPageChange
             }
             mViewHolders.clear();
         }
+    }
+
+    private TimerHandler.TimerHandlerListener mTimerHandlerListener = new TimerHandler.TimerHandlerListener() {
+        @Override
+        public int getNextItem() {
+            return BannerView.this.getNextItem();
+        }
+
+        @Override
+        public void callBack() {
+            scrollNextPage();
+        }
+    };
+
+    public void setScrollMargin(int left, int right) {
+        mUltraViewPager.setPadding(left, 0, right, 0);
+    }
+
+    public void setInfiniteLoop(boolean enableLoop) {
+        mUltraViewPager.setEnableLoop(enableLoop);
+    }
+
+    public void setAutoScroll(int intervalInMillis, SparseIntArray intervalArray) {
+        if (0 == intervalInMillis) {
+            return;
+        }
+        if (timer != null) {
+            disableAutoScroll();
+        }
+        timer = new TimerHandler(mTimerHandlerListener, intervalInMillis);
+        timer.setSpecialInterval(intervalArray);
+        startTimer();
+    }
+
+    public void disableAutoScroll() {
+        stopTimer();
+        timer = null;
+    }
+
+    private void startTimer() {
+        if (timer == null || mUltraViewPager == null || !timer.isStopped()) {
+            return;
+        }
+        timer.setListener(mTimerHandlerListener);
+        timer.removeCallbacksAndMessages(null);
+        timer.tick(0);
+        timer.setStopped(false);
+    }
+
+    private void stopTimer() {
+        if (timer == null || mUltraViewPager == null || timer.isStopped()) {
+            return;
+        }
+        timer.removeCallbacksAndMessages(null);
+        timer.setListener(null);
+        timer.setStopped(true);
+    }
+
+    private int getNextItem() {
+        return mUltraViewPager.getNextItem();
+    }
+
+    private boolean scrollNextPage() {
+        boolean isChange = false;
+        if (mUltraViewPager != null && mUltraViewPager.getAdapter() != null && mUltraViewPager.getAdapter().getCount() > 0) {
+            final int curr = mUltraViewPager.getCurrentItemFake();
+            int nextPage = 0;
+            if (curr < mUltraViewPager.getAdapter().getCount() - 1) {
+                nextPage = curr + 1;
+                isChange = true;
+            }
+            mUltraViewPager.setCurrentItemFake(nextPage, true);
+        }
+        return isChange;
     }
 
 }

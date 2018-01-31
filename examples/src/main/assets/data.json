@@ -56,10 +56,7 @@
       "indicatorPosition": "outside",
       "indicatorMargin": 10,
       "indicatorGap": 2,
-      "scrollMarginLeft": 20,
-      "scrollMarginRight": 20,
       "hGap": 12,
-      "pageRatio": 0.5,
       "bgColor": "#ffffff"
     },
     "items": [
@@ -180,7 +177,7 @@
       "indicatorImg1": "https://gw.alicdn.com/tps/TB16RaxLpXXXXbIXFXXXXXXXXXX-14-14.png",
       "indicatorImg2": "https://gw.alicdn.com/tps/TB1m79uLpXXXXXUXVXXXXXXXXXX-18-16.png",
       "indicatorGravity": "center",
-      "indicatorPosition": "outside",
+      "indicatorPosition": "inside",
       "indicatorMargin": 10,
       "indicatorGap": 2,
       "scrollMarginLeft": 20,
