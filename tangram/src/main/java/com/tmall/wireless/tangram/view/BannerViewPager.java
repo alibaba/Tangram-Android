@@ -117,9 +117,9 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
             }
         }
 
-        if (!pagerAdapter.isEnableMultiScr()) {
-            return;
-        }
+        //if (!pagerAdapter.isEnableMultiScr()) {
+        //    return;
+        //}
 
         int pageLength = getMeasuredWidth();
 
@@ -137,18 +137,18 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
         }
     }
 
-    @Override
-    public PagerAdapter getAdapter() {
+    public PagerAdapter getWrapperAdapter() {
         return super.getAdapter() == null ? null : ((UltraViewPagerAdapter) super.getAdapter()).getAdapter();
     }
 
     @Override
     public void setAdapter(PagerAdapter adapter) {
         if (adapter != null) {
-            if (pagerAdapter == null || pagerAdapter.getAdapter() != adapter) {
-                pagerAdapter = new UltraViewPagerAdapter(adapter);
+            if (pagerAdapter == null || pagerAdapter != adapter) {
+                pagerAdapter = (UltraViewPagerAdapter)adapter;
                 pagerAdapter.setCenterListener(this);
                 pagerAdapter.setEnableLoop(enableLoop);
+                //pagerAdapter.setMultiScrRatio(multiScrRatio);
                 constrainLength = 0;
                 super.setAdapter(pagerAdapter);
             }
@@ -180,7 +180,7 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
     }
 
     public int getNextItem() {
-        if (pagerAdapter.getCount() != 0) {
+        if (pagerAdapter != null && pagerAdapter.getCount() != 0) {
             int next = super.getCurrentItem() + 1;
             return next % pagerAdapter.getRealCount();
         }

@@ -37,6 +37,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.util.SparseIntArray;
 import android.view.Gravity;
@@ -64,7 +65,7 @@ import org.json.JSONException;
 /**
  * Created by mikeafc on 16/1/14.
  */
-public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListener,
+public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListener, TimerHandler.TimerHandlerListener,
     ITangramViewLifeCycle {
 
     private static final String CURRENT_POS = "__current_pos__";
@@ -205,6 +206,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     @Override
     public void onPageSelected(int position) {
         currentItemPos = mUltraViewPager.getCurrentItem();
+        Log.d("Longer", "onPageSelected " + position + " " + currentItemPos);
         mIndicator.setCurrItem(currentItemPos);
 
         if (cell != null && cell.extras != null) {
@@ -258,12 +260,12 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
             setPadding(cell.style.padding[3], cell.style.padding[0], cell.style.padding[1], cell.style.padding[2]);
         }
         setBackgroundColor(bannerCell.mBgColor);
-        setAdapter(bannerCell.mBannerAdapter);
-        getUltraViewPager().setAutoMeasureHeight(true);
+        setAdapter(bannerCell.mBannerWrapper);
+        mUltraViewPager.setAutoMeasureHeight(true);
         this.ratio = bannerCell.mRatio;
-        getUltraViewPager().setRatio(bannerCell.mRatio);
+        mUltraViewPager.setRatio(bannerCell.mRatio);
         setAutoScroll(bannerCell.mAutoScrollInternal, bannerCell.mSpecialInterval);
-        getUltraViewPager().setPageMargin(bannerCell.hGap);
+        mUltraViewPager.setPageMargin(bannerCell.hGap);
         if (bannerCell.mCells.size() <= bannerCell.mInfiniteMinCount) {
             setInfiniteLoop(false);
         } else {
@@ -285,18 +287,18 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         setIndicatorHeight(indicatorHeight);
         if (bannerCell.itemMargin[0] > 0 || bannerCell.itemMargin[1] > 0) {
             setScrollMargin(bannerCell.itemMargin[0], bannerCell.itemMargin[1]);
-            getUltraViewPager().setClipToPadding(false);
-            getUltraViewPager().setClipChildren(false);
+            mUltraViewPager.setClipToPadding(false);
+            mUltraViewPager.setClipChildren(false);
         } else {
             setScrollMargin(0, 0);
-            getUltraViewPager().setClipToPadding(true);
-            getUltraViewPager().setClipChildren(true);
+            mUltraViewPager.setClipToPadding(true);
+            mUltraViewPager.setClipChildren(true);
         }
         VirtualLayoutManager.LayoutParams layoutParams = (VirtualLayoutManager.LayoutParams) getLayoutParams();
         layoutParams.setMargins(bannerCell.margin[3], bannerCell.margin[0], bannerCell.margin[1], bannerCell.margin[2]);
-        getUltraViewPager().setItemRatio(bannerCell.itemRatio);
+        mUltraViewPager.setItemRatio(bannerCell.itemRatio);
         currentItemPos = bannerCell.optIntParam(CURRENT_POS);
-        getUltraViewPager().setCurrentItem(currentItemPos);
+        mUltraViewPager.setCurrentItem(currentItemPos);
         updateIndicators(bannerCell.mIndicatorFocus, bannerCell.mIndicatorNor,
             bannerCell.mIndicatorRadius, bannerCell.mIndicatorColor,
             bannerCell.mIndicatorDefaultColor);
@@ -390,7 +392,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         }
 
         public void updateIndicators(String focusUrl, String norUrl, int radius, int focusColor, int norColor) {
-            if (mUltraViewPager.getAdapter() == null) {
+            if (mUltraViewPager.getWrapperAdapter() == null) {
                 return;
             }
 
@@ -441,7 +443,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 height = mIndicatorHeight;
             }
 
-            int count = mUltraViewPager.getAdapter().getCount();
+            int count = mUltraViewPager.getWrapperAdapter().getCount();
             if (mImageViews == null) {
                 mImageViews = new ImageView[count];
                 for (int i = 0; i < mImageViews.length; i++) {
@@ -571,6 +573,16 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         return false;
     }
 
+    @Override
+    public int getNextItem() {
+        return getNextItemIndex();
+    }
+
+    @Override
+    public void callBack() {
+        scrollNextPage();
+    }
+
     private void bindHeaderView(BaseCell cell) {
         if (cell != null) {
             View header = getViewFromRecycler(cell);
@@ -633,18 +645,6 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         }
     }
 
-    private TimerHandler.TimerHandlerListener mTimerHandlerListener = new TimerHandler.TimerHandlerListener() {
-        @Override
-        public int getNextItem() {
-            return BannerView.this.getNextItem();
-        }
-
-        @Override
-        public void callBack() {
-            scrollNextPage();
-        }
-    };
-
     public void setScrollMargin(int left, int right) {
         mUltraViewPager.setPadding(left, 0, right, 0);
     }
@@ -660,7 +660,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (timer != null) {
             disableAutoScroll();
         }
-        timer = new TimerHandler(mTimerHandlerListener, intervalInMillis);
+        timer = new TimerHandler(this, intervalInMillis);
         timer.setSpecialInterval(intervalArray);
         startTimer();
     }
@@ -674,7 +674,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (timer == null || mUltraViewPager == null || !timer.isStopped()) {
             return;
         }
-        timer.setListener(mTimerHandlerListener);
+        timer.setListener(this);
         timer.removeCallbacksAndMessages(null);
         timer.tick(0);
         timer.setStopped(false);
@@ -689,8 +689,10 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         timer.setStopped(true);
     }
 
-    private int getNextItem() {
-        return mUltraViewPager.getNextItem();
+    private int getNextItemIndex() {
+        int nextIndex = mUltraViewPager.getNextItem();
+        Log.d("Longer", "next Index " + nextIndex);
+        return nextIndex;
     }
 
     private boolean scrollNextPage() {
@@ -718,10 +720,6 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         }
 
         public LayoutParams(@NonNull ViewGroup.LayoutParams source) {
-            super(source);
-        }
-
-        public LayoutParams(@NonNull ViewGroup.MarginLayoutParams source) {
             super(source);
         }
 
