@@ -37,7 +37,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.util.SparseIntArray;
 import android.view.Gravity;
