@@ -24,9 +24,15 @@
 
 package com.tmall.wireless.tangram;
 
+import java.lang.reflect.Method;
+
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 
 import android.os.Build.VERSION;
+import android.support.v4.util.ArrayMap;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.ViewGroup;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.structure.BaseCell;
@@ -34,7 +40,6 @@ import com.tmall.wireless.tangram.structure.CellRender;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
 import com.tmall.wireless.tangram.support.CellSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
-
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.virtualview.core.IContainer;
 import com.tmall.wireless.vaf.virtualview.core.ViewBase;
@@ -42,13 +47,6 @@ import com.tmall.wireless.vaf.virtualview.event.EventData;
 import com.tmall.wireless.vaf.virtualview.event.EventManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import android.support.v4.util.ArrayMap;
-import android.text.TextUtils;
-import android.view.View;
-import android.view.ViewGroup;
-
-import java.lang.reflect.Method;
 
 import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_BOTTOM_INDEX;
 import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_LEFT_INDEX;

@@ -306,7 +306,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     /**
      *
      * @param card
-     * @return card ragne of given instance
+     * @return card range of given instance
      */
     public Range<Integer> getCardRange(Card card) {
         if (card == null) return Range.create(0, 1);
@@ -317,6 +317,20 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
         } else {
             return Range.create(0, 1);
         }
+    }
+
+    /**
+     *
+     * @param card
+     * @return card index of given instance
+     */
+    public int findCardIdxForCard(L card) {
+        for (int i = 0, size = mCards.size(); i < size; i++) {
+            if (mCards.get(i).second == card) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -525,18 +539,50 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     }
 
     /**
-     * remove a component
-     * @param position the position to be removed
+     * !!! Do not call this method directly. It's not designed for users.
+     * @param position the component position to be removed
      */
     abstract public void removeComponent(int position);
 
     /**
-     * remove a component
+     * !!! Do not call this method directly. It's not designed for users.
      * @param component the component to be removed
      */
     abstract public void removeComponent(C component);
 
+    /**
+     * !!! Do not call this method directly. It's not designed for users.
+     * @param group a group of components to be removed.
+     */
+    abstract public void removeComponents(L group);
+
+    /**
+     * !!! Do not call this method directly. It's not designed for users.
+     * @param pos the component position to be inserted
+     * @param components
+     */
     abstract public void insertComponents(int pos, List<C> components);
+
+    /**
+     * !!! Do not call this method directly. It's not designed for users.
+     * @param idx the group index to be inserted
+     * @param group
+     */
+    abstract public void insertBatchComponents(int idx, List<L> group);
+
+    /**
+     * !!! Do not call this method directly. It's not designed for users.
+     * @param oldComponent the old component to be replaced
+     * @param newComponent the new component
+     */
+    abstract public void replaceComponent(List<C> oldComponent, List<C> newComponent);
+
+    /**
+     * !!! Do not call this method directly. It's not designed for users.
+     * @param oldGroup the old group to be replaced
+     * @param newGroup the new group
+     */
+    abstract public void replaceComponent(L oldGroup, L newGroup);
 
     /**
      * @return total card list

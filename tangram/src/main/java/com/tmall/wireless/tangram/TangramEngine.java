@@ -24,6 +24,16 @@
 
 package com.tmall.wireless.tangram;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.alibaba.android.vlayout.LayoutHelper;
+import com.alibaba.android.vlayout.Range;
+import com.alibaba.android.vlayout.VirtualLayoutManager;
+
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,10 +41,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
-import android.widget.ImageView;
-
-import com.alibaba.android.vlayout.Range;
-import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
@@ -48,11 +54,7 @@ import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.Predicate;
-
 import org.json.JSONArray;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by villadora on 15/8/24.
@@ -497,4 +499,285 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         }
         return null;
     }
+
+    /**
+     * NOTE new API
+     * A high performance method to insert cells. TODO handle nested card
+     * @param insertPosition the position to be inserted.
+     * @param data new cell data
+     */
+    public void insertWith(int insertPosition, BaseCell data) {
+        insertWith(insertPosition, Arrays.asList(data));
+    }
+
+
+    /**
+     * NOTE new API
+     * A high performance method to insert cells. TODO handle nested card
+     * @param insertPosition the position to be inserted
+     * @param list new cell data list
+     */
+    public void insertWith(int insertPosition, List<BaseCell> list) {
+        int newItemSize = list != null ? list.size() : 0;
+        if (newItemSize > 0 && mGroupBasicAdapter != null) {
+            if (insertPosition >= mGroupBasicAdapter.getItemCount()) {
+                insertPosition = mGroupBasicAdapter.getItemCount() - 1;
+            }
+            BaseCell insertCell = mGroupBasicAdapter.getItemByPosition(insertPosition);
+            int cardIdx = mGroupBasicAdapter.findCardIdxFor(insertPosition);
+            Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
+            card.addCells(card, card.getCells().indexOf(insertCell), list);
+            List<LayoutHelper> layoutHelpers = getLayoutManager().getLayoutHelpers();
+            if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                    LayoutHelper layoutHelper = layoutHelpers.get(i);
+                    int start = layoutHelper.getRange().getLower();
+                    int end = layoutHelper.getRange().getUpper();
+                    if (end < insertPosition) {
+                        //do nothing
+                    } else if (start <= insertPosition && insertPosition <= end) {
+                        layoutHelper.setItemCount(layoutHelper.getItemCount() + newItemSize);
+                        layoutHelper.setRange(start, end + newItemSize);
+                    } else if (insertPosition < start) {
+                        layoutHelper.setRange(start + newItemSize, end + newItemSize);
+                    }
+                }
+                mGroupBasicAdapter.insertComponents(insertPosition, list);
+            }
+        }
+    }
+
+    /**
+     * NOTE new API
+     * @param insertIdx the index to be inserted
+     * @param group a group of data
+     */
+    public void insertBatchWith(int insertIdx, Card group) {
+        insertBatchWith(insertIdx, Arrays.asList(group));
+    }
+
+    public void insertBatchWith(int insertIdx, List<Card> groups) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (groups != null && groups.size() > 0 && mGroupBasicAdapter != null && layoutManager != null) {
+            List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+            final List<LayoutHelper> newLayoutHelpers = new ArrayList<>(layoutHelpers);
+            List<LayoutHelper> insertedLayoutHelpers = new ArrayList<>();
+            for (int i = 0, size = groups.size(); i < size; i++) {
+                insertedLayoutHelpers.add(groups.get(i).getLayoutHelper());
+            }
+            if (insertIdx >= layoutHelpers.size()) {
+                newLayoutHelpers.addAll(insertedLayoutHelpers);
+            } else {
+                newLayoutHelpers.addAll(insertIdx, insertedLayoutHelpers);
+            }
+            layoutManager.setLayoutHelpers(newLayoutHelpers);
+            mGroupBasicAdapter.insertBatchComponents(insertIdx, groups);
+        }
+    }
+
+    /**
+     * NOTE new API, use this to replace {@link BaseTangramEngine#appendData(List)} and {@link BaseTangramEngine#appendData(Object)}
+     * @param groups new group to be append at tail.
+     */
+    public void appendBatchWith(List<Card> groups) {
+        if (mGroupBasicAdapter != null) {
+            insertBatchWith(mGroupBasicAdapter.getGroups().size(), groups);
+        }
+    }
+
+    /**
+     * NOTE new API
+     * Remove cell at target position. TODO handle nested card
+     * @param position
+     */
+    protected void removeBy(int position) {
+        if (mGroupBasicAdapter != null) {
+            if (position < mGroupBasicAdapter.getItemCount() && position >= 0) {
+                BaseCell removeCell = mGroupBasicAdapter.getItemByPosition(position);
+                removeBy(removeCell);
+            }
+        }
+    }
+
+    /**
+     * NOTE new API
+     * Remove target cell. TODO handle nested card, cell in staggered, cell in onePlusN
+     * @param data
+     */
+    protected void removeBy(BaseCell data) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (data != null && mGroupBasicAdapter != null && layoutManager != null) {
+            int removePosition = mGroupBasicAdapter.getPositionByItem(data);
+            if (removePosition >= 0) {
+                int cardIdx = mGroupBasicAdapter.findCardIdxFor(removePosition);
+                Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
+                card.removeCellSilently(data);
+                List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+                LayoutHelper emptyLayoutHelper = null;
+                if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                    for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                        LayoutHelper layoutHelper = layoutHelpers.get(i);
+                        int start = layoutHelper.getRange().getLower();
+                        int end = layoutHelper.getRange().getUpper();
+                        if (end < removePosition) {
+                            //do nothing
+                        } else if (start <= removePosition && removePosition <= end) {
+                            int itemCount = layoutHelper.getItemCount() - 1;
+                            if (itemCount > 0) {
+                                layoutHelper.setItemCount(itemCount);
+                                layoutHelper.setRange(start, end - 1);
+                            } else {
+                                emptyLayoutHelper = layoutHelper;
+                            }
+                        } else if (removePosition < start) {
+                            layoutHelper.setRange(start - 1, end - 1);
+                        }
+                    }
+                    if (emptyLayoutHelper != null) {
+                        final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
+                        newLayoutHelpers.remove(emptyLayoutHelper);
+                        layoutManager.setLayoutHelpers(newLayoutHelpers);
+                    }
+                    mGroupBasicAdapter.removeComponent(data);
+                }
+            }
+        }
+    }
+
+    /**
+     * NOTE new API
+     * Remove all cells in a card with target index
+     * @param removeIdx target card's index
+     */
+    protected void removeBatchBy(int removeIdx) {
+        if (mGroupBasicAdapter != null) {
+            Pair<Range<Integer>, Card> cardPair = mGroupBasicAdapter.getCardRange(removeIdx);
+            if (cardPair != null) {
+                removeBatchBy(cardPair.second);
+            }
+        }
+    }
+
+    /**
+     * NOTE new API
+     * Remove all cells in a card.
+     * @param group
+     */
+    protected void removeBatchBy(Card group) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (group != null && mGroupBasicAdapter != null && layoutManager != null) {
+            int cardIdx = mGroupBasicAdapter.findCardIdxForCard(group);
+            List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+            LayoutHelper emptyLayoutHelper = null;
+            int removeItemCount = 0;
+            if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                    LayoutHelper layoutHelper = layoutHelpers.get(i);
+                    int start = layoutHelper.getRange().getLower();
+                    int end = layoutHelper.getRange().getUpper();
+                    if (i < cardIdx) {
+                        // do nothing
+                    } else if (i == cardIdx) {
+                        removeItemCount = layoutHelper.getItemCount();
+                        emptyLayoutHelper = layoutHelper;
+                    } else {
+                        layoutHelper.setRange(start - removeItemCount, end - removeItemCount);
+                    }
+                }
+                if (emptyLayoutHelper != null) {
+                    final List<LayoutHelper> newLayoutHelpers = new LinkedList<>(layoutHelpers);
+                    newLayoutHelpers.remove(emptyLayoutHelper);
+                    layoutManager.setLayoutHelpers(newLayoutHelpers);
+                }
+                mGroupBasicAdapter.removeComponents(group);
+            }
+        }
+    }
+
+    /**
+     * NOTE new API
+     * Replace cell one by one.
+     * @param oldOne
+     * @param newOne
+     */
+    public void replace(BaseCell oldOne, BaseCell newOne) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (oldOne != null && newOne != null && mGroupBasicAdapter != null && layoutManager != null) {
+            int replacePosition = mGroupBasicAdapter.getPositionByItem(oldOne);
+            if (replacePosition >= 0) {
+                int cardIdx = mGroupBasicAdapter.findCardIdxFor(replacePosition);
+                Card card = mGroupBasicAdapter.getCardRange(cardIdx).second;
+                card.replaceCell(oldOne, newOne);
+                mGroupBasicAdapter.replaceComponent(Arrays.asList(oldOne), Arrays.asList(newOne));
+            }
+        }
+    }
+
+    /**
+     * NOTE new API
+     * Replace parent card's children. Cells' size should be equal with parent's children size.
+     * @param parent
+     * @param cells
+     */
+    public void replace(Card parent, List<BaseCell> cells) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (parent != null && cells != null && cells.size() > 0 && mGroupBasicAdapter != null && layoutManager != null) {
+            Card card = parent;
+            List<BaseCell> oldChildren = new ArrayList<>(parent.getCells());
+            if (oldChildren.size() == cells.size()) {
+                card.setCells(cells);
+                mGroupBasicAdapter.replaceComponent(oldChildren, cells);
+            } else {
+                List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+                int cardIdx = mGroupBasicAdapter.findCardIdxForCard(parent);
+                int diff = 0;
+                if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                    for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                        LayoutHelper layoutHelper = layoutHelpers.get(i);
+                        int start = layoutHelper.getRange().getLower();
+                        int end = layoutHelper.getRange().getUpper();
+                        if (i < cardIdx) {
+                            // do nothing
+                        } else if (i == cardIdx) {
+                            diff = cells.size() - layoutHelper.getItemCount();
+                            layoutHelper.setItemCount(cells.size());
+                            layoutHelper.setRange(start, end + diff);
+                        } else {
+                            layoutHelper.setRange(start + diff, end + diff);
+                        }
+                    }
+                    card.setCells(cells);
+                    mGroupBasicAdapter.replaceComponent(oldChildren, cells);
+                }
+            }
+        }
+    }
+
+    /**
+     * NOTE new API
+     * Replace card one by one. New one's children size should be equal with old one's children size.
+     * @param oldOne
+     * @param newOne
+     */
+    public void replace(Card oldOne, Card newOne) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (oldOne != null && newOne != null && mGroupBasicAdapter != null && layoutManager != null) {
+            List<LayoutHelper> layoutHelpers = layoutManager.getLayoutHelpers();
+            int cardIdx = mGroupBasicAdapter.findCardIdxForCard(oldOne);
+            if (layoutHelpers != null && cardIdx >= 0 && cardIdx < layoutHelpers.size()) {
+                final List<LayoutHelper> newLayoutHelpers = new LinkedList<>();
+                for (int i = 0, size = layoutHelpers.size(); i < size; i++) {
+                    LayoutHelper layoutHelper = layoutHelpers.get(i);
+                    if (i == cardIdx) {
+                        layoutHelper = newOne.getLayoutHelper();
+                    }
+                    newLayoutHelpers.add(layoutHelper);
+                }
+                layoutManager.setLayoutHelpers(newLayoutHelpers);
+                mGroupBasicAdapter.replaceComponent(oldOne, newOne);
+            }
+        }
+    }
+
+
 }

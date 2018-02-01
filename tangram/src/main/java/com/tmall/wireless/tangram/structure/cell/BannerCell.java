@@ -27,6 +27,7 @@ package com.tmall.wireless.tangram.structure.cell;
 import com.alibaba.android.vlayout.RecyclablePagerAdapter;
 
 import android.util.SparseIntArray;
+import com.tmall.ultraviewpager.UltraViewPagerAdapter;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.structure.BaseCell;
@@ -67,7 +68,8 @@ public class BannerCell extends BaseCell {
     public int[] margin = new int[4];
     public double itemRatio;
 
-    public BannerAdapter mBannerAdapter;
+    public UltraViewPagerAdapter mBannerWrapper;
+    private BannerAdapter mBannerAdapter;
     public List<BaseCell> mCells = new ArrayList<>();
     public BaseCell mHeader;
     public BaseCell mFooter;
@@ -86,6 +88,9 @@ public class BannerCell extends BaseCell {
                 RecyclerView.RecycledViewPool pool = serviceManager.getService(RecyclerView.RecycledViewPool.class);
                 mBannerAdapter = new BannerAdapter(adapter, pool);
             }
+        }
+        if (mBannerWrapper == null) {
+            mBannerWrapper = new UltraViewPagerAdapter(mBannerAdapter);
         }
     }
 

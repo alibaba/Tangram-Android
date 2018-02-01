@@ -289,9 +289,10 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Append original data with type {@link T} to Tangram.
+     * Append original data with type {@link T} to Tangram. It cause full screen item's rebinding, be careful.
      * @param data Original data with type {@link T}.
      */
+    @Deprecated
     public void appendData(@Nullable T data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
 
@@ -299,10 +300,11 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Insert original data to Tangram at target position.
+     * Insert original data to Tangram at target position. It cause full screen item's rebinding, be careful.
      * @param position Target insert position.
      * @param data Original data with type {@link T}.
      */
+    @Deprecated
     public void insertData(int position, @Nullable T data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
 
@@ -310,10 +312,11 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Replace original data to Tangram at target position
+     * Replace original data to Tangram at target position. It cause full screen item's rebinding, be careful.
      * @param position Target insert position.
      * @param data Original data with type {@link T}.
      */
+    @Deprecated
     public void replaceData(int position, @Nullable T data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
 
@@ -333,47 +336,52 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * Append parsed data list with type {@link C} in Tangram
+     * Append parsed data list with type {@link C} in Tangram. It cause full screen item's rebinding, be careful.
      * @param data Parsed data list.
      */
+    @Deprecated
     public void appendData(@Nullable List<C> data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
         this.mGroupBasicAdapter.appendGroup(data);
     }
 
     /**
-     * Insert parsed data to Tangram at target position
+     * Insert parsed data to Tangram at target position. It cause full screen item's rebinding, be careful.
      * @param position Target insert position.
      * @param data Parsed data list.
      */
+    @Deprecated
     public void insertData(int position, @Nullable List<C> data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
         this.mGroupBasicAdapter.insertGroup(position, data);
     }
 
     /**
-     * Replace original data to Tangram at target position
+     * Replace original data to Tangram at target position. It cause full screen item's rebinding, be careful.
      * @param position Target replace position.
      * @param data Parsed data list.
      */
+    @Deprecated
     public void replaceData(int position, @Nullable List<C> data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
         this.mGroupBasicAdapter.replaceGroup(position, data);
     }
 
     /**
-     * Remove a card at target card position
+     * Remove a card at target card position. It cause full screen item's rebinding, be careful.
      * @param position the position of card in group
      */
+    @Deprecated
     public void removeData(int position) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
         this.mGroupBasicAdapter.removeGroup(position);
     }
 
     /**
-     * Remove the target card from list
+     * Remove the target card from list. It cause full screen item's rebinding, be careful.
      * @param data Target card
      */
+    @Deprecated
     public void removeData(C data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
         this.mGroupBasicAdapter.removeGroup(data);
