@@ -107,10 +107,9 @@ configurations.all {
 
 
 dependencies {
-
     if (project.hasProperty('vlayoutDevMode')) {
         println 'compile with vlayout source code'
-        compile (project(':vlayout')) {
+        compile(project(':vlayout')) {
             exclude group: 'com.android.support', module: 'recyclerview-v7'
             exclude group: 'com.android.support', module: 'support-v4'
             exclude group: 'com.android.support', module: 'support-annotations'
@@ -120,23 +119,19 @@ dependencies {
             changing = true
         }
     }
-
     compile 'com.android.support:recyclerview-v7:23.1.1@aar'
     compile 'com.android.support:support-v4:23.1.1@aar'
     compile 'com.android.support:support-annotations:23.1.1'
-
     if (project.hasProperty('ultraViewPagerDevMode')) {
         println 'compile with ultraViewPager source code'
         compile project(':ultraviewpager')
     } else {
-        compile 'com.alibaba.android:ultraviewpager:1.0.6.5@aar'
+        compile 'com.alibaba.android:ultraviewpager:1.0.6.9@aar'
     }
-
     compile('me.everything:overscroll-decor-android:1.0.1@aar') {
         transitive true
         exclude group: 'com.android.support', module: 'recyclerview-v7'
     }
-
     if (project.hasProperty('virtualViewDevMode')) {
         println 'compile with virtualview source code'
         compile(project(':virtualview')) {
@@ -157,7 +152,6 @@ dependencies {
             exclude group: 'com.android.support', module: 'support-annotations'
         }
     }
-
 }
 
 File deployConfig = rootProject.file('jcenterInstall.gradle')
