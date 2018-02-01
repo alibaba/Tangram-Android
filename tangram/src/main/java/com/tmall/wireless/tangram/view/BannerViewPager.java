@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.tmall.ultraviewpager.UltraViewPagerAdapter;
@@ -62,7 +61,6 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
             return;
         }
         int childCount = getChildCount();
-        Log.d("Longer", "measure banner view pager child Count " + childCount);
 
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
