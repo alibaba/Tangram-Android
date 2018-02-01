@@ -362,6 +362,40 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         }
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        startTimer();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        stopTimer();
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility == VISIBLE) {
+            startTimer();
+        } else {
+            stopTimer();
+        }
+    }
+
+    @Override
+    public void onStartTemporaryDetach() {
+        super.onStartTemporaryDetach();
+        stopTimer();
+    }
+
+    @Override
+    public void onFinishTemporaryDetach() {
+        super.onFinishTemporaryDetach();
+        startTimer();
+    }
+
     private int getIndicatorGravity(String gravity) {
         if ("left".equals(gravity)) {
             return BannerView.GRAVITY_LEFT;
