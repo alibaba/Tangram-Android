@@ -36,23 +36,30 @@ import java.util.List;
 public interface Engine extends ServiceManager {
 
     /**
-     * Notify Tangrm to update data or view.
+     * Notify Tangram to update data or view.
      * @param layoutUpdate True to update both data and view, false to update data only.
      */
     void refresh(boolean layoutUpdate);
 
     /**
-     * Notify Tangrm to update data and view.
+     * Notify Tangram to update data and view.
      */
     void refresh();
 
     /**
-     * Replace card with new data, would cause view updated.
+     * Replace card with new data, would cause view updated. It cause full screen item's rebinding, be careful.
      * @param oldCard Old card data to be replaced.
      * @param newCard New card data.
      */
+    @Deprecated
     void replaceCard(Card oldCard, Card newCard);
 
+    /**
+     * It cause full screen item's rebinding, be careful.
+     * @param parent Old card to be replaced its children.
+     * @param cells New children cells.
+     */
+    @Deprecated
     void replaceCells(Card parent, List<BaseCell> cells);
 
     /**

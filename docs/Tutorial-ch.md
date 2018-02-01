@@ -1,8 +1,10 @@
 ## 1.引入依赖
 
+最新版本号从 [release 说明](https://github.com/alibaba/Tangram-Android/releases)里获取，比如：
+
 ```
 // gradle
-compile 'com.alibaba.android:tangram:2.0.0@aar'
+compile 'com.alibaba.android:tangram:2.0.5@aar'
 ```
 
 或者
@@ -12,7 +14,7 @@ compile 'com.alibaba.android:tangram:2.0.0@aar'
 <dependency>
   <groupId>com.alibaba.android</groupId>
   <artifactId>tangram</artifactId>
-  <version>2.0.0</version>
+  <version>2.0.5</version>
   <type>aar</type>
 </dependency>
 ```

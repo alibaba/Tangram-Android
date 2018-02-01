@@ -183,8 +183,9 @@ public class BannerEntityCard extends BannerCell {
         resolver.parseCell(resolver, cell, data);
         //noinspection unchecked
         if (appended && !addCellInternal(resolver, cell, false)) {
-            if (TangramBuilder.isPrintLog())
+            if (TangramBuilder.isPrintLog()) {
                 LogUtils.w("BannerCell", "Parse invalid cell with data: " + data.toString());
+            }
         }
     }
 
@@ -219,11 +220,7 @@ public class BannerEntityCard extends BannerCell {
         style = new Style();
         style.parseWith(data);
         setRatio(style.aspectRatio);
-        if (style.bgColor == 0) {
-            setBgColor(Color.WHITE);
-        } else {
-            setBgColor(style.bgColor);
-        }
+        setBgColor(style.bgColor);
         margin = style.margin;
         if (margin != null) {
             for (int i = 0; i < margin.length; i++) {

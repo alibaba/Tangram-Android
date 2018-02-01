@@ -374,69 +374,105 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
 
     /**
+     * !!! Do not call this method directly. It's not designed for users.
      * remove a component
      *
      * @param position the position to be removes
      */
     @Override
     public void removeComponent(int position) {
-        if (mData != null) {
-            if (position >= 0 && position <= mData.size() - 1) {
-                BaseCell cell = mData.remove(position);
-                boolean changed = cell != null;
-                int idx = findCardIdxFor(position);
-                if (idx >= 0) {
-                    Pair<Range<Integer>, Card> pair = mCards.get(idx);
-                    pair.second.removeCellSilently(cell);
-                }
-                if (changed) {
-                    notifyItemRemoved(position);
-                    int last = mLayoutManager.findLastVisibleItemPosition();
-                    notifyItemRangeChanged(position, last - position);
-                }
-            }
+        if (mData != null && position >= 0 && position < mData.size()) {
+            removeComponent(mData.get(position));
         }
     }
 
     /**
+     * !!! Do not call this method directly. It's not designed for users.
      * @param component the component to be removed
      */
     @Override
     public void removeComponent(BaseCell component) {
-        if (mData != null && component != null) {
-            int position = mData.indexOf(component);
-            if (position >= 0) {
-                mData.remove(component);
-                int idx = findCardIdxFor(position);
-                if (idx >= 0) {
-                    Pair<Range<Integer>, Card> pair = mCards.get(idx);
-                    pair.second.removeCellSilently(component);
+        int removePosition = getPositionByItem(component);
+        if (mData != null && component != null && removePosition >= 0) {
+            if (mCards != null) {
+                List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
+                for (int i = 0, size = mCards.size(); i < size; i++) {
+                    Pair<Range<Integer>, Card> pair = mCards.get(i);
+                    int start = pair.first.getLower();
+                    int end = pair.first.getUpper();
+                    if (end < removePosition) {
+                        //do nothing
+                        newCards.add(pair);
+                    } else if (start <= removePosition && removePosition < end) {
+                        int itemCount = end - start - 1;
+                        if (itemCount > 0) {
+                            Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end - 1), pair.second);
+                            newCards.add(newPair);
+                        }
+
+                    } else if (removePosition <= start) {
+                        Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start - 1, end - 1), pair.second);
+                        newCards.add(newPair);
+                    }
                 }
-                notifyItemRemoved(position);
+                mCards.clear();
+                mCards.addAll(newCards);
+                mData.remove(component);
+                notifyItemRemoved(removePosition);
                 int last = mLayoutManager.findLastVisibleItemPosition();
-                notifyItemRangeChanged(position, last - position);
+                notifyItemRangeChanged(removePosition, last - removePosition);
             }
+        }
+    }
+
+    @Override
+    public void removeComponents(Card group) {
+        if (group != null && mCards != null) {
+            List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
+            int cardIdx = findCardIdxForCard(group);
+            int removeItemCount = 0;
+            int removePosition = 0;
+            for (int i = 0, size = mCards.size(); i < size; i++) {
+                Pair<Range<Integer>, Card> pair = mCards.get(i);
+                int start = pair.first.getLower();
+                int end = pair.first.getUpper();
+                if (i < cardIdx) {
+                    //do nothing
+                    newCards.add(pair);
+                } else if (i == cardIdx) {
+                    removePosition = start;
+                    removeItemCount = end - start;
+                } else {
+                    Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start - removeItemCount, end - removeItemCount), pair.second);
+                    newCards.add(newPair);
+                }
+            }
+            mCards.clear();
+            mCards.addAll(newCards);
+            mData.removeAll(group.getCells());
+            notifyItemRangeRemoved(removePosition, removeItemCount);
+            int last = mLayoutManager.findLastVisibleItemPosition();
+            notifyItemRangeChanged(removePosition, last - removePosition);
         }
     }
 
     @Override
     public void insertComponents(int pos, List<BaseCell> components) {
-        if (mData != null && components != null && !components.isEmpty() && pos > 0) {
+        if (mData != null && components != null && !components.isEmpty() && pos >= 0) {
             int newItemSize = components.size();
             if (mCards != null) {
                 List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
-                int clickPos = pos -1;
                 for (int i = 0, size = mCards.size(); i < size; i++) {
                     Pair<Range<Integer>, Card> pair = mCards.get(i);
-                    int start = pair.first.getLower().intValue();
-                    int end = pair.first.getUpper().intValue();
-                    if (end < clickPos) {
+                    int start = pair.first.getLower();
+                    int end = pair.first.getUpper();
+                    if (end < pos) {
                         //do nothing
                         newCards.add(pair);
-                    } else if (start <= clickPos && clickPos <= end) {
+                    } else if (start <= pos && pos < end) {
                         Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end + newItemSize), pair.second);
                         newCards.add(newPair);
-                    } else if (clickPos < start) {
+                    } else if (pos <= start) {
                         Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
                         newCards.add(newPair);
                     }
@@ -452,6 +488,140 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 }
             }
             notifyItemRangeInserted(pos, newItemSize);
+        }
+    }
+
+    @Override
+    public void insertBatchComponents(int idx, List<Card> group) {
+        if (mCards != null && group != null) {
+
+            List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
+            List<BaseCell> newData = new ArrayList<>();
+            int newItemSize = 0;
+            int lastEnd = 0;
+            int insertPosition = 0;
+
+            if (idx >= 0 && idx < mCards.size()) {
+                for (int i = 0, size = mCards.size(); i < size; i++) {
+                    Pair<Range<Integer>, Card> pair = mCards.get(i);
+                    int start = pair.first.getLower();
+                    int end = pair.first.getUpper();
+                    if (i < idx) {
+                        //do nothing
+                        newCards.add(pair);
+                        lastEnd = end;
+                    } else if (i == idx) {
+                        insertPosition = start;
+                        for (int j = 0, gs = group.size(); j < gs; j++) {
+                            Card newGroup = group.get(j);
+                            int childrenSize = newGroup.getCells().size();
+                            newItemSize += childrenSize;
+                            Pair<Range<Integer>, Card> insertPair = new Pair<>(Range.create(lastEnd, lastEnd + childrenSize), newGroup);
+                            newCards.add(insertPair);
+                            newData.addAll(newGroup.getCells());
+                            lastEnd = lastEnd + childrenSize;
+                        }
+                        Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
+                        newCards.add(newPair);
+                        lastEnd = end + newItemSize;
+                    } else {
+                        Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + newItemSize, end + newItemSize), pair.second);
+                        newCards.add(newPair);
+                        lastEnd = end;
+                    }
+                }
+            } else {
+                newCards.addAll(mCards);
+                lastEnd = mCards.get(mCards.size() - 1).first.getUpper();
+                insertPosition = lastEnd;
+                for (int j = 0, gs = group.size(); j < gs; j++) {
+                    Card newGroup = group.get(j);
+                    int childrenSize = newGroup.getCells().size();
+                    newItemSize += childrenSize;
+                    Pair<Range<Integer>, Card> insertPair = new Pair<>(Range.create(lastEnd, lastEnd + childrenSize), newGroup);
+                    newCards.add(insertPair);
+                    newData.addAll(newGroup.getCells());
+                    lastEnd = lastEnd + childrenSize;
+                }
+            }
+            mCards.clear();
+            mCards.addAll(newCards);
+            mData.addAll(insertPosition, newData);
+            notifyItemRangeInserted(insertPosition, newItemSize);
+        }
+    }
+
+    @Override
+    public void replaceComponent(List<BaseCell> oldComponent, List<BaseCell> newComponent) {
+        if (mData != null && oldComponent != null && newComponent != null && oldComponent.size() > 0 && newComponent.size() > 0) {
+            int index = mData.indexOf(oldComponent.get(0));
+            if (index >= 0) {
+                if (mCards != null) {
+                    List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
+                    int diff = 0;
+                    for (int i = 0, size = mCards.size(); i < size; i++) {
+                        Pair<Range<Integer>, Card> pair = mCards.get(i);
+                        int start = pair.first.getLower();
+                        int end = pair.first.getUpper();
+                        if (end < index) {
+                            //do nothing
+                            newCards.add(pair);
+                        } else if (start <= index && index < end) {
+                            diff = newComponent.size() - oldComponent.size();
+                            Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end + diff), pair.second);
+                            newCards.add(newPair);
+                        } else if (index <= start) {
+                            Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + diff, end + diff), pair.second);
+                            newCards.add(newPair);
+                        }
+                    }
+                    mCards.clear();
+                    mCards.addAll(newCards);
+                }
+                mData.removeAll(oldComponent);
+                mData.addAll(index, newComponent);
+                int oldSize = oldComponent.size();
+                int newSize = newComponent.size();
+                notifyItemRangeChanged(index, Math.max(oldSize, newSize));
+            }
+        }
+    }
+
+    @Override
+    public void replaceComponent(Card oldGroup, Card newGroup) {
+        if (mData != null && mCards != null && oldGroup != null && newGroup != null) {
+            List<BaseCell> oldComponent = oldGroup.getCells();
+            List<BaseCell> newComponent = newGroup.getCells();
+            int index = mData.indexOf(oldComponent.get(0));
+            if (index >= 0) {
+                if (mCards != null) {
+                    List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
+                    int diff = 0;
+                    for (int i = 0, size = mCards.size(); i < size; i++) {
+                        Pair<Range<Integer>, Card> pair = mCards.get(i);
+                        int start = pair.first.getLower();
+                        int end = pair.first.getUpper();
+                        if (end < index) {
+                            //do nothing
+                            newCards.add(pair);
+                        } else if (start <= index && index < end) {
+                            diff = newComponent.size() - oldComponent.size();
+                            Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start, end + diff), newGroup);
+                            newCards.add(newPair);
+                        } else if (index <= start) {
+                            Pair<Range<Integer>, Card> newPair = new Pair<>(Range.create(start + diff, end + diff), pair.second);
+                            newCards.add(newPair);
+                        }
+                    }
+                    mCards.clear();
+                    mCards.addAll(newCards);
+                }
+                mData.removeAll(oldComponent);
+                mData.addAll(index, newComponent);
+                int oldSize = oldComponent.size();
+                int newSize = newComponent.size();
+                notifyItemRangeChanged(index, Math.max(oldSize, newSize));
+            }
         }
     }
 

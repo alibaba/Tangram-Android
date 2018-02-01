@@ -47,6 +47,9 @@ out/
 target/
 lint.xml
 .idea/misc.xml
+
+captures/
+
 config.gradle
 
 deploy.gradle
