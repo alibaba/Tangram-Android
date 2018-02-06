@@ -90,7 +90,9 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     private BannerSupport bannerSupport;
 
-    private List<BinderViewHolder> mViewHolders = new ArrayList<BinderViewHolder>();
+    private List<BinderViewHolder> mHeaderViewHolders = new ArrayList<BinderViewHolder>();
+
+    private List<BinderViewHolder> mFooterViewHolders = new ArrayList<BinderViewHolder>();
 
     private int currentItemPos;
 
@@ -336,14 +338,32 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         }
         mUltraViewPager.measure(widthMeasureSpec, heightMeasureSpec);
         mIndicator.measure(widthMeasureSpec, heightMeasureSpec);
+        int headerHeight = 0;
+        if (!mHeaderViewHolders.isEmpty()) {
+            for (int i = 0, count = mHeaderViewHolders.size(); i < count; i++) {
+                View header = mHeaderViewHolders.get(i).itemView;
+                LayoutParams lp = (LayoutParams) header.getLayoutParams();
+                header.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                headerHeight += header.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
+            }
+        }
+        int footerHeight = 0;
+        if (!mFooterViewHolders.isEmpty()) {
+            for (int i = 0, count = mFooterViewHolders.size(); i < count; i++) {
+                View footer = mFooterViewHolders.get(i).itemView;
+                LayoutParams lp = (LayoutParams) footer.getLayoutParams();
+                footer.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                footerHeight += footer.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
+            }
+        }
 
         int measureWidth = mUltraViewPager.getMeasuredWidth();
         int measureHeight = mUltraViewPager.getMeasuredHeight();
         if (isIndicatorOutside) {
             int indicatorHeight = mIndicator.getMeasuredHeight();
-            setMeasuredDimension(measureWidth, measureHeight + indicatorHeight);
+            setMeasuredDimension(measureWidth, measureHeight + indicatorHeight + headerHeight + footerHeight);
         } else {
-            setMeasuredDimension(measureWidth, measureHeight);
+            setMeasuredDimension(measureWidth, measureHeight + headerHeight + footerHeight);
         }
     }
 
@@ -352,12 +372,33 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         int measureWidth = mUltraViewPager.getMeasuredWidth();
         int measureHeight = mUltraViewPager.getMeasuredHeight();
         int indicatorHeight = mIndicator.getMeasuredHeight();
-
-        mUltraViewPager.layout(0, 0, measureWidth, measureHeight);
+        int top = getPaddingTop();
+        int left = getPaddingLeft();
+        if (!mHeaderViewHolders.isEmpty()) {
+            for (int i = 0, count = mHeaderViewHolders.size(); i < count; i++) {
+                View header = mHeaderViewHolders.get(i).itemView;
+                LayoutParams lp = (LayoutParams) header.getLayoutParams();
+                header.layout(left + lp.leftMargin, top + lp.topMargin, header.getMeasuredWidth(),
+                    top + lp.topMargin + header.getMeasuredHeight());
+                top += lp.topMargin + header.getMeasuredHeight() + lp.bottomMargin;
+            }
+        }
+        mUltraViewPager.layout(left, top, measureWidth, top + measureHeight);
+        top += measureHeight;
         if (isIndicatorOutside) {
-            mIndicator.layout(0, measureHeight, measureWidth, measureHeight + indicatorHeight);
+            mIndicator.layout(left, top, measureWidth, top + measureHeight + indicatorHeight);
+            top += indicatorHeight;
         } else {
-            mIndicator.layout(0, measureHeight - indicatorHeight, measureWidth, measureHeight);
+            mIndicator.layout(left, top - indicatorHeight, measureWidth, top);
+        }
+        if (!mFooterViewHolders.isEmpty()) {
+            for (int i = 0, count = mFooterViewHolders.size(); i < count; i++) {
+                View footer = mFooterViewHolders.get(i).itemView;
+                LayoutParams lp = (LayoutParams) footer.getLayoutParams();
+                footer.layout(left + lp.leftMargin, top + lp.topMargin, footer.getMeasuredWidth(),
+                    top + lp.topMargin + footer.getMeasuredHeight());
+                top +=  + lp.topMargin + footer.getMeasuredHeight() + lp.bottomMargin;
+            }
         }
     }
 
@@ -617,7 +658,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     private void bindHeaderView(BaseCell cell) {
         if (cell != null) {
-            View header = getViewFromRecycler(cell);
+            View header = getHeaderViewFromRecycler(cell);
             if (header != null) {
                 ViewGroup.LayoutParams lp = header.getLayoutParams();
                 if (lp == null || !(lp instanceof LayoutParams)) {
@@ -635,7 +676,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     private void bindFooterView(BaseCell cell) {
         if (cell != null) {
-            View footer = getViewFromRecycler(cell);
+            View footer = getFooterViewFromRecycler(cell);
             if (footer != null) {
                 ViewGroup.LayoutParams lp = footer.getLayoutParams();
                 if (lp == null || !(lp instanceof LayoutParams)) {
@@ -651,7 +692,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         }
     }
 
-    private View getViewFromRecycler(@NonNull BaseCell cell) {
+    private View getHeaderViewFromRecycler(@NonNull BaseCell cell) {
         GroupBasicAdapter adapter = cell.serviceManager.getService(GroupBasicAdapter.class);
         RecyclerView.RecycledViewPool pool = cell.serviceManager.getService(RecyclerView.RecycledViewPool.class);
         int itemViewType = adapter.getItemType(cell);
@@ -660,20 +701,38 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
             holder = (BinderViewHolder) adapter.createViewHolder(this, itemViewType);
         }
         holder.bind(cell);
-        mViewHolders.add(holder);
+        mHeaderViewHolders.add(holder);
+        return holder.itemView;
+    }
+
+    private View getFooterViewFromRecycler(@NonNull BaseCell cell) {
+        GroupBasicAdapter adapter = cell.serviceManager.getService(GroupBasicAdapter.class);
+        RecyclerView.RecycledViewPool pool = cell.serviceManager.getService(RecyclerView.RecycledViewPool.class);
+        int itemViewType = adapter.getItemType(cell);
+        BinderViewHolder holder = (BinderViewHolder) pool.getRecycledView(itemViewType);
+        if (holder == null) {
+            holder = (BinderViewHolder) adapter.createViewHolder(this, itemViewType);
+        }
+        holder.bind(cell);
+        mFooterViewHolders.add(holder);
         return holder.itemView;
     }
 
     private void recycleView() {
-        if (!mViewHolders.isEmpty()) {
+        recyclerView(mHeaderViewHolders);
+        recyclerView(mFooterViewHolders);
+    }
+
+    private void recyclerView(List<BinderViewHolder> cache) {
+        if (!cache.isEmpty()) {
             RecyclerView.RecycledViewPool pool = cell.serviceManager.getService(RecyclerView.RecycledViewPool.class);
-            for (int i = 0, size = mViewHolders.size(); i < size; i++) {
-                BinderViewHolder viewHolder = mViewHolders.get(i);
+            for (int i = 0, size = cache.size(); i < size; i++) {
+                BinderViewHolder viewHolder = cache.get(i);
                 viewHolder.unbind();
                 removeView(viewHolder.itemView);
                 pool.putRecycledView(viewHolder);
             }
-            mViewHolders.clear();
+            cache.clear();
         }
     }
 
