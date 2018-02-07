@@ -243,7 +243,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
 
         maxChildren = data.optInt(KEY_MAX_CHILDREN, maxChildren);
         // parsing header
-        if (Utils.isSupportHeaderFooter(stringType) && isParseCell) {
+        if (isParseCell) {
             JSONObject header = data.optJSONObject(KEY_HEADER);
             parseHeaderCell(resolver, header);
         }
@@ -258,7 +258,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
             }
         }
         // parsing footer
-        if (Utils.isSupportHeaderFooter(stringType) && isParseCell) {
+        if (isParseCell) {
             JSONObject footer = data.optJSONObject(KEY_FOOTER);
             parseFooterCell(resolver, footer);
         }

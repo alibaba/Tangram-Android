@@ -24,6 +24,11 @@
 
 package com.tmall.wireless.tangram.structure.entitycard;
 
+import java.util.Collections;
+import java.util.List;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.MVResolver;
 import com.tmall.wireless.tangram.TangramBuilder;
@@ -35,18 +40,9 @@ import com.tmall.wireless.tangram.structure.card.BannerCard;
 import com.tmall.wireless.tangram.structure.cell.BannerCell;
 import com.tmall.wireless.tangram.util.LogUtils;
 import com.tmall.wireless.tangram.util.Utils;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by longerian on 16/8/22.
@@ -64,10 +60,8 @@ public class BannerEntityCard extends BannerCell {
         id = data.optString(Card.KEY_ID, id == null ? "" : id);
         this.cardType = data.optString(Card.KEY_TYPE);
         // parsing header
-        if (Utils.isSupportHeaderFooter(cardType)) {
-            JSONObject header = data.optJSONObject(Card.KEY_HEADER);
-            parseHeaderCell(resolver, header);
-        }
+        JSONObject header = data.optJSONObject(Card.KEY_HEADER);
+        parseHeaderCell(resolver, header);
 
         // parsing body
         JSONArray componentArray = data.optJSONArray(Card.KEY_ITEMS);
@@ -85,10 +79,8 @@ public class BannerEntityCard extends BannerCell {
             }
         }
         // parsing footer
-        if (Utils.isSupportHeaderFooter(cardType)) {
-            JSONObject footer = data.optJSONObject(Card.KEY_FOOTER);
-            parseFooterCell(resolver, footer);
-        }
+        JSONObject footer = data.optJSONObject(Card.KEY_FOOTER);
+        parseFooterCell(resolver, footer);
 
         JSONObject styleJson = data.optJSONObject(Card.KEY_STYLE);
 

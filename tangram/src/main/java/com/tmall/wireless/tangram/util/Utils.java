@@ -223,32 +223,4 @@ public class Utils {
         }
     }
 
-    private static ArrayMap<String, Boolean> supportHeaderFooterTable = new ArrayMap<>();
-
-    static {
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_FLOW, Boolean.TRUE);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_1C_FLOW, Boolean.TRUE);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_2C_FLOW, Boolean.TRUE);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_3C_FLOW, Boolean.TRUE);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_4C_FLOW, Boolean.TRUE);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_5C_FLOW, Boolean.TRUE);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_ON_PLUSN, Boolean.TRUE);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_BANNER, Boolean.TRUE);
-        supportHeaderFooterTable.put(TangramBuilder.TYPE_CONTAINER_SCROLL, Boolean.TRUE);
-    }
-
-    /**
-     * 只有流式布局(1,2,3,4,9)，和滚动布局(10) 支持header和 footer
-     * @param type
-     * @return
-     */
-    public static boolean isSupportHeaderFooter(String type) {
-        Boolean isSupport = supportHeaderFooterTable.get(type);
-        if (isSupport != null) {
-            return isSupport.booleanValue();
-        } else {
-            return false;
-        }
-    }
-
 }
