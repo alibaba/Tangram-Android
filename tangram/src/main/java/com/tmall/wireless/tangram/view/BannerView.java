@@ -29,7 +29,10 @@ import java.util.List;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
@@ -37,6 +40,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.Pair;
 import android.util.SparseIntArray;
 import android.view.Gravity;
@@ -102,6 +106,10 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     private TimerHandler timer;
 
+    private ScreenBroadcastReceiver mScreenBroadcastReceiver;
+
+    private IntentFilter filter = new IntentFilter();
+
     public BannerView(Context context) {
         this(context, null);
     }
@@ -122,6 +130,10 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         addView(mUltraViewPager);
         addView(mIndicator);
         mIndicator.setPadding(mIndicatorGap, 0, 0, 0);
+        mScreenBroadcastReceiver = new ScreenBroadcastReceiver(this);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        filter.addAction(Intent.ACTION_USER_PRESENT);
     }
 
     public void setAdapter(PagerAdapter adapter) {
@@ -254,6 +266,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     @Override
     public void postBindView(BaseCell cell) {
+        getContext().registerReceiver(mScreenBroadcastReceiver, filter);
         BannerCell bannerCell = (BannerCell) cell;
         bannerCell.initAdapter();
         if (cell.style != null) {
@@ -313,6 +326,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     @Override
     public void postUnBindView(BaseCell cell) {
         recycleView();
+        getContext().unregisterReceiver(mScreenBroadcastReceiver);
     }
 
     @Override
@@ -814,5 +828,28 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         }
 
     }
+
+    private static class ScreenBroadcastReceiver extends BroadcastReceiver {
+
+        private String action = null;
+        private BannerView mBannerView = null;
+
+        public ScreenBroadcastReceiver(BannerView bannerView) {
+            mBannerView = bannerView;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            action = intent.getAction();
+            if (Intent.ACTION_SCREEN_ON.equals(action)) {
+                mBannerView.startTimer();
+            } else if (Intent.ACTION_SCREEN_OFF.equals(action)) {
+                mBannerView.stopTimer();
+            } else if (Intent.ACTION_USER_PRESENT.equals(action)) {
+                mBannerView.startTimer();
+            }
+        }
+    }
+
 
 }
