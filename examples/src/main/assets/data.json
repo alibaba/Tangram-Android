@@ -48,6 +48,63 @@
     ]
   },
   {
+    "type": "container-scroll",
+    "style": {
+      "pageWidth": 200,
+      "pageHeight": 100,
+      "indicatorMargin": "5",
+      "infinite": "true",
+      "indicatorImg2": "https://img.alicdn.com/tps/TB1XRNFNXXXXXXKXXXXXXXXXXXX-32-4.png",
+      "indicatorImg1": "https://img.alicdn.com/tps/TB16i4qNXXXXXbBXFXXXXXXXXXX-32-4.png",
+      "scrollMarginLeft": "10",
+      "indicatorGap": "2",
+      "indicatorHeight": "1.5",
+      "itemRatio": "2.654",
+      "scrollMarginRight": "10",
+      "autoScroll": "5000",
+      "indicatorGravity": "center",
+      "hGap": "20"
+    },
+    "items": [
+      {
+        "type": 1,
+        "msg": "info1",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info2",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info3",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info4",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info5",
+        "style": {
+        }
+      },
+      {
+        "type": 1,
+        "msg": "info6",
+        "style": {
+        }
+      }
+    ]
+  },
+  {
     "type": "10",
     "style": {
       "indicatorMargin": "5",
@@ -101,7 +158,70 @@
         }
       }
     ]
-  }, {
+  },
+  {
+    "type": "container-oneColumn",
+    "items": [
+      {
+        "type": "container-scroll",
+        "style": {
+          "pageWidth": 200,
+          "pageHeight": 100,
+          "indicatorMargin": "5",
+          "infinite": "true",
+          "indicatorImg2": "https://img.alicdn.com/tps/TB1XRNFNXXXXXXKXXXXXXXXXXXX-32-4.png",
+          "indicatorImg1": "https://img.alicdn.com/tps/TB16i4qNXXXXXbBXFXXXXXXXXXX-32-4.png",
+          "scrollMarginLeft": "10",
+          "indicatorGap": "2",
+          "indicatorHeight": "1.5",
+          "itemRatio": "2.654",
+          "scrollMarginRight": "10",
+          "autoScroll": "5000",
+          "indicatorGravity": "center",
+          "hGap": "20"
+        },
+        "items": [
+          {
+            "type": 1,
+            "msg": "info1",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info2",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info3",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info4",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info5",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info6",
+            "style": {
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "BuyCate",
     "style": {
       "hGap": "15",

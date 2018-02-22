@@ -70,8 +70,14 @@ public class TestView extends FrameLayout implements ITangramViewLifeCycle {
     @Override
     public void postBindView(BaseCell cell) {
         int pos = cell.pos;
+        String parent = "";
+        if (cell.parent != null) {
+            parent = cell.parent.getClass().getSimpleName();
+        } else if (cell.nestedParent != null) {
+            parent = cell.nestedParent.getClass().getSimpleName();
+        }
         textView.setText(
-                cell.id + " pos: " + pos + " " + cell.parent.getClass().getSimpleName() + " " + cell
+                cell.id + " pos: " + pos + " " + parent + " " + cell
                         .optParam("msg"));
 
         if (pos > 57) {
