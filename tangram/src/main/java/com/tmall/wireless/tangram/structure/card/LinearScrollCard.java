@@ -117,14 +117,8 @@ public class LinearScrollCard extends Card {
     public void parseStyle(@Nullable JSONObject data) {
         super.parseStyle(data);
         if (data != null) {
-            cell.pageWidth = optDoubleParam(LinearScrollCell.KEY_PAGE_WIDTH);
-            cell.pageHeight = optDoubleParam(LinearScrollCell.KEY_PAGE_HEIGHT);
-            if (!Double.isNaN(cell.pageWidth)) {
-                cell.pageWidth = Style.dp2px(cell.pageWidth);
-            }
-            if (!Double.isNaN(cell.pageHeight)) {
-                cell.pageHeight = Style.dp2px(cell.pageHeight);
-            }
+            cell.pageWidth = Style.parseSize(optStringParam(LinearScrollCell.KEY_PAGE_WIDTH), 0);
+            cell.pageHeight = Style.parseSize(optStringParam(LinearScrollCell.KEY_PAGE_HEIGHT), 0);
             cell.defaultIndicatorColor = parseColor(optStringParam(LinearScrollCell.KEY_DEFAULT_INDICATOR_COLOR),
                 LinearScrollCell.DEFAULT_DEFAULT_INDICATOR_COLOR);
             cell.indicatorColor = parseColor(optStringParam(LinearScrollCell.KEY_INDICATOR_COLOR),
@@ -137,8 +131,8 @@ public class LinearScrollCard extends Card {
             }
             cell.bgColor = parseColor(data.optString(Style.KEY_BG_COLOR), Color.TRANSPARENT);
             cell.retainScrollState = data.optBoolean(LinearScrollCell.KEY_RETAIN_SCROLL_STATE, true);
-            cell.scrollMarginLeft = Style.dp2px(data.optDouble(LinearScrollCell.KEY_SCROLL_MARGIN_LEFT));
-            cell.scrollMarginRight = Style.dp2px(data.optDouble(LinearScrollCell.KEY_SCROLL_MARGIN_RIGHT));
+            cell.scrollMarginLeft = Style.parseSize(data.optString(LinearScrollCell.KEY_SCROLL_MARGIN_LEFT), 0);
+            cell.scrollMarginRight = Style.parseSize(data.optString(LinearScrollCell.KEY_SCROLL_MARGIN_RIGHT), 0);
         }
     }
 

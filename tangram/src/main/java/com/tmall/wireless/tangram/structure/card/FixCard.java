@@ -138,8 +138,8 @@ public class FixCard extends OneItemCard {
                     alignType = ALIGN_MAP.get(align);
                 }
 
-                x = Style.dp2px(data.optDouble(KEY_X, 0));
-                y = Style.dp2px(data.optDouble(KEY_Y, 0));
+                x = Style.parseSize(data.optString(KEY_X), 0);
+                y = Style.parseSize(data.optString(KEY_Y), 0);
             }
         }
     }

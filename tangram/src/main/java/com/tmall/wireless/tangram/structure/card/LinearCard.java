@@ -59,7 +59,7 @@ public class LinearCard extends Card {
             }
 
             if (style.extras != null && style.extras.has(KEY_DIVIDE_HEIGHT)) {
-                helper.setDividerHeight(Style.dp2px(style.extras.optInt(KEY_DIVIDE_HEIGHT, 0)));
+                helper.setDividerHeight(Style.parseSize(style.extras.optString(KEY_DIVIDE_HEIGHT), 0));
             }
 
 
