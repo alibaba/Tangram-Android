@@ -311,8 +311,8 @@ public class GridCard extends Card {
                     cols = new float[0];
                 }
 
-                hGap = Style.dp2px(data.optDouble(KEY_H_GAP, 0.0f));
-                vGap = Style.dp2px(data.optDouble(KEY_V_GAP, 0.0f));
+                hGap = Style.parseSize(data.optString(KEY_H_GAP), 0);
+                vGap = Style.parseSize(data.optString(KEY_V_GAP), 0);
             }
         }
     }

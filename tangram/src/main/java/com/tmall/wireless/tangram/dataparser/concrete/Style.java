@@ -41,6 +41,8 @@ import java.util.Arrays;
 
 public class Style {
 
+    private static final String RP = "rp";
+
     private static final LruCache<String, Integer> colorCache = new LruCache<>(100);
 
     public static final String KEY_BG_COLOR = "bgColor";
@@ -112,8 +114,6 @@ public class Style {
     @Nullable
     public JSONObject extras;
 
-    public int overlapOffset;
-
     public int zIndex = 0;
 
     public boolean slidable;
@@ -131,7 +131,7 @@ public class Style {
     public final int[] padding = new int[]{0, 0, 0, 0};
 
     public int width = VirtualLayoutManager.LayoutParams.MATCH_PARENT;
-    public int height = VirtualLayoutManager.LayoutParams.MATCH_PARENT;
+    public int height = VirtualLayoutManager.LayoutParams.WRAP_CONTENT;
 
     public float aspectRatio = Float.NaN;
 
@@ -164,7 +164,10 @@ public class Style {
         this.bgColor = parseColor(bgColor);
     }
 
-
+    /**
+     * Parse margin with string like '[10,10,10,10]'
+     * @param marginString
+     */
     public void setMargin(@Nullable String marginString) {
         if (!TextUtils.isEmpty(marginString)) {
             // remove leading and ending '[' ']'
@@ -174,11 +177,9 @@ public class Style {
                 int size = marginStringArray.length > 4 ? 4 : marginStringArray.length;
                 for (int i = 0; i < size; i++) {
                     String marginStr = marginStringArray[i];
-                    try {
-                        if (!TextUtils.isEmpty(marginStr)) {
-                            margin[i] = dp2px(Float.parseFloat(marginStr.trim().replace("\"", "")));
-                        }
-                    } catch (NumberFormatException ignored) {
+                    if (!TextUtils.isEmpty(marginStr)) {
+                        margin[i] = parseSize(marginStr.trim().replace("\"", ""), 0);
+                    } else {
                         margin[i] = 0;
                     }
                 }
@@ -189,6 +190,10 @@ public class Style {
         }
     }
 
+    /**
+     * Parse padding with string like '[10,10,10,10]'
+     * @param paddingString
+     */
     public void setPadding(@Nullable String paddingString) {
         if (!TextUtils.isEmpty(paddingString)) {
             // remove leading and ending '[' ']'
@@ -200,7 +205,9 @@ public class Style {
                     String paddingStr = paddingStringArray[i];
                     try {
                         if (!TextUtils.isEmpty(paddingStr)) {
-                            padding[i] = dp2px(Float.parseFloat(paddingStr.trim().replace("\"", "")));
+                            padding[i] = parseSize(paddingStr.trim().replace("\"", ""), 0);
+                        } else {
+                            padding[i] = 0;
                         }
                     } catch (NumberFormatException ignored) {
                         padding[i] = 0;
@@ -227,14 +234,13 @@ public class Style {
                 setBgColor(backgroundColor);
             }
 
-            double width = data.optDouble(KEY_WIDTH, VirtualLayoutManager.LayoutParams.MATCH_PARENT);
-            if (width >= 0) {
-                this.width = dp2px(width);
+            if (data.has(KEY_WIDTH)) {
+                String widthValue = data.optString(KEY_WIDTH);
+                this.width = parseSize(widthValue, VirtualLayoutManager.LayoutParams.MATCH_PARENT);
             }
-
-            double height = data.optDouble(KEY_HEIGHT, VirtualLayoutManager.LayoutParams.WRAP_CONTENT);
-            if (height >= 0) {
-                this.height = dp2px(height);
+            if (data.has(KEY_HEIGHT)) {
+                String heightValue = data.optString(KEY_HEIGHT);
+                this.height = parseSize(heightValue, VirtualLayoutManager.LayoutParams.WRAP_CONTENT);
             }
 
             bgImage = data.optString(KEY_BG_IMAGE, "");
@@ -262,10 +268,7 @@ public class Style {
             if (marginArray != null) {
                 int size = Math.min(margin.length, marginArray.length());
                 for (int i = 0; i < size; i++) {
-                    try {
-                        margin[i] = dp2px(marginArray.optDouble(i));
-                    } catch (Exception e) {
-                    }
+                    margin[i] = parseSize(marginArray.optString(i), 0);
                 }
 
                 if (size > 0) {
@@ -282,10 +285,7 @@ public class Style {
             if (paddingArray != null) {
                 int size = Math.min(padding.length, paddingArray.length());
                 for (int i = 0; i < size; i++) {
-                    try {
-                        padding[i] = dp2px(paddingArray.optDouble(i));
-                    } catch (Exception e) {
-                    }
+                    padding[i] = parseSize(paddingArray.optString(i), 0);
                 }
 
                 if (size > 0) {
@@ -299,6 +299,32 @@ public class Style {
             }
         }
 
+    }
+
+    public static int parseSize(String sourceValue, int defaultValue) {
+        int result;
+        if (sourceValue != null && sourceValue.length() > 0) {
+            sourceValue = sourceValue.trim();
+            if (sourceValue.endsWith(RP)) {
+                sourceValue = sourceValue.substring(0, sourceValue.length() - 2).trim();
+                try {
+                    double number = Double.parseDouble(sourceValue);
+                    result = rp2px(number);
+                } catch (NumberFormatException e) {
+                    result = defaultValue;
+                }
+            } else {
+                try {
+                    double number = Double.parseDouble(sourceValue);
+                    result = dp2px(number);
+                } catch (NumberFormatException e) {
+                    result = defaultValue;
+                }
+            }
+        } else {
+            result = defaultValue;
+        }
+        return result;
     }
 
     public static int parseColor(String colorString) {
@@ -334,6 +360,8 @@ public class Style {
     }
 
 
-
+    public static int rp2px(double rpValue) {
+        return (int)((rpValue * TangramViewMetrics.screenWidth()) / TangramViewMetrics.uedScreenWidth() + 0.5f);
+    }
 
 }

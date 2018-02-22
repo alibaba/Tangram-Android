@@ -297,6 +297,7 @@ public class TangramBuilder {
         registry.registerCell(TYPE_CAROUSEL_CELL_COMPACT, BannerView.class);
         registry.registerCell(TYPE_CONTAINER_BANNER, BannerView.class);
         registry.registerCell(TYPE_LINEAR_SCROLL_CELL_COMPACT, LinearScrollView.class);
+        registry.registerCell(TYPE_CONTAINER_SCROLL, LinearScrollView.class);
 
         // built-in cards
         registry.registerCard(TYPE_CAROUSEL_COMPACT, BannerCard.class);
