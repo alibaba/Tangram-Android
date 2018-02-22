@@ -100,10 +100,10 @@ public class StaggeredCard extends Card {
 
                 column = data.optInt(KEY_COLUMN, 2);
 
-                vGap = hGap = Style.dp2px(data.optDouble(KEY_GAP, 0f));
+                vGap = hGap = Style.parseSize(data.optString(KEY_GAP), 0);
 
-                hGap = Style.dp2px(data.optDouble(KEY_H_GAP, hGap));
-                vGap = Style.dp2px(data.optDouble(KEY_V_GAP, vGap));
+                hGap = Style.parseSize(data.optString(KEY_H_GAP), 0);
+                vGap = Style.parseSize(data.optString(KEY_V_GAP), 0);
             }
         }
     }

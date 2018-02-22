@@ -224,7 +224,7 @@ public class BannerEntityCard extends BannerCell {
             }
         }
         if (data != null) {
-            setIndicatorRadius(Style.dp2px(data.optDouble(BannerCard.ATTR_INDICATOR_RADIUS)));
+            setIndicatorRadius(Style.parseSize(data.optString(BannerCard.ATTR_INDICATOR_RADIUS), 0));
             setIndicatorColor(Style.parseColor(data.optString(BannerCard.ATTR_INDICATOR_COLOR, "#00000000")));
             setIndicatorDefaultColor(Style.parseColor(data.optString(BannerCard.ATTR_INDICATOR_DEFAULT_INDICATOR_COLOR, "#00000000")));
             setAutoScrollInternal(data.optInt(BannerCard.ATTR_AUTOSCROLL));
@@ -235,13 +235,13 @@ public class BannerEntityCard extends BannerCell {
             setIndicatorNor(data.optString(BannerCard.ATTR_INDICATOR_NORMAL));
             setIndicatorGravity(data.optString(BannerCard.ATTR_INDICATOR_GRA));
             setIndicatorPos(data.optString(BannerCard.ATTR_INDICATOR_POS));
-            setIndicatorGap(Style.dp2px(data.optInt(BannerCard.ATTR_INDICATOR_GAP)));
-            setIndicatorMargin(Style.dp2px(data.optInt(BannerCard.ATTR_INDICATOR_MARGIN)));
-            setIndicatorHeight(Style.dp2px(data.optInt(BannerCard.ATTR_INDICATOR_HEIGHT)));
+            setIndicatorGap(Style.parseSize(data.optString(BannerCard.ATTR_INDICATOR_GAP), 0));
+            setIndicatorMargin(Style.parseSize(data.optString(BannerCard.ATTR_INDICATOR_MARGIN), 0));
+            setIndicatorHeight(Style.parseSize(data.optString(BannerCard.ATTR_INDICATOR_HEIGHT), 0));
             setPageWidth(data.optDouble(BannerCard.ATTR_PAGE_WIDTH));
-            sethGap(Style.dp2px(data.optInt(BannerCard.ATTR_HGAP)));
-            itemMargin[0] = Style.dp2px(data.optInt(BannerCard.ATTR_ITEM_MARGIN_LEFT));
-            itemMargin[1] = Style.dp2px(data.optInt(BannerCard.ATTR_ITEM_MARGIN_RIGHT));
+            sethGap(Style.parseSize(data.optString(BannerCard.ATTR_HGAP), 0));
+            itemMargin[0] = Style.parseSize(data.optString(BannerCard.ATTR_ITEM_MARGIN_LEFT), 0);
+            itemMargin[1] = Style.parseSize(data.optString(BannerCard.ATTR_ITEM_MARGIN_RIGHT), 0);
             itemRatio = data.optDouble(BannerCard.ATTR_ITEM_RATIO, Double.NaN);
         }
     }
