@@ -39,6 +39,7 @@ import com.tmall.wireless.tangram.expression.ITangramExprParser;
 import com.tmall.wireless.tangram.expression.TangramExpr;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.entitycard.BannerEntityCard;
+import com.tmall.wireless.tangram.structure.entitycard.LinearScrollEntityCard;
 import com.tmall.wireless.tangram.support.CardSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -300,9 +301,12 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
                             case TangramBuilder.TYPE_CONTAINER_BANNER:
                                 cell = new BannerEntityCard();
                                 break;
+                            case TangramBuilder.TYPE_CONTAINER_SCROLL:
+                                cell = new LinearScrollEntityCard();
+                                break;
                         }
                         if (cell != null) {
-                            cell.serviceManager = serviceManager; // ensure service manager
+                            cell.serviceManager = serviceManager;
                             cell.parent = this;
                             cell.parentId = id;
                         } else {
@@ -310,24 +314,24 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
                         }
                     } else {
                         cell = new BaseCell(cellType);
-                        cell.serviceManager = serviceManager; // ensure service manager
+                        cell.serviceManager = serviceManager;
                         cell.parent = this;
                         cell.parentId = id;
                     }
                 }
                 parseCell(resolver, cellData, cell, appended);
-                cell.setStringType(cellType); // ensure cell type
+                cell.setStringType(cellType);
                 return cell;
             } else {
                 //support virtual view at layout
                 BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
                 if (componentBinderResolver.has(cellType)) {
                     cell = new BaseCell(cellType);
-                    cell.serviceManager = serviceManager; // ensure service manager
+                    cell.serviceManager = serviceManager;
                     cell.parent = this;
                     cell.parentId = id;
                     parseCell(resolver, cellData, cell, appended);
-                    cell.setStringType(cellType); // ensure cell type
+                    cell.setStringType(cellType);
                     return cell;
                 } else {
                     return null;

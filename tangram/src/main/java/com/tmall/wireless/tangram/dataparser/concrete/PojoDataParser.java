@@ -36,6 +36,7 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.SlideCard;
 import com.tmall.wireless.tangram.structure.card.WrapCellCard;
 import com.tmall.wireless.tangram.structure.entitycard.BannerEntityCard;
+import com.tmall.wireless.tangram.structure.entitycard.LinearScrollEntityCard;
 import com.tmall.wireless.tangram.util.LogUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
 import com.tmall.wireless.tangram.util.Utils;
@@ -171,7 +172,7 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
                         return null;
                     }
 
-                    cell.serviceManager = serviceManager; // ensure service manager
+                    cell.serviceManager = serviceManager;
                 } else {
                     if (Utils.isCard(cellData)) {
                         switch (cellType) {
@@ -179,18 +180,21 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
                             case TangramBuilder.TYPE_CONTAINER_BANNER:
                                 cell = new BannerEntityCard();
                                 break;
+                            case TangramBuilder.TYPE_CONTAINER_SCROLL:
+                                cell = new LinearScrollEntityCard();
+                                break;
                         }
                         if (cell != null) {
-                            cell.serviceManager = serviceManager; // ensure service manager
+                            cell.serviceManager = serviceManager;
                         }
                     } else {
                         cell = new BaseCell(cellType);
-                        cell.serviceManager = serviceManager; // ensure service manager
+                        cell.serviceManager = serviceManager;
                     }
                 }
                 if (cell != null) {
                     resolver.parseCell(resolver, cell, cellData);
-                    cell.setStringType(cellType); // ensure cell type
+                    cell.setStringType(cellType);
                 }
                 return cell;
             } else {
@@ -198,9 +202,9 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
                 BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
                 if (componentBinderResolver.has(cellType)) {
                     cell = new BaseCell(cellType);
-                    cell.serviceManager = serviceManager; // ensure service manager
+                    cell.serviceManager = serviceManager;
                     resolver.parseCell(resolver, cell, cellData);
-                    cell.setStringType(cellType); // ensure cell type
+                    cell.setStringType(cellType);
                     return cell;
                 } else {
                     return null;

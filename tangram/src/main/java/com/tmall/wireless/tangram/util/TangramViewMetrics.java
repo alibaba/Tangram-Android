@@ -41,6 +41,8 @@ public final class TangramViewMetrics {
 
     private static int mScreenHeight;
 
+    private static int mUedScreen = 750;
+
     public static void initWith(@NonNull final Context context) {
 
         final Resources resources = context.getResources();
@@ -52,6 +54,7 @@ public final class TangramViewMetrics {
         mScreenHeight = configuration.orientation == Configuration.ORIENTATION_PORTRAIT ? dm.heightPixels : dm.widthPixels;
     }
 
+    @Deprecated
     public static int dp2px(float dp) {
         return (int) (mDensity * dp);
     }
@@ -66,6 +69,14 @@ public final class TangramViewMetrics {
 
     public static float screenDensity() {
         return mDensity;
+    }
+
+    public static int uedScreenWidth() {
+        return mUedScreen;
+    }
+
+    public static void setUedScreenWidth(int uedScreenWidth) {
+        mUedScreen = uedScreenWidth;
     }
 }
 

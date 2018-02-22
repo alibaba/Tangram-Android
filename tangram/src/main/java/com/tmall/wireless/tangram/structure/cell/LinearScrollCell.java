@@ -145,8 +145,8 @@ public class LinearScrollCell extends BaseCell {
             }
             lp.setMargins(margins[3], margins[0], margins[1], margins[2]);
             //chils cell's pageWidth override pageWidth in style
-            if (!Double.isNaN(cell.extras.optDouble("pageWidth"))) {
-                lp.width = Style.dp2px(cell.extras.optDouble("pageWidth"));
+            if (cell.extras.has("pageWidth")) {
+                lp.width = Style.parseSize(cell.extras.optString("pageWidth"), 0);
             }
             binderViewHolder.itemView.setLayoutParams(lp);
         }

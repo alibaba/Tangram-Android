@@ -197,8 +197,8 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                     totalDistance = totalDistance + bc.style.margin[1] + bc.style.margin[3];
                 }
                 if (!Double.isNaN(lSCell.pageWidth)) {
-                    if (!Double.isNaN(bc.extras.optDouble("pageWidth"))) {
-                        totalDistance += Style.dp2px(bc.extras.optDouble("pageWidth"));
+                    if (bc.extras.has("pageWidth")) {
+                        totalDistance += Style.parseSize(bc.extras.optString("pageWidth"), 0);
                     } else {
                         totalDistance += lSCell.pageWidth;
                     }
