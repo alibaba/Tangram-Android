@@ -120,9 +120,8 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setOrientation(HORIZONTAL);
-        layoutManager.setRecycleChildrenOnDetach(true);
         recyclerView.setLayoutManager(layoutManager);
-
+        recyclerView.setItemAnimator(null);
         totalDistanceOfIndicator = Style.dp2px(34);
 
         touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
