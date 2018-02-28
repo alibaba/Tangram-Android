@@ -62,3 +62,6 @@ Tangram是一套动态化构建 Native 页面的框架，它包含 Tangram Andro
 
 # 开源许可证
 Tangram 遵循MIT开源许可证协议。
+
+# 微信群
+搜索帐号 longerian 获取邀请
