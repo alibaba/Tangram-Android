@@ -67,11 +67,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public String stringType;
 
     /**
-     * indicate whether this cell is a cellized card
-     */
-    public boolean inlineCard;
-
-    /**
      * parent's id
      */
     @Nullable

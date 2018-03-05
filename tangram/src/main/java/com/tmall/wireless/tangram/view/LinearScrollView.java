@@ -274,7 +274,6 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         }
 
         totalDistance = 0;
-        totalDistanceOfIndicator = 0;
 
         if (lSCell.hasIndicator) {
             indicator.setTranslationX(0);
