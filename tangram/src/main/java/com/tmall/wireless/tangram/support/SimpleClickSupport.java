@@ -86,8 +86,7 @@ public abstract class SimpleClickSupport {
     private void findClickMethods(Method[] methods) {
         for (Method method : methods) {
             String methodName = method.getName();
-            if (!methodName.equals(ON_CLICK_METHOD_NAME) && methodName.startsWith(ON_CLICK_METHOD_NAME) ||
-                    (methodName.startsWith(ON_CLICK_METHOD_PREFIX) && methodName.endsWith(ON_CLICK_METHOD_POSTFIX))) {
+            if (isValidMethodName(methodName)) {
                 int modifiers = method.getModifiers();
                 if ((modifiers & Modifier.PUBLIC) != 0 && (modifiers & MODIFIERS_IGNORE) == 0) {
                     Class<?>[] parameterTypes = method.getParameterTypes();
@@ -111,6 +110,11 @@ public abstract class SimpleClickSupport {
                 }
             }
         }
+    }
+
+    private boolean isValidMethodName(String methodName) {
+        return !methodName.equals(ON_CLICK_METHOD_NAME) && methodName.startsWith(ON_CLICK_METHOD_NAME) ||
+            (methodName.startsWith(ON_CLICK_METHOD_PREFIX) && methodName.endsWith(ON_CLICK_METHOD_POSTFIX));
     }
 
     /**

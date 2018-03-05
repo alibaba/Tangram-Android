@@ -93,10 +93,7 @@ public abstract class ExposureSupport {
     private void findTraceMethods(Method[] methods) {
         for (Method method : methods) {
             String methodName = method.getName();
-            if (!methodName.equals(ON_TRACE_METHOD_NAME) && methodName.startsWith(
-                    ON_TRACE_METHOD_NAME) ||
-                    (methodName.startsWith(ON_TRACE_METHOD_PREFIX) && methodName.endsWith(
-                            ON_TRACE_METHOD_POSTFIX))) {
+            if (isValidTraceMethodName(methodName)) {
                 int modifiers = method.getModifiers();
                 if ((modifiers & Modifier.PUBLIC) != 0 && (modifiers & MODIFIERS_IGNORE) == 0) {
                     Class<?>[] parameterTypes = method.getParameterTypes();
@@ -116,13 +113,15 @@ public abstract class ExposureSupport {
         }
     }
 
+    private boolean isValidTraceMethodName(String methodName) {
+        return !methodName.equals(ON_TRACE_METHOD_NAME) && methodName.startsWith(ON_TRACE_METHOD_NAME) ||
+            (methodName.startsWith(ON_TRACE_METHOD_PREFIX) && methodName.endsWith(ON_TRACE_METHOD_POSTFIX));
+    }
+
     private void findExposureMethods(Method[] methods) {
         for (Method method : methods) {
             String methodName = method.getName();
-            if (!methodName.equals(ON_EXPOSURE_METHOD_NAME) && methodName.startsWith(
-                    ON_EXPOSURE_METHOD_NAME) ||
-                    (methodName.startsWith(ON_EXPOSURE_METHOD_PREFIX) && methodName.endsWith(
-                            ON_EXPOSURE_METHOD_POSTFIX))) {
+            if (isValidExposureMethodName(methodName)) {
                 int modifiers = method.getModifiers();
                 if ((modifiers & Modifier.PUBLIC) != 0 && (modifiers & MODIFIERS_IGNORE) == 0) {
                     Class<?>[] parameterTypes = method.getParameterTypes();
@@ -140,6 +139,11 @@ public abstract class ExposureSupport {
                 }
             }
         }
+    }
+
+    private boolean isValidExposureMethodName(String methodName) {
+        return !methodName.equals(ON_EXPOSURE_METHOD_NAME) && methodName.startsWith(ON_EXPOSURE_METHOD_NAME) ||
+            (methodName.startsWith(ON_EXPOSURE_METHOD_PREFIX) && methodName.endsWith(ON_EXPOSURE_METHOD_POSTFIX));
     }
 
     /**
