@@ -50,10 +50,6 @@ public class Utils {
     private static final Pattern REGEX_1 = Pattern.compile("(\\d+)x(\\d+)(_?q\\d+)?(\\.[jpg|png|gif])");
     private static final Pattern REGEX_2 = Pattern.compile("(\\d+)-(\\d+)(_?q\\d+)?(\\.[jpg|png|gif])");
 
-    public static <T> List<T> newArrayList() {
-        return new ArrayList<T>();
-    }
-
     public static <K, V> Map<K, V> newMap(K k1, V v1, K k2, V v2) {
         ArrayMap<K, V> map = new ArrayMap<>();
         map.put(k1, v1);

@@ -35,8 +35,6 @@ import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
-import com.tmall.wireless.tangram.expression.ITangramExprParser;
-import com.tmall.wireless.tangram.expression.TangramExpr;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.entitycard.BannerEntityCard;
 import com.tmall.wireless.tangram.structure.entitycard.LinearScrollEntityCard;
@@ -73,7 +71,7 @@ import java.util.Map;
  * Basic Card, which will represent LayoutHelpers
  * <p/>
  */
-public abstract class Card extends ComponentLifecycle implements ITangramExprParser {
+public abstract class Card extends ComponentLifecycle {
 
     private static final String TAG = "Card";
 
@@ -1084,24 +1082,4 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
         }
     }
 
-    @Override
-    public Object getValueBy(TangramExpr var) {
-        if (var.hasNextFragment()) {
-            String next = var.nextFragment();
-            try {
-                int index = Integer.parseInt(next);
-                if (mCells != null && mCells.size() > index && index >= 0) {
-                    return mCells.get(index).getValueBy(var);
-                } else {
-                    return null;
-                }
-            } catch (NumberFormatException e) {
-                //TODO return card json feild
-                return null;
-            }
-        } else {
-            //TODO return card json
-            return null;
-        }
-    }
 }

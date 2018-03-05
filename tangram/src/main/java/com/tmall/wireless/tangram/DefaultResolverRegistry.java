@@ -93,7 +93,7 @@ public class DefaultResolverRegistry {
         if (viewHolderMap.get(type) == null) {
             mDefaultCellBinderResolver.register(type, new BaseCellBinder<>(viewClz, mMVHelper));
         } else {
-            mDefaultCellBinderResolver.register(type, new BaseCellBinder<>(viewHolderMap.get(type),
+            mDefaultCellBinderResolver.register(type, new BaseCellBinder<ViewHolderCreator.ViewHolder, V>(viewHolderMap.get(type),
                 mMVHelper));
         }
         mMVHelper.resolver().register(type, viewClz);

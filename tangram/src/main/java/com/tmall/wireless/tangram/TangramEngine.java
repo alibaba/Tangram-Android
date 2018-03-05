@@ -44,9 +44,6 @@ import android.view.View;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
-import com.tmall.wireless.tangram.expression.ITangramExprParser;
-import com.tmall.wireless.tangram.expression.TangramExpr;
-import com.tmall.wireless.tangram.expression.TangramExprSupport;
 import com.tmall.wireless.tangram.ext.PullFromEndListener;
 import com.tmall.wireless.tangram.ext.SwipeItemTouchListener;
 import com.tmall.wireless.tangram.structure.BaseCell;
@@ -61,8 +58,7 @@ import org.json.JSONArray;
  *
  * The core of Tangram used to access data, bind view, register service.
  */
-public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> implements Engine,
-    ITangramExprParser {
+public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> implements Engine {
 
     private static final int NO_SWIPE = -1;
 
@@ -71,13 +67,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         @NonNull IAdapterBuilder<Card, BaseCell> adapterBuilder) {
         super(context, dataParser, adapterBuilder);
         this.register(DataParser.class, dataParser);
-        mTangramExprSupport = new TangramExprSupport();
-        mTangramExprSupport.registerExprParser(TangramExprSupport.TANGRAM, this);
-        this.register(TangramExprSupport.class, mTangramExprSupport);
-
     }
-
-    private TangramExprSupport mTangramExprSupport;
 
     private Runnable updateRunnable;
 
@@ -483,21 +473,6 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 getContentView().addOnItemTouchListener(mSwipeItemTouchListener);
             }
         }
-    }
-
-    @Override
-    public Object getValueBy(TangramExpr var) {
-        if (var.hasNextFragment()) {
-            String next = var.nextFragment();
-            List<Card> cards = getGroupBasicAdapter().getGroups();
-            for (int i = 0, size = cards.size(); i < size; i++) {
-                Card card = cards.get(i);
-                if (card.id.equals(next)) {
-                    return card.getValueBy(var);
-                }
-            }
-        }
-        return null;
     }
 
     /**

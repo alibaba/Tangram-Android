@@ -31,8 +31,6 @@ import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.ComponentLifecycle;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
-import com.tmall.wireless.tangram.expression.ITangramExprParser;
-import com.tmall.wireless.tangram.expression.TangramExpr;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -52,8 +50,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by mikeafc on 16/4/25.
  */
-public class BaseCell<V extends View> extends ComponentLifecycle implements View.OnClickListener,
-    ITangramExprParser {
+public class BaseCell<V extends View> extends ComponentLifecycle implements View.OnClickListener {
     private static AtomicLong sIdGen = new AtomicLong();
 
     public static boolean sIsGenIds = false;
@@ -97,63 +94,9 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public String id;
 
     /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String action;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String pageParam;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String scm;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String spm;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String syncIds;
-
-    /**
      * the natural position this cell in its parent
      */
     public int pos;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String title;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String subTitle;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public int titleColor = -1;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public int subTitleColor = -1;
 
     /**
      * position that assigned from server side
@@ -185,18 +128,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public JSONObject extras = new JSONObject();
 
     private ArrayMap<String, Object> bizParaMap = new ArrayMap<>(32);
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String imgUrl;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public float urlRatio = Float.NaN;
 
     private ArrayMap<Integer, Integer> innerClickMap = new ArrayMap<>();
 
@@ -405,16 +336,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
      */
     public boolean isValid() {
         return true;
-    }
-
-    @Override
-    public Object getValueBy(TangramExpr var) {
-        if (var.hasNextFragment()) {
-            String next = var.nextFragment();
-            return optParam(next);
-        } else {
-            return extras;
-        }
     }
 
     /**
