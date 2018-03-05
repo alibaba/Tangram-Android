@@ -31,6 +31,7 @@ import android.view.View;
 import com.tmall.wireless.tangram.dataparser.concrete.Cell;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.util.LogUtils;
+import io.reactivex.functions.Consumer;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -196,5 +197,21 @@ public abstract class SimpleClickSupport {
             this.method = method;
         }
     }
+
+    private Consumer<? extends ClickEvent> mConsumer = new Consumer<ClickEvent>() {
+        @Override
+        public void accept(ClickEvent clickEvent) throws Exception {
+            defaultClick(clickEvent.mView, clickEvent.mCell, clickEvent.eventType);
+        }
+    };
+
+    public void setConsumer(Consumer<? extends ClickEvent> consumer) {
+        mConsumer = consumer;
+    }
+
+    public Consumer<? extends ClickEvent> returnConsumer() {
+        return mConsumer;
+    }
+
 
 }

@@ -29,7 +29,9 @@ package com.tmall.wireless.tangram.util;
  * Precondition class borrows from facebook, which originally is taken from guava
  */
 
+import android.os.Looper;
 import android.support.annotation.Nullable;
+import io.reactivex.Observer;
 
 /**
  * Static convenience methods that help a method or constructor check whether it was invoked
@@ -451,5 +453,14 @@ public final class Preconditions {
         }
 
         return builder.toString();
+    }
+
+    public static boolean checkMainThread(Observer<?> observer) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            observer.onError(new IllegalStateException(
+                "Expected to be called on the main thread but was " + Thread.currentThread().getName()));
+            return false;
+        }
+        return true;
     }
 }
