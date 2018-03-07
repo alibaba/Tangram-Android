@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -89,6 +90,8 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     private float yDown;
 
     private float ratio = Float.NaN;
+
+    private int height = VirtualLayoutManager.LayoutParams.WRAP_CONTENT;
 
     private BaseCell cell;
 
@@ -276,7 +279,8 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         setAdapter(bannerCell.mBannerWrapper);
         mUltraViewPager.setAutoMeasureHeight(true);
         this.ratio = bannerCell.mRatio;
-        mUltraViewPager.setRatio(bannerCell.mRatio);
+        this.height = bannerCell.height;
+        mUltraViewPager.setRatio(this.ratio);
         setAutoScroll(bannerCell.mAutoScrollInternal, bannerCell.mSpecialInterval);
         mUltraViewPager.setPageMargin(bannerCell.hGap);
         if (bannerCell.mCells.size() <= bannerCell.mInfiniteMinCount) {
@@ -349,9 +353,11 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (!Float.isNaN(ratio)) {
             int widthSize = MeasureSpec.getSize(widthMeasureSpec);
             heightMeasureSpec = MeasureSpec.makeMeasureSpec((int) (widthSize / ratio), MeasureSpec.EXACTLY);
+        } else if (height > 0) {
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
         }
         mUltraViewPager.measure(widthMeasureSpec, heightMeasureSpec);
-        mIndicator.measure(widthMeasureSpec, heightMeasureSpec);
+        mIndicator.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
         int headerHeight = 0;
         if (!mHeaderViewHolders.isEmpty()) {
             for (int i = 0, count = mHeaderViewHolders.size(); i < count; i++) {
