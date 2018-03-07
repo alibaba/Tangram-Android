@@ -168,6 +168,7 @@ public class BannerCard extends Card {
         if (style != null) {
             cell.setRatio(style.aspectRatio);
             cell.margin = style.margin;
+            cell.height = style.height;
         }
     }
 
