@@ -32,7 +32,7 @@ import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.ComponentLifecycle;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
-import com.tmall.wireless.tangram.support.ClickEvent;
+import com.tmall.wireless.tangram.support.TangramRxEvent;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -364,68 +364,88 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         return null;
     }
 
-    private Disposable clickDisposable;
+    private TangramRxEvent mRxClickEvent;
 
-    public void click(View view, ClickEvent clickEvent) {
-        Observable clickObservable = new ViewClickObservable(clickEvent);
+    private Disposable mClickDisposable;
+
+    private ViewClickObservable mViewClickObservable;
+
+    public void click(View view, TangramRxEvent tangramRxEvent) {
+        if (mViewClickObservable == null) {
+            mViewClickObservable = new ViewClickObservable(tangramRxEvent);
+        } else {
+            mViewClickObservable.mTangramRxEvent = tangramRxEvent;
+        }
         if (serviceManager != null) {
             final SimpleClickSupport service = serviceManager.getService(SimpleClickSupport.class);
             if (service != null) {
-                clickDisposable = clickObservable.subscribe(service.returnConsumer());
+                mClickDisposable = service.onRxClick(mViewClickObservable, tangramRxEvent);
             }
         }
     }
 
     public void click(View view) {
-        click(view, new ClickEvent(view, this, this.pos));
+        if (mRxClickEvent == null) {
+            mRxClickEvent = new TangramRxEvent(view, this, this.pos);
+        } else {
+            mRxClickEvent.update(view, this, this.pos);
+        }
+        click(view, mRxClickEvent);
     }
 
     public void unclick() {
-        if (clickDisposable != null) {
-            clickDisposable.dispose();
+        if (mClickDisposable != null) {
+            mClickDisposable.dispose();
         }
     }
 
-    private static class ViewClickObservable extends Observable<ClickEvent> {
+    private static class ViewClickObservable extends Observable<TangramRxEvent> {
 
-        private final ClickEvent mClickEvent;
+        private TangramRxEvent mTangramRxEvent;
 
-        private ViewClickObservable(ClickEvent clickEvent) {
-            Preconditions.checkNotNull(clickEvent);
-            Preconditions.checkNotNull(clickEvent.mView);
-            this.mClickEvent = clickEvent;
+        private Listener mListener;
+
+        private ViewClickObservable(TangramRxEvent tangramRxEvent) {
+            Preconditions.checkNotNull(tangramRxEvent);
+            Preconditions.checkNotNull(tangramRxEvent.getView());
+            this.mTangramRxEvent = tangramRxEvent;
         }
 
         @Override
-        protected void subscribeActual(Observer<? super ClickEvent> observer) {
+        protected void subscribeActual(Observer<? super TangramRxEvent> observer) {
             if (!Preconditions.checkMainThread(observer)) {
                 return;
             }
-            Listener listener = new Listener(mClickEvent, observer);
-            observer.onSubscribe(listener);
-            mClickEvent.mView.setOnClickListener(listener);
+            if (mListener == null) {
+                mListener = new Listener(mTangramRxEvent, observer);
+            } else {
+                mListener.mTangramRxEvent = mTangramRxEvent;
+                mListener.mObserver = observer;
+            }
+            observer.onSubscribe(mListener);
+            mTangramRxEvent.getView().setOnClickListener(mListener);
         }
     }
 
     static final private class Listener extends MainThreadDisposable implements OnClickListener {
 
-        private final ClickEvent mClickEvent;
+        private TangramRxEvent mTangramRxEvent;
 
-        private final Observer<? super ClickEvent> mObserver;
+        private Observer<? super TangramRxEvent> mObserver;
 
-        Listener(ClickEvent clickEvent, Observer<? super ClickEvent> observer) {
-            this.mClickEvent = clickEvent;
+        Listener(TangramRxEvent tangramRxEvent, Observer<? super TangramRxEvent> observer) {
+            this.mTangramRxEvent = tangramRxEvent;
             this.mObserver = observer;
         }
 
         @Override public void onClick(View v) {
             if (!isDisposed()) {
-                mObserver.onNext(mClickEvent);
+                mObserver.onNext(mTangramRxEvent);
             }
         }
 
         @Override protected void onDispose() {
-            mClickEvent.mView.setOnClickListener(null);
+            mTangramRxEvent.getView().setOnClickListener(null);
         }
     }
 

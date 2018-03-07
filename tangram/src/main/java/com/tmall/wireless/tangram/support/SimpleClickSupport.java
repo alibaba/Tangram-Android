@@ -31,12 +31,13 @@ import android.view.View;
 import com.tmall.wireless.tangram.dataparser.concrete.Cell;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.util.LogUtils;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,7 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * <pre>
  *     SimpleClickSupport support = serviceManager.getService(SimpleClickSupport.class)
- *     support.onClick(targetView, thisCell, eventType, [params]);
+ *     support.onClick(targetView, thisCell, mEventType, [params]);
  * </pre>
  * <p>
  * Which make all the click handlers registered in one place, and decouple the business logic from ComponentViews
@@ -133,6 +134,16 @@ public abstract class SimpleClickSupport {
         }
     }
 
+    /**
+     * Handler click event on item in reactive way
+     *
+     * @param clickEventObservable
+     * @param rxEvent
+     */
+    public Disposable onRxClick(Observable<TangramRxEvent> clickEventObservable, TangramRxEvent rxEvent) {
+        return clickEventObservable.subscribe(mConsumer);
+    }
+
     public void onClick(View targetView, Cell cell, int eventType) {
         onClick(targetView, cell, eventType, null);
     }
@@ -198,20 +209,15 @@ public abstract class SimpleClickSupport {
         }
     }
 
-    private Consumer<? extends ClickEvent> mConsumer = new Consumer<ClickEvent>() {
+    private Consumer<TangramRxEvent> mConsumer = new Consumer<TangramRxEvent>() {
         @Override
-        public void accept(ClickEvent clickEvent) throws Exception {
-            defaultClick(clickEvent.mView, clickEvent.mCell, clickEvent.eventType);
+        public void accept(TangramRxEvent tangramRxEvent) throws Exception {
+            defaultClick(tangramRxEvent.getView(), tangramRxEvent.getCell(), tangramRxEvent.getEventType());
         }
     };
 
-    public void setConsumer(Consumer<? extends ClickEvent> consumer) {
+    public void setConsumer(Consumer<TangramRxEvent> consumer) {
         mConsumer = consumer;
     }
-
-    public Consumer<? extends ClickEvent> returnConsumer() {
-        return mConsumer;
-    }
-
 
 }

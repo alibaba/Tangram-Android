@@ -313,6 +313,14 @@ public class TangramActivity extends Activity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (engine != null) {
+            engine.destroy();
+        }
+    }
+
     public static byte[] getAssertsFile(Context context, String fileName) {
         InputStream inputStream = null;
         AssetManager assetManager = context.getAssets();

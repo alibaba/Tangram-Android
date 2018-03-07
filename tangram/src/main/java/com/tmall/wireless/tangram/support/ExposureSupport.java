@@ -49,7 +49,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * <pre>
  *     ExposureSupport support = serviceManager.getService(ExposureSupport.class)
- *     support.onExposure(targetView, thisCell, eventType);
+ *     support.onExposure(targetView, thisCell, mEventType);
  * </pre>
  * <p>
  * Which make all the click handlers registered in one place, and decouple the business logic from ComponentViews
