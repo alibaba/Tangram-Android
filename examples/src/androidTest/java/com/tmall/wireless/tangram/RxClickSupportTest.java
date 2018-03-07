@@ -165,6 +165,7 @@ public class RxClickSupportTest extends AndroidTestCase {
 
         mBaseCell1.click(mView1);
         mBaseCell1.unclick();
+        mView1.performClick();
     }
 
     @Test

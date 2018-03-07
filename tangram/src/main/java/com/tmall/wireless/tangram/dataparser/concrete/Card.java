@@ -510,12 +510,6 @@ public abstract class Card extends ComponentLifecycle {
                 exposureSupport.onExposure(this, offset, position);
             }
         }
-        if (offset == 0) {
-            ExposureSupport exposureSupport = serviceManager.getService(ExposureSupport.class);
-            if (exposureSupport != null) {
-                exposureSupport.onExposureReaptly(this, offset, position);
-            }
-        }
     }
 
 

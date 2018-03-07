@@ -32,6 +32,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Cancellable;
+import io.reactivex.functions.Consumer;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -261,20 +265,28 @@ public abstract class ExposureSupport {
 
     public abstract void onExposure(@NonNull Card card, int offset, int position);
 
-    public void onExposureReaptly(@NonNull Card card, int offset, int position) {
-
-    }
-
-    public void attachTrackInfoToView(View targetView, BaseCell baseCell, int spmD) {
-
-    }
-
-    public void attachTrackInfoToView(View targetView, BaseCell baseCell, int spmD,
-            HashMap<String, Object> extras) {
-
-    }
-
     public void attachUtInfoToView(View targetView, BaseCell baseCell) {
 
     }
+
+    private ExposureCancellable mCancellable;
+
+    public void setRxExposureCancellable(ExposureCancellable cancellable) {
+        this.mCancellable = cancellable;
+    }
+
+    public Cancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+        return mCancellable;
+    }
+
+    /**
+     * Handler exposure event on item in reactive way
+     *
+     * @param exposureEventObservable
+     * @param rxEvent
+     */
+    public Disposable onRxExposure(Observable<TangramRxEvent> exposureEventObservable, TangramRxEvent rxEvent) {
+        return exposureEventObservable.subscribe(mCancellable);
+    }
+
 }
