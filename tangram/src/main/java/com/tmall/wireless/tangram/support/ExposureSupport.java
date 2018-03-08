@@ -269,7 +269,7 @@ public abstract class ExposureSupport {
 
     }
 
-    private ExposureCancellable mCancellable;
+    protected ExposureCancellable mCancellable;
 
     public void setRxExposureCancellable(ExposureCancellable cancellable) {
         this.mCancellable = cancellable;

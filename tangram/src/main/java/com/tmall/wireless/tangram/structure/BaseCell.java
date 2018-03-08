@@ -367,38 +367,44 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         return null;
     }
 
-    private TangramRxEvent mRxExposureEvent;
+    private ArrayMap<View, TangramRxEvent> mRxExposureEvents = new ArrayMap<>();
 
-    private Disposable mExposureDisposable;
+    private ArrayMap<View, Disposable> mExposureDisposables = new ArrayMap<>();
 
-    private ViewExposureObservable mViewExposureObservable;
+    private ArrayMap<View, ViewExposureObservable> mViewExposureObservables = new ArrayMap<>();
 
     public void exposure(View targetView, TangramRxEvent tangramRxEvent) {
-        if (mViewExposureObservable == null) {
-            mViewExposureObservable = new ViewExposureObservable(tangramRxEvent);
+        ViewExposureObservable viewExposureObservable = mViewExposureObservables.get(targetView);
+        if (viewExposureObservable == null) {
+            viewExposureObservable = new ViewExposureObservable(tangramRxEvent);
+            mViewExposureObservables.put(targetView, viewExposureObservable);
         } else {
-            mViewExposureObservable.setTangramRxEvent(tangramRxEvent);
+            viewExposureObservable.setTangramRxEvent(tangramRxEvent);
         }
         if (serviceManager != null) {
             final ExposureSupport service = serviceManager.getService(ExposureSupport.class);
             if (service != null) {
-                mExposureDisposable = service.onRxExposure(mViewExposureObservable, tangramRxEvent);
+                Disposable exposureDisposable = service.onRxExposure(viewExposureObservable, tangramRxEvent);
+                mExposureDisposables.put(targetView, exposureDisposable);
             }
         }
     }
 
     public void exposure(View targetView) {
-        if (mRxExposureEvent == null) {
-            mRxExposureEvent = new TangramRxEvent(targetView, this, this.pos);
+        TangramRxEvent rxExposureEvent = mRxExposureEvents.get(targetView);
+        if (rxExposureEvent == null) {
+            rxExposureEvent = new TangramRxEvent(targetView, this, this.pos);
+            mRxExposureEvents.put(targetView, rxExposureEvent);
         } else {
-            mRxExposureEvent.update(targetView, this, this.pos);
+            rxExposureEvent.update(targetView, this, this.pos);
         }
-        exposure(targetView, mRxExposureEvent);
+        exposure(targetView, rxExposureEvent);
     }
 
-    public void unexposure() {
-        if (mExposureDisposable != null) {
-            mExposureDisposable.dispose();
+    public void unexposure(View view) {
+        Disposable exposureDisposable = mExposureDisposables.get(view);
+        if (exposureDisposable != null) {
+            exposureDisposable.dispose();
         }
     }
 
@@ -426,14 +432,14 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     }
 
     public void click(View view) {
-        TangramRxEvent mRxClickEvent = mRxClickEvents.get(view);
-        if (mRxClickEvent == null) {
-            mRxClickEvent = new TangramRxEvent(view, this, this.pos);
-            mRxClickEvents.put(view, mRxClickEvent);
+        TangramRxEvent rxClickEvent = mRxClickEvents.get(view);
+        if (rxClickEvent == null) {
+            rxClickEvent = new TangramRxEvent(view, this, this.pos);
+            mRxClickEvents.put(view, rxClickEvent);
         } else {
-            mRxClickEvent.update(view, this, this.pos);
+            rxClickEvent.update(view, this, this.pos);
         }
-        click(view, mRxClickEvent);
+        click(view, rxClickEvent);
     }
 
     public void unclick(View view) {
