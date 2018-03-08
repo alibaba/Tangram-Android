@@ -33,14 +33,13 @@ import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
 import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Cancellable;
-import io.reactivex.functions.Consumer;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -269,24 +268,22 @@ public abstract class ExposureSupport {
 
     }
 
-    protected ExposureCancellable mCancellable;
-
-    public void setRxExposureCancellable(ExposureCancellable cancellable) {
-        this.mCancellable = cancellable;
-    }
-
-    public Cancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
-        return mCancellable;
+    /**
+     *
+     * @param rxEvent
+     * @return exposure handle task by rxEvent
+     */
+    public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+        return null;
     }
 
     /**
-     * Handler exposure event on item in reactive way
-     *
-     * @param exposureEventObservable
+     * By default,
      * @param rxEvent
+     * @return
      */
-    public Disposable onRxExposure(Observable<TangramRxEvent> exposureEventObservable, TangramRxEvent rxEvent) {
-        return exposureEventObservable.subscribe(mCancellable);
+    public ObservableTransformer<TangramRxEvent, TangramRxEvent> getObservableTransformer(TangramRxEvent rxEvent) {
+        return null;
     }
 
 }

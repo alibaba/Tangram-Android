@@ -33,6 +33,7 @@ import com.tmall.wireless.tangram.dataparser.concrete.ComponentLifecycle;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.RxClickListener;
+import com.tmall.wireless.tangram.support.RxExposureCancellable;
 import com.tmall.wireless.tangram.support.TangramRxEvent;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.ViewClickObservable;
@@ -42,6 +43,7 @@ import com.tmall.wireless.tangram.util.ImageUtils;
 
 import com.tmall.wireless.tangram.util.Preconditions;
 import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.internal.disposables.CancellableDisposable;
@@ -374,19 +376,29 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     private ArrayMap<View, ViewExposureObservable> mViewExposureObservables = new ArrayMap<>();
 
     public void exposure(View targetView, TangramRxEvent tangramRxEvent) {
+        final ExposureSupport exposureSupport = serviceManager.getService(ExposureSupport.class);
+        RxExposureCancellable exposureCancellable = null;
+        if (exposureSupport != null) {
+            exposureCancellable = exposureSupport.getRxExposureCancellable(tangramRxEvent);
+        }
         ViewExposureObservable viewExposureObservable = mViewExposureObservables.get(targetView);
         if (viewExposureObservable == null) {
-            viewExposureObservable = new ViewExposureObservable(tangramRxEvent);
+            viewExposureObservable = new ViewExposureObservable(tangramRxEvent, exposureCancellable);
             mViewExposureObservables.put(targetView, viewExposureObservable);
         } else {
             viewExposureObservable.setTangramRxEvent(tangramRxEvent);
+            viewExposureObservable.setRxExposureCancellable(exposureCancellable);
         }
-        if (serviceManager != null) {
-            final ExposureSupport service = serviceManager.getService(ExposureSupport.class);
-            if (service != null) {
-                Disposable exposureDisposable = service.onRxExposure(viewExposureObservable, tangramRxEvent);
-                mExposureDisposables.put(targetView, exposureDisposable);
+        if (exposureSupport != null && exposureCancellable != null) {
+            ObservableTransformer<TangramRxEvent, TangramRxEvent> transformer = exposureSupport.getObservableTransformer(
+                tangramRxEvent);
+            Disposable exposureDisposable;
+            if (transformer != null) {
+                exposureDisposable = viewExposureObservable.compose(transformer).subscribe(exposureCancellable);
+            } else {
+                exposureDisposable = viewExposureObservable.subscribe(exposureCancellable);
             }
+            mExposureDisposables.put(targetView, exposureDisposable);
         }
     }
 

@@ -15,24 +15,27 @@ import io.reactivex.internal.disposables.CancellableDisposable;
 public class ViewExposureObservable extends Observable<TangramRxEvent> {
 
     private TangramRxEvent mTangramRxEvent;
+    private RxExposureCancellable mRxExposureCancellable;
 
-    public ViewExposureObservable(TangramRxEvent tangramRxEvent) {
+    public ViewExposureObservable(TangramRxEvent tangramRxEvent, RxExposureCancellable rxExposureCancellable) {
         Preconditions.checkNotNull(tangramRxEvent);
         Preconditions.checkNotNull(tangramRxEvent.getView());
         this.mTangramRxEvent = tangramRxEvent;
+        this.mRxExposureCancellable = rxExposureCancellable;
     }
 
     public void setTangramRxEvent(TangramRxEvent tangramRxEvent) {
         mTangramRxEvent = tangramRxEvent;
     }
 
+    public void setRxExposureCancellable(RxExposureCancellable rxExposureCancellable) {
+        mRxExposureCancellable = rxExposureCancellable;
+    }
+
     @Override
     protected void subscribeActual(Observer<? super TangramRxEvent> observer) {
-        if (mTangramRxEvent.getCell().serviceManager != null) {
-            final ExposureSupport service = mTangramRxEvent.getCell().serviceManager.getService(ExposureSupport.class);
-            if (service != null) {
-                observer.onSubscribe(new CancellableDisposable(service.getRxExposureCancellable(mTangramRxEvent)));
-            }
+        if (mRxExposureCancellable != null) {
+            observer.onSubscribe(new CancellableDisposable(mRxExposureCancellable));
         }
         observer.onNext(mTangramRxEvent);
     }

@@ -11,6 +11,7 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 /**
  * Created by longerian on 17/1/22.
  */
+@Deprecated
 abstract public class PageDetectorSupport {
 
     protected TangramEngine mTangramEngine;

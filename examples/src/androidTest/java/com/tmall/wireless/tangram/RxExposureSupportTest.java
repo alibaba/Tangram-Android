@@ -1,7 +1,6 @@
 package com.tmall.wireless.tangram;
 
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.os.Looper;
@@ -18,11 +17,12 @@ import android.view.View;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.support.ExposureCancellable;
 import com.tmall.wireless.tangram.support.ExposureSupport;
+import com.tmall.wireless.tangram.support.RxExposureCancellable;
 import com.tmall.wireless.tangram.support.TangramRxEvent;
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.schedulers.Schedulers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,14 +48,7 @@ public class RxExposureSupportTest extends AndroidTestCase {
     private final BaseCell mBaseCell1 = new BaseCell();
     private final BaseCell mBaseCell2 = new BaseCell();
 
-    private final ExposureSupport mExposureSupport = new ExposureSupport() {
 
-        @Override
-        public void onExposure(@NonNull Card card, int offset, int position) {
-
-        }
-
-    };
     private final ServiceManager mServiceManager = new ServiceManager() {
         private Map<Class<?>, Object> mServices = new ArrayMap<>();
 
@@ -76,8 +69,6 @@ public class RxExposureSupportTest extends AndroidTestCase {
 
     @Before
     public void setUp() throws Exception {
-        mServiceManager.register(ExposureSupport.class, mExposureSupport);
-
         mBaseCell1.pos = 10;
         mBaseCell1.serviceManager = mServiceManager;
 
@@ -89,22 +80,33 @@ public class RxExposureSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellExposure() {
-        ExposureCancellable consumer1 = new ExposureCancellable() {
+        ExposureSupport exposureSupport = new ExposureSupport() {
+
             @Override
-            public void accept(TangramRxEvent tangramEvent) throws Exception {
-                assertTrue(Looper.myLooper() == Looper.getMainLooper());
-                assertEquals(tangramEvent.getView(), mView1);
-                assertEquals(tangramEvent.getCell(), mBaseCell1);
-                assertEquals(tangramEvent.getEventType(), 10);
-                Log.d("RxExposureSupportTest", "testOneCellExposure test One cell mEventType " + tangramEvent.getEventType());
+            public void onExposure(@NonNull Card card, int offset, int position) {
+
             }
 
             @Override
-            public void cancel() throws Exception {
-                super.cancel();
+            public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+                RxExposureCancellable cancellable = new RxExposureCancellable() {
+                    @Override
+                    public void accept(TangramRxEvent tangramEvent) throws Exception {
+                        assertTrue(Looper.myLooper() == Looper.getMainLooper());
+                        assertEquals(tangramEvent.getView(), mView1);
+                        assertEquals(tangramEvent.getCell(), mBaseCell1);
+                        assertEquals(tangramEvent.getEventType(), 10);
+                        Log.d("RxExposureSupportTest", "testOneCellExposure test One cell mEventType " + tangramEvent.getEventType());
+                    }
+
+                    @Override
+                    public void cancel() throws Exception {
+                    }
+                };
+                return cancellable;
             }
         };
-        mExposureSupport.setRxExposureCancellable(consumer1);
+        mServiceManager.register(ExposureSupport.class, exposureSupport);
         mBaseCell1.exposure(mView1);
     }
 
@@ -112,18 +114,33 @@ public class RxExposureSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellWithMultiViewExposure() {
-        ExposureCancellable consumer = new ExposureCancellable() {
+        ExposureSupport exposureSupport = new ExposureSupport() {
 
             @Override
-            public void accept(TangramRxEvent tangramEvent) throws Exception {
-                assertTrue(Looper.myLooper() == Looper.getMainLooper());
-                assertTrue(tangramEvent.getView() == mView1 || tangramEvent.getView() == mView2);
-                assertTrue(tangramEvent.getCell() == mBaseCell1);
-                Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure mEventType " + tangramEvent.getEventType());
-                Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure view " + tangramEvent.getView());
+            public void onExposure(@NonNull Card card, int offset, int position) {
+
+            }
+
+            @Override
+            public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+                RxExposureCancellable cancellable = new RxExposureCancellable() {
+                    @Override
+                    public void accept(TangramRxEvent tangramEvent) throws Exception {
+                        assertTrue(Looper.myLooper() == Looper.getMainLooper());
+                        assertTrue(tangramEvent.getView() == mView1 || tangramEvent.getView() == mView2);
+                        assertTrue(tangramEvent.getCell() == mBaseCell1);
+                        Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure mEventType " + tangramEvent.getEventType());
+                        Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure view " + tangramEvent.getView());
+                    }
+
+                    @Override
+                    public void cancel() throws Exception {
+                    }
+                };
+                return cancellable;
             }
         };
-        mExposureSupport.setRxExposureCancellable(consumer);
+        mServiceManager.register(ExposureSupport.class, exposureSupport);
 
         mBaseCell1.exposure(mView1);
         mBaseCell1.exposure(mView2);
@@ -140,33 +157,43 @@ public class RxExposureSupportTest extends AndroidTestCase {
 
             }
 
-            public Disposable onRxExposure(Observable<TangramRxEvent> exposureEventObservable, TangramRxEvent rxEvent) {
-                return exposureEventObservable.subscribeOn(Schedulers.newThread()).subscribe(mCancellable);
+            @Override
+            public ObservableTransformer<TangramRxEvent, TangramRxEvent> getObservableTransformer(
+                TangramRxEvent rxEvent) {
+                return new ObservableTransformer<TangramRxEvent, TangramRxEvent>() {
+                    @Override
+                    public ObservableSource<TangramRxEvent> apply(Observable<TangramRxEvent> upstream) {
+                        return upstream.subscribeOn(Schedulers.newThread());
+                    }
+                };
+            }
+
+            @Override
+            public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+                RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
+
+                    @Override
+                    public void accept(TangramRxEvent tangramEvent) throws Exception {
+                        assertTrue(Looper.myLooper() != Looper.getMainLooper());
+                        assertEquals(tangramEvent.getView(), mView1);
+                        assertEquals(tangramEvent.getCell(), mBaseCell1);
+                        assertEquals(tangramEvent.getEventType(), 10);
+                        Log.d("RxExposureSupportTest", "testExpsoureTaskAsync  mEventType " + tangramEvent.getEventType());
+                        Log.d("RxExposureSupportTest",
+                            "testExpsoureTaskAsync  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
+                                .getName());
+                    }
+
+                    @Override
+                    public void cancel() throws Exception {
+                    }
+                };
+                return rxExposureCancellable;
             }
 
         };
         mServiceManager.register(ExposureSupport.class, exposureSupport);
 
-        ExposureCancellable exposureCancellable = new ExposureCancellable() {
-
-            @Override
-            public void accept(TangramRxEvent tangramEvent) throws Exception {
-                assertTrue(Looper.myLooper() != Looper.getMainLooper());
-                assertEquals(tangramEvent.getView(), mView1);
-                assertEquals(tangramEvent.getCell(), mBaseCell1);
-                assertEquals(tangramEvent.getEventType(), 10);
-                Log.d("RxExposureSupportTest", "testExpsoureTaskAsync  mEventType " + tangramEvent.getEventType());
-                Log.d("RxExposureSupportTest",
-                    "testExpsoureTaskAsync  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
-                        .getName());
-            }
-
-            @Override
-            public void cancel() throws Exception {
-                super.cancel();
-            }
-        };
-        exposureSupport.setRxExposureCancellable(exposureCancellable);
         mBaseCell1.exposure(mView1);
     }
 
@@ -181,41 +208,50 @@ public class RxExposureSupportTest extends AndroidTestCase {
 
             }
 
-            public Disposable onRxExposure(Observable<TangramRxEvent> exposureEventObservable, TangramRxEvent rxEvent) {
-                return exposureEventObservable.subscribeOn(Schedulers.newThread()).delay(500, TimeUnit.MILLISECONDS)
-                    .subscribe(mCancellable);
+            @Override
+            public ObservableTransformer<TangramRxEvent, TangramRxEvent> getObservableTransformer(
+                TangramRxEvent rxEvent) {
+                return new ObservableTransformer<TangramRxEvent, TangramRxEvent>() {
+                    @Override
+                    public ObservableSource<TangramRxEvent> apply(Observable<TangramRxEvent> upstream) {
+                        return upstream.subscribeOn(Schedulers.newThread());
+                    }
+                };
+            }
+
+            @Override
+            public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+                RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
+
+                    boolean cancel = false;
+
+                    @Override
+                    public void accept(TangramRxEvent tangramEvent) throws Exception {
+                        assertTrue(Looper.myLooper() != Looper.getMainLooper());
+                        //should not run here
+                        assertTrue(false);
+                        if (!cancel) {
+                            assertEquals(tangramEvent.getView(), mView1);
+                            assertEquals(tangramEvent.getCell(), mBaseCell1);
+                            assertEquals(tangramEvent.getEventType(), 10);
+                            Log.d("RxExposureSupportTest", "testExposureTaskAsyncThenCancelIt  mEventType " + tangramEvent.getEventType());
+                            Log.d("RxExposureSupportTest",
+                                "testExposureTaskAsyncThenCancelIt  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
+                                    .getName());
+                        }
+                    }
+
+                    @Override
+                    public void cancel() throws Exception {
+                        cancel = true;
+                    }
+                };
+                return rxExposureCancellable;
             }
 
         };
         mServiceManager.register(ExposureSupport.class, exposureSupport);
 
-        ExposureCancellable exposureCancellable = new ExposureCancellable() {
-
-            boolean cancel = false;
-
-            @Override
-            public void accept(TangramRxEvent tangramEvent) throws Exception {
-                assertTrue(Looper.myLooper() != Looper.getMainLooper());
-                //should not run here
-                assertTrue(false);
-                if (!cancel) {
-                    assertEquals(tangramEvent.getView(), mView1);
-                    assertEquals(tangramEvent.getCell(), mBaseCell1);
-                    assertEquals(tangramEvent.getEventType(), 10);
-                    Log.d("RxExposureSupportTest", "testExposureTaskAsyncThenCancelIt  mEventType " + tangramEvent.getEventType());
-                    Log.d("RxExposureSupportTest",
-                        "testExposureTaskAsyncThenCancelIt  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
-                            .getName());
-                }
-            }
-
-            @Override
-            public void cancel() throws Exception {
-                super.cancel();
-                cancel = true;
-            }
-        };
-        exposureSupport.setRxExposureCancellable(exposureCancellable);
         mBaseCell1.exposure(mView1);
         mBaseCell1.unexposure(mView1);
     }
