@@ -126,7 +126,24 @@ public class RxExposureSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testExpsoureTaskAsync() {
+        ExposureCancellable consumer1 = new ExposureCancellable() {
+            @Override
+            public void accept(TangramRxEvent tangramEvent) throws Exception {
+                assertEquals(tangramEvent.getView(), mView1);
+                assertEquals(tangramEvent.getCell(), mBaseCell1);
+                assertEquals(tangramEvent.getEventType(), 10);
+                Log.d("RxExposureSupportTest", "testOneCellExposure test One cell mEventType " + tangramEvent.getEventType());
+            }
 
+            @Override
+            public void cancel() throws Exception {
+                super.cancel();
+            }
+        };
+        mExposureSupport.setRxExposureCancellable(consumer1);
+        mBaseCell1.exposure(mView1);
+
+        mBaseCell1.unexposure();
     }
 
     @Test

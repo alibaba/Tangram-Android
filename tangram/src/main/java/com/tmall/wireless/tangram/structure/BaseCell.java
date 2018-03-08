@@ -402,38 +402,44 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         }
     }
 
-    private TangramRxEvent mRxClickEvent;
+    private ArrayMap<View, TangramRxEvent> mRxClickEvents = new ArrayMap<>();
 
-    private Disposable mClickDisposable;
+    private ArrayMap<View, Disposable> mClickDisposables = new ArrayMap<>();
 
-    private ViewClickObservable mViewClickObservable;
+    private ArrayMap<View, ViewClickObservable> mViewClickObservables = new ArrayMap<>();
 
     public void click(View view, TangramRxEvent tangramRxEvent) {
-        if (mViewClickObservable == null) {
-            mViewClickObservable = new ViewClickObservable(tangramRxEvent);
+        ViewClickObservable viewClickObservable = mViewClickObservables.get(view);
+        if (viewClickObservable == null) {
+            viewClickObservable = new ViewClickObservable(tangramRxEvent);
+            mViewClickObservables.put(view, viewClickObservable);
         } else {
-            mViewClickObservable.setTangramRxEvent(tangramRxEvent);
+            viewClickObservable.setTangramRxEvent(tangramRxEvent);
         }
         if (serviceManager != null) {
             final SimpleClickSupport service = serviceManager.getService(SimpleClickSupport.class);
             if (service != null) {
-                mClickDisposable = service.onRxClick(mViewClickObservable, tangramRxEvent);
+                Disposable clickDisposable = service.onRxClick(viewClickObservable, tangramRxEvent);
+                mClickDisposables.put(view, clickDisposable);
             }
         }
     }
 
     public void click(View view) {
+        TangramRxEvent mRxClickEvent = mRxClickEvents.get(view);
         if (mRxClickEvent == null) {
             mRxClickEvent = new TangramRxEvent(view, this, this.pos);
+            mRxClickEvents.put(view, mRxClickEvent);
         } else {
             mRxClickEvent.update(view, this, this.pos);
         }
         click(view, mRxClickEvent);
     }
 
-    public void unclick() {
-        if (mClickDisposable != null) {
-            mClickDisposable.dispose();
+    public void unclick(View view) {
+        Disposable clickDisposable = mClickDisposables.get(view);
+        if (clickDisposable != null) {
+            clickDisposable.dispose();
         }
     }
 
