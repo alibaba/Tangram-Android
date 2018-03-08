@@ -129,38 +129,5 @@ public class HandlerTimer implements Runnable, ITimer {
         return mStatus;
     }
 
-    /**
-     * Timer status
-     */
-    public enum TimerStatus {
 
-        Waiting(0, "Wating"),
-        Running(1, "Running"),
-        Paused(-1, "Paused"),
-        Stopped(-2, "Stopped");
-
-        private int code;
-        private String desc;
-
-        private TimerStatus(int code, String desc) {
-            this.code = code;
-            this.desc = desc;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public void setCode(int code) {
-            this.code = code;
-        }
-
-        public String getDesc() {
-            return desc;
-        }
-
-        public void setDesc(String desc) {
-            this.desc = desc;
-        }
-    }
 }

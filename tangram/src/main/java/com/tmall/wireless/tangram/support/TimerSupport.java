@@ -25,25 +25,28 @@
 package com.tmall.wireless.tangram.support;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
+import com.tmall.wireless.tangram.support.ITimer.TimerStatus;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by villadora on 15/9/8.
  */
-public class TimerSupport implements Runnable {
+public class TimerSupport {
 
     private static final int MILLISECOND = 1000;
 
-    private Map<OnTickListener, IntervalTickListener> mListeners = new HashMap<>();
-
-    private List<IntervalTickListener> mCopyListeners = new ArrayList<IntervalTickListener>();
-
-    private HandlerTimer mDefaultTimer = new HandlerTimer(MILLISECOND, this);
+    private ReactiveTimer mDefaultTimer = new ReactiveTimer(MILLISECOND);
 
     public void register(int interval, @NonNull OnTickListener onTickListener) {
         register(interval, onTickListener, false);
@@ -57,8 +60,7 @@ public class TimerSupport implements Runnable {
      * @param intermediate   whether execute onTick intermediately
      */
     public void register(int interval, @NonNull OnTickListener onTickListener, boolean intermediate) {
-        mListeners.put(onTickListener, new IntervalTickListener(interval, onTickListener, intermediate));
-        mDefaultTimer.start(false);
+        mDefaultTimer.register(interval, onTickListener, intermediate);
     }
 
     /**
@@ -66,7 +68,7 @@ public class TimerSupport implements Runnable {
      * @param onTickListener
      */
     public void unregister(@NonNull OnTickListener onTickListener) {
-        mListeners.remove(onTickListener);
+        mDefaultTimer.unregister(onTickListener);
     }
 
     /**
@@ -94,24 +96,11 @@ public class TimerSupport implements Runnable {
      * clear timer listener and stop timer
      */
     public void clear() {
-        mListeners.clear();
         mDefaultTimer.stop();
     }
 
     public boolean isRegistered(@NonNull OnTickListener onTickListener) {
-        return mListeners.containsKey(onTickListener);
-    }
-
-    public void run() {
-        mCopyListeners.clear();
-        mCopyListeners.addAll(mListeners.values());
-        for (int i = 0, size = mCopyListeners.size(); i < size; i++) {
-            IntervalTickListener listener = mCopyListeners.get(i);
-            listener.onTick();
-        }
-        if (mListeners.isEmpty()) {
-            mDefaultTimer.stop();
-        }
+        return mDefaultTimer.isRegistered(onTickListener);
     }
 
 
@@ -122,30 +111,25 @@ public class TimerSupport implements Runnable {
         void onTick();
     }
 
-    static final class IntervalTickListener {
-        private int interval;
-        private int count;
-
-        private OnTickListener mListener;
-
-        IntervalTickListener(int interval, @NonNull OnTickListener onTickListener, boolean intermediate) {
-            this.interval = interval;
-            this.count = 0;
-            this.mListener = onTickListener;
-
-            if (intermediate) {
-                onTickListener.onTick();
-            }
-        }
-
-        void onTick() {
-            count = (count + 1) % interval;
-            if (count == 0) {
-                if (mListener != null) {
-                    mListener.onTick();
-                }
-            }
-        }
-
+    /**
+     * return tick observable for each user, user should handle the observable with cell's lifecycle
+     * @param interval timer interval, in TimeUnit.SECOND
+     * @param intermediate true, get event immediately
+     * @return
+     */
+    public Observable<Long> getTickObservable(int interval, boolean intermediate) {
+        return Observable.interval(intermediate ? 0 : interval, interval, TimeUnit.SECONDS);
     }
+
+    /**
+     * return tick observable for each user, user should handle the observable with cell's lifecycle
+     * @param interval timer interval, in TimeUnit.SECOND
+     * @param total total event count
+     * @param intermediate true, get event immediately
+     * @return
+     */
+    public Observable<Long> getTickObservable(int interval, int total, boolean intermediate) {
+        return Observable.intervalRange(0, total, intermediate ? 0 : interval, interval, TimeUnit.SECONDS);
+    }
+
 }
