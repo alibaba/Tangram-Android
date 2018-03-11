@@ -223,6 +223,7 @@ public class BannerEntityCard extends BannerCell {
                 }
             }
         }
+        height = style.height;
         if (data != null) {
             setIndicatorRadius(Style.parseSize(data.optString(BannerCard.ATTR_INDICATOR_RADIUS), 0));
             setIndicatorColor(Style.parseColor(data.optString(BannerCard.ATTR_INDICATOR_COLOR, "#00000000")));

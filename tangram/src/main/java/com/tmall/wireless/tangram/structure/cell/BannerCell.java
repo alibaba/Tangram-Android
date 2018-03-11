@@ -25,6 +25,7 @@
 package com.tmall.wireless.tangram.structure.cell;
 
 import com.alibaba.android.vlayout.RecyclablePagerAdapter;
+import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 
 import android.util.SparseIntArray;
 import com.tmall.ultraviewpager.UltraViewPagerAdapter;
@@ -66,6 +67,7 @@ public class BannerCell extends BaseCell {
     public int hGap;
     public int[] itemMargin = new int[2];
     public int[] margin = new int[4];
+    public int height = LayoutParams.WRAP_CONTENT;
     public double itemRatio;
 
     public UltraViewPagerAdapter mBannerWrapper;
@@ -188,6 +190,10 @@ public class BannerCell extends BaseCell {
 
     public void setRatio(float ratio) {
         this.mRatio = ratio;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public void setBgColor(int bgColor) {
