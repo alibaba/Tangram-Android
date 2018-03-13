@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
-import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -41,7 +40,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.util.SparseIntArray;
 import android.view.Gravity;
@@ -105,7 +103,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     private boolean init;
 
-    private int direction; // 1 for right, -1 for left
+    private int direction; // > 0 for right, < 0 for left
 
     private TimerHandler timer;
 
@@ -633,8 +631,22 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (timer != null) {
+            final int action = ev.getAction();
+            if (action == MotionEvent.ACTION_DOWN) {
+                stopTimer();
+            }
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                startTimer();
+                direction = 1;
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
 
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
         int action = ev.getAction();
         float x = ev.getRawX();
         float y = ev.getRawY();
@@ -657,7 +669,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                direction = 0;
+                direction = 1;
                 break;
             default:
                 break;
