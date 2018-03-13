@@ -13,14 +13,20 @@ import io.reactivex.Observer;
 
 public class BannerSelectedObservable extends Observable<Integer> {
 
-    private final BannerViewPager mBannerViewPager;
+    private BannerViewPager mBannerViewPager;
 
     public BannerSelectedObservable(BannerViewPager bannerViewPager) {
         mBannerViewPager = bannerViewPager;
     }
 
+    public void setBannerViewPager(BannerViewPager bannerViewPager) {
+        mBannerViewPager = bannerViewPager;
+    }
+
     @Override
     protected void subscribeActual(Observer<? super Integer> observer) {
-
+        RxBannerSelectedListener listener = new RxBannerSelectedListener(mBannerViewPager, observer);
+        observer.onSubscribe(listener);
+        mBannerViewPager.addOnPageChangeListener(listener);
     }
 }

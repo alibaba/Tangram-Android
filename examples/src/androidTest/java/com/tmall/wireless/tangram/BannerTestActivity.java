@@ -1,71 +1,19 @@
-/*
- * MIT License
- *
- * Copyright (c) 2017 Alibaba Group
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+package com.tmall.wireless.tangram;
 
-package com.tmall.wireless.tangram.example;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alibaba.android.vlayout.Range;
-
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import com.libra.Utils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Picasso.LoadedFrom;
-import com.squareup.picasso.RequestCreator;
-import com.squareup.picasso.Target;
-import com.tmall.wireless.tangram.TangramBuilder;
-import com.tmall.wireless.tangram.TangramEngine;
-import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
-import com.tmall.wireless.tangram.dataparser.concrete.Card;
-import com.tmall.wireless.tangram.example.data.RatioTextView;
-import com.tmall.wireless.tangram.example.data.SimpleImgView;
-import com.tmall.wireless.tangram.example.data.SingleImageView;
-import com.tmall.wireless.tangram.example.data.TestView;
-import com.tmall.wireless.tangram.example.data.TestViewHolder;
-import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
-import com.tmall.wireless.tangram.example.data.VVTEST;
-import com.tmall.wireless.tangram.example.support.SampleBannerSupport;
-import com.tmall.wireless.tangram.example.support.SampleClickSupport;
-import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
-import com.tmall.wireless.tangram.support.BannerSupport;
-import com.tmall.wireless.tangram.support.async.AsyncLoader;
-import com.tmall.wireless.tangram.support.async.AsyncPageLoader;
-import com.tmall.wireless.tangram.support.async.CardLoadSupport;
-import com.tmall.wireless.tangram.util.IInnerImageSetter;
-
-import com.tmall.wireless.vaf.framework.VafContext;
-import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter;
-import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
-import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -76,20 +24,44 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.libra.Utils;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Picasso.LoadedFrom;
+import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Target;
+import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
+import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.example.R;
+import com.tmall.wireless.tangram.example.data.RatioTextView;
+import com.tmall.wireless.tangram.example.data.SimpleImgView;
+import com.tmall.wireless.tangram.example.data.SingleImageView;
+import com.tmall.wireless.tangram.example.data.TestView;
+import com.tmall.wireless.tangram.example.data.TestViewHolder;
+import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
+import com.tmall.wireless.tangram.example.data.VVTEST;
+import com.tmall.wireless.tangram.example.support.SampleClickSupport;
+import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
+import com.tmall.wireless.tangram.support.async.AsyncLoader;
+import com.tmall.wireless.tangram.support.async.AsyncPageLoader;
+import com.tmall.wireless.tangram.support.async.CardLoadSupport;
+import com.tmall.wireless.tangram.util.IInnerImageSetter;
+import com.tmall.wireless.vaf.framework.VafContext;
+import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter;
+import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
+import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
- * Created by villadora on 15/8/18.
+ * Created by longerian on 2018/3/13.
+ *
+ * @author longerian
+ * @date 2018/03/13
  */
-public class TangramActivity extends Activity {
 
-    private static final String TAG = TangramActivity.class.getSimpleName();
+public class BannerTestActivity extends Activity {
 
     private Handler mMainHandler;
     TangramEngine engine;
@@ -149,8 +121,8 @@ public class TangramActivity extends Activity {
         TangramBuilder.init(this, new IInnerImageSetter() {
             @Override
             public <IMAGE extends ImageView> void doLoadImageUrl(@NonNull IMAGE view,
-                    @Nullable String url) {
-                Picasso.with(TangramActivity.this).load(url).into(view);
+                @Nullable String url) {
+                Picasso.with(BannerTestActivity.this).load(url).into(view);
             }
         }, ImageView.class);
 
@@ -166,8 +138,8 @@ public class TangramActivity extends Activity {
         builder.registerCell(2, SimpleImgView.class);
         builder.registerCell(4, RatioTextView.class);
         builder.registerCell(110,
-                TestViewHolderCell.class,
-                new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TextView.class));
+            TestViewHolderCell.class,
+            new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TextView.class));
         builder.registerCell(199,SingleImageView.class);
         builder.registerVirtualView("vvtest");
         //Step 4: new engine
@@ -179,8 +151,8 @@ public class TangramActivity extends Activity {
 
             @Override
             public void bindImage(String uri, final ImageBase imageBase, int reqWidth, int reqHeight) {
-                RequestCreator requestCreator = Picasso.with(TangramActivity.this).load(uri);
-                Log.d("TangramActivity", "bindImage request width height " + reqHeight + " " + reqWidth);
+                RequestCreator requestCreator = Picasso.with(BannerTestActivity.this).load(uri);
+                Log.d("BannerTestActivity", "bindImage request width height " + reqHeight + " " + reqWidth);
                 if (reqHeight > 0 || reqWidth > 0) {
                     requestCreator.resize(reqWidth, reqHeight);
                 }
@@ -191,8 +163,8 @@ public class TangramActivity extends Activity {
 
             @Override
             public void getBitmap(String uri, int reqWidth, int reqHeight, final Listener lis) {
-                RequestCreator requestCreator = Picasso.with(TangramActivity.this).load(uri);
-                Log.d("TangramActivity", "getBitmap request width height " + reqHeight + " " + reqWidth);
+                RequestCreator requestCreator = Picasso.with(BannerTestActivity.this).load(uri);
+                Log.d("BannerTestActivity", "getBitmap request width height " + reqHeight + " " + reqWidth);
                 if (reqHeight > 0 || reqWidth > 0) {
                     requestCreator.resize(reqWidth, reqHeight);
                 }
@@ -205,80 +177,79 @@ public class TangramActivity extends Activity {
 
         //Step 5: add card load support if you have card that loading cells async
         engine.addCardLoadSupport(new CardLoadSupport(
-                new AsyncLoader() {
-                    @Override
-                    public void loadData(Card card, @NonNull final LoadedCallback callback) {
-                        Log.w("Load Card", card.load);
+            new AsyncLoader() {
+                @Override
+                public void loadData(Card card, @NonNull final LoadedCallback callback) {
+                    Log.w("Load Card", card.load);
 
-                        mMainHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                // do loading
-                                JSONArray cells = new JSONArray();
+                    mMainHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // do loading
+                            JSONArray cells = new JSONArray();
 
-                                for (int i = 0; i < 10; i++) {
-                                    try {
-                                        JSONObject obj = new JSONObject();
-                                        obj.put("type", 1);
-                                        obj.put("msg", "async loaded");
-                                        JSONObject style = new JSONObject();
-                                        style.put("bgColor", "#FF1111");
-                                        obj.put("style", style.toString());
-                                        cells.put(obj);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                            for (int i = 0; i < 10; i++) {
+                                try {
+                                    JSONObject obj = new JSONObject();
+                                    obj.put("type", 1);
+                                    obj.put("msg", "async loaded");
+                                    JSONObject style = new JSONObject();
+                                    style.put("bgColor", "#FF1111");
+                                    obj.put("style", style.toString());
+                                    cells.put(obj);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-
-                                // callback.fail(false);
-                                callback.finish(engine.parseComponent(cells));
                             }
-                        }, 200);
-                    }
-                },
 
-                new AsyncPageLoader() {
-                    @Override
-                    public void loadData(final int page, @NonNull final Card card, @NonNull final LoadedCallback callback) {
-                        mMainHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.w("Load page", card.load + " page " + page);
-                                JSONArray cells = new JSONArray();
-                                for (int i = 0; i < 9; i++) {
-                                    try {
-                                        JSONObject obj = new JSONObject();
-                                        obj.put("type", 1);
-                                        obj.put("msg", "async page loaded, params: " + card.getParams().toString());
-                                        cells.put(obj);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                            // callback.fail(false);
+                            callback.finish(engine.parseComponent(cells));
+                        }
+                    }, 200);
+                }
+            },
+
+            new AsyncPageLoader() {
+                @Override
+                public void loadData(final int page, @NonNull final Card card, @NonNull final LoadedCallback callback) {
+                    mMainHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.w("Load page", card.load + " page " + page);
+                            JSONArray cells = new JSONArray();
+                            for (int i = 0; i < 9; i++) {
+                                try {
+                                    JSONObject obj = new JSONObject();
+                                    obj.put("type", 1);
+                                    obj.put("msg", "async page loaded, params: " + card.getParams().toString());
+                                    cells.put(obj);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                                List<BaseCell> cs = engine.parseComponent(cells);
-
-                                if (card.page == 1) {
-                                    GroupBasicAdapter<Card, ?> adapter = engine.getGroupBasicAdapter();
-
-                                    card.setCells(cs);
-                                    adapter.refreshWithoutNotify();
-                                    Range<Integer> range = adapter.getCardRange(card);
-
-                                    adapter.notifyItemRemoved(range.getLower());
-                                    adapter.notifyItemRangeInserted(range.getLower(), cs.size());
-
-                                } else
-                                    card.addCells(cs);
-
-                                //mock load 6 pages
-                                callback.finish(card.page != 6);
-                                card.notifyDataChange();
                             }
-                        }, 400);
-                    }
-                }));
+                            List<BaseCell> cs = engine.parseComponent(cells);
+
+                            if (card.page == 1) {
+                                GroupBasicAdapter<Card, ?> adapter = engine.getGroupBasicAdapter();
+
+                                card.setCells(cs);
+                                adapter.refreshWithoutNotify();
+                                Range<Integer> range = adapter.getCardRange(card);
+
+                                adapter.notifyItemRemoved(range.getLower());
+                                adapter.notifyItemRangeInserted(range.getLower(), cs.size());
+
+                            } else
+                                card.addCells(cs);
+
+                            //mock load 6 pages
+                            callback.finish(card.page != 6);
+                            card.notifyDataChange();
+                        }
+                    }, 400);
+                }
+            }));
         engine.addSimpleClickSupport(new SampleClickSupport());
-        engine.register(BannerSupport.class, new SampleBannerSupport());
 
         //Step 6: enable auto load more if your page's data is lazy loaded
         engine.enableAutoLoadMore(true);
@@ -299,7 +270,7 @@ public class TangramActivity extends Activity {
         engine.getLayoutManager().setFixOffset(0, 40, 0, 0);
 
         //Step 10: get tangram data and pass it to engine
-        String json = new String(getAssertsFile(this, "data.json"));
+        String json = new String(getAssertsFile(this, "testdata.json"));
         JSONArray data = null;
         try {
             data = new JSONArray(json);

@@ -61,6 +61,7 @@ import com.tmall.wireless.tangram.ext.BannerListener;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.cell.BannerCell;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
+import com.tmall.wireless.tangram.support.BannerSelectedObservable;
 import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Utils;
@@ -325,12 +326,15 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (cell.serviceManager != null) {
             bannerSupport = cell.serviceManager.getService(BannerSupport.class);
         }
+        bannerCell.observeBannerSelected(mUltraViewPager);
     }
 
     @Override
     public void postUnBindView(BaseCell cell) {
         recycleView();
         getContext().unregisterReceiver(mScreenBroadcastReceiver);
+        BannerCell bannerCell = (BannerCell) cell;
+        bannerCell.disposeBannerSelected();
     }
 
     @Override

@@ -25,7 +25,7 @@ public class RxBannerSelectedListener extends RxBannerListener<Integer> {
     @Override
     public void onPageSelected(int position) {
         if (!isDisposed()) {
-            mObserver.onNext(position);
+            mObserver.onNext(mBannerViewPager.getCurrentItem());
         }
     }
 

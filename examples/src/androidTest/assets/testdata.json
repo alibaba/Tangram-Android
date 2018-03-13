@@ -1,0 +1,111 @@
+[
+  {
+    "type": "container-oneColumn",
+    "items": [
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "标题1",
+        "type": "vvtest"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "标题2",
+        "type": "vvtest"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "标题3",
+        "type": "vvtest"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "标题4",
+        "type": "vvtest"
+      }
+    ]
+  },
+  {
+    "id": "banner1",
+    "type": 1,
+    "style": {
+      "aspectRatio": 3.223
+    },
+    "items": [
+      {
+        "bizId":"item1",
+        "type": 110,
+        "msg": "info1"
+      },
+      {
+        "bizId":"item2",
+        "type": 110,
+        "msg": "info2"
+      }
+    ]
+  },
+  {
+    "type": "container-oneColumn",
+    "items": [
+      {
+        "type": "container-banner",
+        "style": {
+          "indicatorMargin": "5",
+          "infinite": "true",
+          "indicatorImg2": "https://img.alicdn.com/tps/TB1XRNFNXXXXXXKXXXXXXXXXXXX-32-4.png",
+          "indicatorImg1": "https://img.alicdn.com/tps/TB16i4qNXXXXXbBXFXXXXXXXXXX-32-4.png",
+          "scrollMarginLeft": "10",
+          "indicatorGap": "2",
+          "indicatorHeight": "1.5",
+          "itemRatio": "2.654",
+          "scrollMarginRight": "10",
+          "autoScroll": "5000",
+          "indicatorGravity": "center",
+          "hGap": "20",
+          "height": 200
+        },
+        "items": [
+          {
+            "type": 1,
+            "msg": "info1",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info2",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info3",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info4",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info5",
+            "style": {
+            }
+          },
+          {
+            "type": 1,
+            "msg": "info6",
+            "style": {
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
