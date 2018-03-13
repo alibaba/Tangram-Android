@@ -219,6 +219,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     @Override
     public void onPageSelected(int position) {
+        direction = 1;
         currentItemPos = mUltraViewPager.getCurrentItem();
         mIndicator.setCurrItem(currentItemPos);
 
@@ -639,7 +640,6 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
             }
             if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
                 startTimer();
-                direction = 1;
             }
         }
         return super.dispatchTouchEvent(ev);
