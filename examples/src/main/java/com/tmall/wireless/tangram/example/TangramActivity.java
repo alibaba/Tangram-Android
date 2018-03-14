@@ -331,6 +331,39 @@ public class TangramActivity extends Activity {
         engine.getLayoutManager().setFixOffset(0, 40, 0, 0);
 
         //Step 10: get tangram data and pass it to engine
+        // method 1, use simple consumer api
+        //Observable.fromCallable(new Callable<byte[]>() {
+        //    @Override
+        //    public byte[] call() throws Exception {
+        //        Log.d("TangramActivity", "call asset in thread " + Thread.currentThread().getName());
+        //
+        //        return getAssertsFile(getApplicationContext(), "data.json");
+        //    }
+        //}).subscribeOn(Schedulers.io())
+        //    .observeOn(Schedulers.computation())
+        //    .map(new Function<byte[], String>() {
+        //    @Override
+        //    public String apply(byte[] bytes) throws Exception {
+        //        Log.d("TangramActivity", "to string in thread " + Thread.currentThread().getName());
+        //
+        //        return new String(bytes);
+        //    }
+        //}).map(new Function<String, JSONArray>() {
+        //    @Override
+        //    public JSONArray apply(String s) throws Exception {
+        //        Log.d("TangramActivity", "to json in thread " + Thread.currentThread().getName());
+        //        return new JSONArray(s);
+        //    }
+        //}).observeOn(AndroidSchedulers.mainThread())
+        //    .doOnSubscribe(new Consumer<Disposable>() {
+        //        @Override
+        //        public void accept(Disposable disposable) throws Exception {
+        //            Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
+        //        }
+        //    })
+        //    .subscribe(engine.consumeOriginal());
+
+        // method 2, use transformer api
         Observable.fromCallable(new Callable<byte[]>() {
             @Override
             public byte[] call() throws Exception {
@@ -339,27 +372,27 @@ public class TangramActivity extends Activity {
                 return getAssertsFile(getApplicationContext(), "data.json");
             }
         }).map(new Function<byte[], String>() {
-            @Override
-            public String apply(byte[] bytes) throws Exception {
-                Log.d("TangramActivity", "to string in thread " + Thread.currentThread().getName());
+                @Override
+                public String apply(byte[] bytes) throws Exception {
+                    Log.d("TangramActivity", "to string in thread " + Thread.currentThread().getName());
 
-                return new String(bytes);
-            }
-        }).map(new Function<String, JSONArray>() {
+                    return new String(bytes);
+                }
+            }).map(new Function<String, JSONArray>() {
             @Override
             public JSONArray apply(String s) throws Exception {
                 Log.d("TangramActivity", "to json in thread " + Thread.currentThread().getName());
                 return new JSONArray(s);
             }
         }).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe(new Consumer<Disposable>() {
-                @Override
-                public void accept(Disposable disposable) throws Exception {
-                    Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
-                }
-            })
-            .subscribe(engine.consumeOriginal());
+        .compose(engine.getDataTransformer())
+        .doOnSubscribe(new Consumer<Disposable>() {
+            @Override
+            public void accept(Disposable disposable) throws Exception {
+                Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
+            }
+        })
+        .subscribe(engine.consumeParsed());
 
         findViewById(R.id.first).setOnClickListener(new View.OnClickListener() {
             @Override

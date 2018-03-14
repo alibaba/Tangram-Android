@@ -59,7 +59,13 @@ import com.tmall.wireless.tangram.util.Preconditions;
 import com.tmall.wireless.tangram.util.Predicate;
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.framework.ViewManager;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -342,8 +348,25 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
+     * @return An ObservableTransformer help to transformer original data to parsed data.
+     */
+    public ObservableTransformer<T, List<C>> getDataTransformer() {
+        return new ObservableTransformer<T, List<C>>() {
+            @Override
+            public ObservableSource<List<C>> apply(Observable<T> upstream) {
+                return upstream.observeOn(Schedulers.computation()).map(new Function<T, List<C>>() {
+                    @Override
+                    public List<C> apply(T t) throws Exception {
+                        return mDataParser.parseGroup(t, BaseTangramEngine.this);
+                    }
+                }).observeOn(AndroidSchedulers.mainThread());
+            }
+        };
+    }
+
+    /**
      * Make engine as a consumer to accept origin data from user
-     * @return
+     * @return A consumer will call {@link BaseTangramEngine#setData(Object)}
      */
     public Consumer<T> consumeOriginal() {
         return new Consumer<T>() {
@@ -356,7 +379,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
 
     /**
      * Make engine as a consumer to accept parsed data from user
-     * @return
+     * @return A consumer will call {@link BaseTangramEngine#setData(List)}
      */
     public Consumer<List<C>> consumeParsed() {
         return new Consumer<List<C>>() {
