@@ -144,7 +144,7 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
 
         final int size = data.length();
         final List<BaseCell> result = new ArrayList<>(size);
-        //解析 body 组件
+        //parse body
         JSONArray componentArray = data;
         if (componentArray != null) {
             final int cellLength = componentArray.length();

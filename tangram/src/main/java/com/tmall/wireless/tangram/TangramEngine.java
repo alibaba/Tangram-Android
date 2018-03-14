@@ -488,7 +488,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
 
     /**
-     * A high performance method to insert cells. TODO handle nested card
+     * A high performance method to insert cells. Do not allowed to insert to an empty Tangram. TODO handle nested card
      * @param insertPosition the position to be inserted
      * @param list new cell data list
      * @since 2.1.0
