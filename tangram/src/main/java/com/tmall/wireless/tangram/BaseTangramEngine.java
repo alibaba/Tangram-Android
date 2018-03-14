@@ -368,7 +368,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
      * Make engine as a consumer to accept origin data from user
      * @return A consumer will call {@link BaseTangramEngine#setData(Object)}
      */
-    public Consumer<T> consumeOriginal() {
+    public Consumer<T> asOriginalDataConsume() {
         return new Consumer<T>() {
             @Override
             public void accept(T t) throws Exception {
@@ -381,7 +381,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
      * Make engine as a consumer to accept parsed data from user
      * @return A consumer will call {@link BaseTangramEngine#setData(List)}
      */
-    public Consumer<List<C>> consumeParsed() {
+    public Consumer<List<C>> asParsedDataConsume() {
         return new Consumer<List<C>>() {
             @Override
             public void accept(List<C> cs) throws Exception {

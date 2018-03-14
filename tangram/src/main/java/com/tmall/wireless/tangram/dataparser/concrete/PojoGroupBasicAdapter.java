@@ -27,6 +27,8 @@ package com.tmall.wireless.tangram.dataparser.concrete;
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+
+import android.util.Log;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
@@ -532,7 +534,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 }
             } else {
                 newCards.addAll(mCards);
-                lastEnd = mCards.get(mCards.size() - 1).first.getUpper();
+                lastEnd = mCards.size() > 0 ? mCards.get(mCards.size() - 1).first.getUpper() : 0;
                 insertPosition = lastEnd;
                 for (int j = 0, gs = group.size(); j < gs; j++) {
                     Card newGroup = group.get(j);

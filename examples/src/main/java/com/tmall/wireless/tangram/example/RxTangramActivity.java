@@ -79,6 +79,9 @@ import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
 import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -356,38 +359,65 @@ public class RxTangramActivity extends Activity {
         //            Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
         //        }
         //    })
-        //    .subscribe(engine.consumeOriginal());
+        //    .subscribe(engine.asOriginalDataConsume());
 
         // method 2, use transformer api
-        Observable.fromCallable(new Callable<byte[]>() {
+        //Observable.fromCallable(new Callable<byte[]>() {
+        //    @Override
+        //    public byte[] call() throws Exception {
+        //        Log.d("TangramActivity", "call asset in thread " + Thread.currentThread().getName());
+        //
+        //        return getAssertsFile(getApplicationContext(), "data.json");
+        //    }
+        //}).map(new Function<byte[], String>() {
+        //    @Override
+        //    public String apply(byte[] bytes) throws Exception {
+        //        Log.d("TangramActivity", "to string in thread " + Thread.currentThread().getName());
+        //
+        //        return new String(bytes);
+        //    }
+        //}).map(new Function<String, JSONArray>() {
+        //    @Override
+        //    public JSONArray apply(String s) throws Exception {
+        //        Log.d("TangramActivity", "to json in thread " + Thread.currentThread().getName());
+        //        return new JSONArray(s);
+        //    }
+        //}).subscribeOn(Schedulers.io())
+        //    .compose(engine.getDataTransformer())
+        //    .doOnSubscribe(new Consumer<Disposable>() {
+        //        @Override
+        //        public void accept(Disposable disposable) throws Exception {
+        //            Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
+        //        }
+        //    })
+        //    .subscribe(engine.asParsedDataConsume());
+        // mock
+        Observable.create(new ObservableOnSubscribe<Card>() {
             @Override
-            public byte[] call() throws Exception {
-                Log.d("TangramActivity", "call asset in thread " + Thread.currentThread().getName());
-
-                return getAssertsFile(getApplicationContext(), "data.json");
-            }
-        }).map(new Function<byte[], String>() {
-            @Override
-            public String apply(byte[] bytes) throws Exception {
-                Log.d("TangramActivity", "to string in thread " + Thread.currentThread().getName());
-
-                return new String(bytes);
-            }
-        }).map(new Function<String, JSONArray>() {
-            @Override
-            public JSONArray apply(String s) throws Exception {
-                Log.d("TangramActivity", "to json in thread " + Thread.currentThread().getName());
-                return new JSONArray(s);
+            public void subscribe(ObservableEmitter<Card> emitter) throws Exception {
+                Log.d("TangramActivity", "subscribe in thread " + Thread.currentThread().getName());
+                String json = new String(getAssertsFile(getApplicationContext(), "data.json"));
+                JSONArray data = null;
+                try {
+                    data = new JSONArray(json);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                List<Card> cards = engine.parseData(data);
+                for (int i = 0, size = cards.size(); i < size; i++) {
+                    emitter.onNext(cards.get(i));
+                    Log.d("TangramActivity", "emitter " + i);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                emitter.onComplete();
             }
         }).subscribeOn(Schedulers.io())
-            .compose(engine.getDataTransformer())
-            .doOnSubscribe(new Consumer<Disposable>() {
-                @Override
-                public void accept(Disposable disposable) throws Exception {
-                    Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
-                }
-            })
-            .subscribe(engine.consumeParsed());
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(engine.asAppendConsumer());
 
         findViewById(R.id.first).setOnClickListener(new View.OnClickListener() {
             @Override

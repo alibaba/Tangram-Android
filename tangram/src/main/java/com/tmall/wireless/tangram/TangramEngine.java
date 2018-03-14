@@ -51,6 +51,7 @@ import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.Predicate;
+import io.reactivex.functions.Consumer;
 import org.json.JSONArray;
 
 /**
@@ -556,8 +557,16 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
+     * @param group new group to be append at tail.
+     * @since 3.0.0
+     */
+    public void appendWith(Card group) {
+        appendBatchWith(Arrays.asList(group));
+    }
+
+    /**
      * NOTE new API, use this to replace {@link BaseTangramEngine#appendData(List)} and {@link BaseTangramEngine#appendData(Object)}
-     * @param groups new group to be append at tail.
+     * @param groups new groups to be append at tail.
      * @since 2.1.0
      */
     public void appendBatchWith(List<Card> groups) {
@@ -760,5 +769,30 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         }
     }
 
+    /**
+     * Make engine as a consumer to accept data to append at the end of list
+     * @return
+     */
+    public Consumer<List<Card>> asBatchAppendConsumer() {
+        return new Consumer<List<Card>>() {
+            @Override
+            public void accept(List<Card> cards) throws Exception {
+                appendBatchWith(cards);
+            }
+        };
+    }
+
+    /**
+     * Make engine as a consumer to accept data to append at the end of list
+     * @return
+     */
+    public Consumer<Card> asAppendConsumer() {
+        return new Consumer<Card>() {
+            @Override
+            public void accept(Card card) throws Exception {
+                appendWith(card);
+            }
+        };
+    }
 
 }
