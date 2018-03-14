@@ -59,6 +59,7 @@ import com.tmall.wireless.tangram.util.Preconditions;
 import com.tmall.wireless.tangram.util.Predicate;
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.framework.ViewManager;
+import io.reactivex.functions.Consumer;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -277,17 +278,6 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
         }
     }
 
-    /**
-     * Set original data list with type {@link T} in Tangram.
-     * @param data Original data with type {@link T}.
-     */
-    public void setData(@Nullable T data) {
-        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
-
-        List<C> cards = mDataParser.parseGroup(data, this);
-        this.setData(cards);
-    }
-
     public boolean isFullScreen() {
         mLayoutManager.findLastVisibleItemPosition();
         return false;
@@ -329,6 +319,17 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
+     * Set original data list with type {@link T} in Tangram.
+     * @param data Original data with type {@link T}.
+     */
+    public void setData(@Nullable T data) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+
+        List<C> cards = mDataParser.parseGroup(data, this);
+        this.setData(cards);
+    }
+
+    /**
      * Set parsed data list with type {@link C} in Tangram
      * @param data Parsed data list.
      */
@@ -338,6 +339,32 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
         if (mvHelper != null)
             mvHelper.reset();
         this.mGroupBasicAdapter.setData(data);
+    }
+
+    /**
+     * Make engine as a consumer to accept origin data from user
+     * @return
+     */
+    public Consumer<T> consumeOriginal() {
+        return new Consumer<T>() {
+            @Override
+            public void accept(T t) throws Exception {
+                setData(t);
+            }
+        };
+    }
+
+    /**
+     * Make engine as a consumer to accept parsed data from user
+     * @return
+     */
+    public Consumer<List<C>> consumeParsed() {
+        return new Consumer<List<C>>() {
+            @Override
+            public void accept(List<C> cs) throws Exception {
+                setData(cs);
+            }
+        };
     }
 
     /**

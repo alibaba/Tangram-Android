@@ -58,8 +58,13 @@ import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
 import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,7 +89,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.Callable;
 
 /**
  * Created by villadora on 15/8/18.
@@ -285,26 +290,26 @@ public class TangramActivity extends Activity {
         Disposable ob1 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
-                Log.d("Longer", "1 selected " + integer);
+                Log.d("TangramActivity", "1 selected " + integer);
             }
         });
         Disposable ob2 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
-                Log.d("Longer", "2 selected " + integer);
+                Log.d("TangramActivity", "2 selected " + integer);
             }
         });
 
         bannerSupport.observeScrollStateChanged("banner2").subscribe(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
-                Log.d("Longer", "state changed " + integer);
+                Log.d("TangramActivity", "state changed " + integer);
             }
         });
         bannerSupport.observeScrolled("banner2").subscribe(new Consumer<ScrollEvent>() {
             @Override
             public void accept(ScrollEvent scrollEvent) throws Exception {
-                Log.d("Longer", "scrolled " + scrollEvent.toString());
+                Log.d("TangramActivity", "scrolled " + scrollEvent.toString());
             }
         });
         //Step 6: enable auto load more if your page's data is lazy loaded
@@ -326,14 +331,35 @@ public class TangramActivity extends Activity {
         engine.getLayoutManager().setFixOffset(0, 40, 0, 0);
 
         //Step 10: get tangram data and pass it to engine
-        String json = new String(getAssertsFile(this, "data.json"));
-        JSONArray data = null;
-        try {
-            data = new JSONArray(json);
-            engine.setData(data);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Observable.fromCallable(new Callable<byte[]>() {
+            @Override
+            public byte[] call() throws Exception {
+                Log.d("TangramActivity", "call asset in thread " + Thread.currentThread().getName());
+
+                return getAssertsFile(getApplicationContext(), "data.json");
+            }
+        }).map(new Function<byte[], String>() {
+            @Override
+            public String apply(byte[] bytes) throws Exception {
+                Log.d("TangramActivity", "to string in thread " + Thread.currentThread().getName());
+
+                return new String(bytes);
+            }
+        }).map(new Function<String, JSONArray>() {
+            @Override
+            public JSONArray apply(String s) throws Exception {
+                Log.d("TangramActivity", "to json in thread " + Thread.currentThread().getName());
+                return new JSONArray(s);
+            }
+        }).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe(new Consumer<Disposable>() {
+                @Override
+                public void accept(Disposable disposable) throws Exception {
+                    Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
+                }
+            })
+            .subscribe(engine.consumeOriginal());
 
         findViewById(R.id.first).setOnClickListener(new View.OnClickListener() {
             @Override
