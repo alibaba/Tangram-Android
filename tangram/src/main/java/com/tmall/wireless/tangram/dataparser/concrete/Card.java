@@ -36,8 +36,8 @@ import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.structure.entitycard.BannerEntityCard;
-import com.tmall.wireless.tangram.structure.entitycard.LinearScrollEntityCard;
+import com.tmall.wireless.tangram.structure.card.BannerCard;
+import com.tmall.wireless.tangram.structure.card.LinearScrollCard;
 import com.tmall.wireless.tangram.support.CardSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -272,7 +272,7 @@ public abstract class Card extends ComponentLifecycle {
         if (cellData != null) {
             BaseCell cell = null;
             String cellType = cellData.optString(Card.KEY_TYPE);
-            if ((getMVHelper() != null && getMVHelper().resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
+            if ((resolver != null && resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
                 if (resolver.resolver().isCompatibleType(cellType)) {
                     cell = Utils.newInstance(resolver.resolver().getCellClass(cellType));
 
@@ -297,10 +297,16 @@ public abstract class Card extends ComponentLifecycle {
                                 addChildCard(gridCard);
                                 break;
                             case TangramBuilder.TYPE_CONTAINER_BANNER:
-                                cell = new BannerEntityCard();
+                                BannerCard bannerCard = new BannerCard();
+                                bannerCard.serviceManager = serviceManager;
+                                bannerCard.parseWith(cellData, resolver);
+                                cell = bannerCard.getCells().get(0);
                                 break;
                             case TangramBuilder.TYPE_CONTAINER_SCROLL:
-                                cell = new LinearScrollEntityCard();
+                                LinearScrollCard linearScrollCard = new LinearScrollCard();
+                                linearScrollCard.serviceManager = serviceManager;
+                                linearScrollCard.parseWith(cellData, resolver);
+                                cell = linearScrollCard.getCells().get(0);
                                 break;
                         }
                         if (cell != null) {

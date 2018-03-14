@@ -49,6 +49,18 @@
   },
   {
     "type": "container-scroll",
+    "header": {
+      "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "title": "container-scroll标题2",
+      "type": "vvtest"
+    },
+    "footer": {
+      "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "title": "container-scroll尾巴2",
+      "type": "vvtest"
+    },
     "style": {
       "pageWidth": 200,
       "pageHeight": 100,
@@ -109,6 +121,18 @@
     "items": [
       {
         "id": "banner1",
+        "header": {
+          "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+          "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+          "title": "container-banner标题1",
+          "type": "vvtest"
+        },
+        "footer": {
+          "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+          "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+          "title": "container-banner尾巴1",
+          "type": "vvtest"
+        },
         "type": "container-banner",
         "style": {
           "indicatorMargin": "5",
@@ -170,6 +194,18 @@
     "type": "container-oneColumn",
     "items": [
       {
+        "header": {
+          "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+          "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+          "title": "container-scroll标题1",
+          "type": "vvtest"
+        },
+        "footer": {
+          "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+          "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+          "title": "container-scroll尾巴1",
+          "type": "vvtest"
+        },
         "type": "container-scroll",
         "style": {
           "pageWidth": 200,
@@ -303,8 +339,20 @@
     ]
   },
   {
-    "type": "10",
+    "type": "container-banner",
     "id": "banner2",
+    "header": {
+      "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "title": "container-banner标题2",
+      "type": "vvtest"
+    },
+    "footer": {
+      "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "title": "container-banner尾巴2",
+      "type": "vvtest"
+    },
     "style": {
       "indicatorImg1": "https://gw.alicdn.com/tps/TB16RaxLpXXXXbIXFXXXXXXXXXX-14-14.png",
       "indicatorImg2": "https://gw.alicdn.com/tps/TB1m79uLpXXXXXUXVXXXXXXXXXX-18-16.png",
