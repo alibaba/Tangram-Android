@@ -28,5 +28,6 @@ public class BannerSelectedObservable extends Observable<Integer> {
         RxBannerSelectedListener listener = new RxBannerSelectedListener(mBannerViewPager, observer);
         observer.onSubscribe(listener);
         mBannerViewPager.addOnPageChangeListener(listener);
+        observer.onNext(mBannerViewPager.getCurrentItem());
     }
 }
