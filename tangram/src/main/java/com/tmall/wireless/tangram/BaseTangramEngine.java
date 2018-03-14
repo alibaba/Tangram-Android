@@ -52,6 +52,7 @@ import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.VVCard;
+import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
@@ -265,6 +266,10 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
         BusSupport busSupport = getService(BusSupport.class);
         if (busSupport != null) {
             busSupport.shutdown();
+        }
+        BannerSupport bannerSupport = getService(BannerSupport.class);
+        if (bannerSupport != null) {
+            bannerSupport.destroy();
         }
         VafContext vafContext = getService(VafContext.class);
         if (vafContext != null) {

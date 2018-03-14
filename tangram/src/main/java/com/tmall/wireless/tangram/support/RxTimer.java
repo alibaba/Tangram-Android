@@ -20,7 +20,7 @@ import io.reactivex.functions.Predicate;
  * @date 2018/03/08
  */
 
-public class ReactiveTimer implements ITimer {
+public class RxTimer implements ITimer {
 
     private long mInterval;
     private TimerStatus mStatus;
@@ -30,7 +30,7 @@ public class ReactiveTimer implements ITimer {
 
     private ArrayMap<OnTickListener, Disposable> tickCache = new ArrayMap<>();
 
-    public ReactiveTimer(long interval) {
+    public RxTimer(long interval) {
         this.mInterval = interval;
         this.mStatus = TimerStatus.Waiting;
         this.mIntervalObservable = Observable

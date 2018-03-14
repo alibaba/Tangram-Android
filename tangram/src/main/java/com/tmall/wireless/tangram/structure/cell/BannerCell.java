@@ -83,38 +83,6 @@ public class BannerCell extends BaseCell {
     public BaseCell mHeader;
     public BaseCell mFooter;
 
-    private Disposable mBannerSelectedDisposable;
-
-    private BannerSelectedObservable mBannerSelectedObservable;
-
-    //private Disposable mBannerSelectedDisposable;
-    //
-    //private BannerSelectedObservable mBannerSelectedObservable;
-    //
-    //private Disposable mBannerSelectedDisposable;
-    //
-    //private BannerSelectedObservable mBannerSelectedObservable;
-
-    public void observeBannerSelected(BannerViewPager mBannerViewPager) {
-        if (mBannerSelectedObservable == null) {
-            mBannerSelectedObservable = new BannerSelectedObservable(mBannerViewPager);
-            mBannerSelectedObservable.share();
-        } else {
-            mBannerSelectedObservable.setBannerViewPager(mBannerViewPager);
-        }
-        BannerSupport bannerSupport = serviceManager.getService(BannerSupport.class);
-        if (bannerSupport != null) {
-            //TODO handle for multi consumers
-            mBannerSelectedDisposable = bannerSupport.onBannerSelectedObservable(parent, mBannerSelectedObservable);
-        }
-    }
-
-    public void disposeBannerSelected() {
-        if (mBannerSelectedDisposable != null) {
-            mBannerSelectedDisposable.dispose();
-        }
-    }
-
     public void setData(List<BaseCell> cells) {
         initAdapter();
         this.mCells.clear();

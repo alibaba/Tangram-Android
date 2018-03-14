@@ -1,7 +1,9 @@
 package com.tmall.wireless.tangram.support;
 
-import android.support.v4.view.ViewPager.OnPageChangeListener;
-import com.tmall.wireless.tangram.view.BannerViewPager;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.tmall.wireless.tangram.ext.BannerListener;
 import io.reactivex.Observer;
 import io.reactivex.android.MainThreadDisposable;
 
@@ -12,35 +14,32 @@ import io.reactivex.android.MainThreadDisposable;
  * @date 2018/03/09
  */
 
-public abstract class RxBannerListener<T> extends MainThreadDisposable implements OnPageChangeListener {
+public abstract class RxBannerListener<T> extends MainThreadDisposable implements BannerListener {
 
-    protected final BannerViewPager mBannerViewPager;
-    protected final Observer<? super T> mObserver;
+    protected List<Observer<? super T>> mObservers = new ArrayList<>();
 
-    public RxBannerListener(BannerViewPager view, Observer<? super T> observer) {
-        this.mBannerViewPager = view;
-        this.mObserver = observer;
+    public void setObserver(Observer<? super T> observer) {
+        mObservers.add(observer);
     }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels, int direction) {
 
     }
 
-    @Override
     public void onPageSelected(int position) {
 
     }
 
-    @Override
     public void onPageScrollStateChanged(int state) {
+
+    }
+
+    public void onItemPositionInBanner(int position) {
 
     }
 
     @Override
     protected void onDispose() {
-        mBannerViewPager.removeOnPageChangeListener(this);
+
     }
-
-
 }

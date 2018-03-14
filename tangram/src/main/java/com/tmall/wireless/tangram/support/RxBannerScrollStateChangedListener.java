@@ -1,7 +1,8 @@
 package com.tmall.wireless.tangram.support;
 
-import com.tmall.wireless.tangram.view.BannerViewPager;
+import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by longerian on 2018/3/9.
@@ -12,25 +13,15 @@ import io.reactivex.Observer;
 
 public class RxBannerScrollStateChangedListener extends RxBannerListener<Integer> {
 
-    public RxBannerScrollStateChangedListener(BannerViewPager view,
-        Observer<? super Integer> observer) {
-        super(view, observer);
-    }
-
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
+    public void onPageScrollStateChanged(final int state) {
         if (!isDisposed()) {
-            mObserver.onNext(state);
+            Observable.fromIterable(mObservers).subscribe(new Consumer<Observer<? super Integer>>() {
+                @Override
+                public void accept(Observer<? super Integer> observer) throws Exception {
+                    observer.onNext(state);
+                }
+            });
         }
     }
 

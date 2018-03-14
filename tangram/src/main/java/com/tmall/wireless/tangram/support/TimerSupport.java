@@ -25,18 +25,8 @@
 package com.tmall.wireless.tangram.support;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
-import com.tmall.wireless.tangram.support.ITimer.TimerStatus;
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Consumer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,7 +36,7 @@ public class TimerSupport {
 
     private static final int MILLISECOND = 1000;
 
-    private ReactiveTimer mDefaultTimer = new ReactiveTimer(MILLISECOND);
+    private RxTimer mDefaultTimer = new RxTimer(MILLISECOND);
 
     public void register(int interval, @NonNull OnTickListener onTickListener) {
         register(interval, onTickListener, false);

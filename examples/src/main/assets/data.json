@@ -108,6 +108,7 @@
     "type": "container-oneColumn",
     "items": [
       {
+        "id": "banner1",
         "type": "container-banner",
         "style": {
           "indicatorMargin": "5",
@@ -303,6 +304,7 @@
   },
   {
     "type": "10",
+    "id": "banner2",
     "style": {
       "indicatorImg1": "https://gw.alicdn.com/tps/TB16RaxLpXXXXbIXFXXXXXXXXXX-14-14.png",
       "indicatorImg2": "https://gw.alicdn.com/tps/TB1m79uLpXXXXXUXVXXXXXXXXXX-18-16.png",

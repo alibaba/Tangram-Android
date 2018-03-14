@@ -1,21 +1,20 @@
 package com.tmall.wireless.tangram.support;
 
-import com.tmall.wireless.tangram.view.BannerViewPager;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 
 /**
- * Created by longerian on 2018/3/9.
+ * Created by longerian on 2018/3/14.
  *
  * @author longerian
- * @date 2018/03/09
+ * @date 2018/03/14
  */
 
-public class BannerSelectedObservable extends Observable<Integer> {
+public class BannerScrollStateChangedObservable extends Observable<Integer> {
 
     private final RxBannerListener mBannerListener;
 
-    public BannerSelectedObservable(RxBannerSelectedListener bannerListener) {
+    public BannerScrollStateChangedObservable(RxBannerScrollStateChangedListener bannerListener) {
         mBannerListener = bannerListener;
     }
 

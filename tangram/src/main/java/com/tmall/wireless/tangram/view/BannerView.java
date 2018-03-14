@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
-import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -41,7 +40,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.util.SparseIntArray;
 import android.view.Gravity;
@@ -61,7 +59,6 @@ import com.tmall.wireless.tangram.ext.BannerListener;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.cell.BannerCell;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
-import com.tmall.wireless.tangram.support.BannerSelectedObservable;
 import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Utils;
@@ -218,6 +215,12 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 listener.onPageScrolled(currentItemPos, positionOffset, positionOffsetPixels, direction);
             }
         }
+        if (bannerSupport != null) {
+            BannerListener listener = bannerSupport.getScrolledListenerById(cell.id);
+            if (listener != null) {
+                listener.onPageScrolled(currentItemPos, positionOffset, positionOffsetPixels, direction);
+            }
+        }
     }
 
     @Override
@@ -249,6 +252,12 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 busSupport.post(BusSupport.obtainEvent(BusSupport.EVENT_ON_EXPOSURE, cell.id, null, eventContext));
             }
         }
+        if (bannerSupport != null) {
+            BannerListener listener = bannerSupport.getSelectedListenerById(cell.id);
+            if (listener != null) {
+                listener.onPageSelected(currentItemPos);
+            }
+        }
 
     }
 
@@ -257,6 +266,12 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (bannerSupport != null) {
             for (int j = 0; j < bannerSupport.getListeners().size(); j++) {
                 BannerListener listener = bannerSupport.getListeners().get(j);
+                listener.onPageScrollStateChanged(state);
+            }
+        }
+        if (bannerSupport != null) {
+            BannerListener listener = bannerSupport.getScrollStateChangedListenerById(cell.id);
+            if (listener != null) {
                 listener.onPageScrollStateChanged(state);
             }
         }
@@ -326,15 +341,12 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (cell.serviceManager != null) {
             bannerSupport = cell.serviceManager.getService(BannerSupport.class);
         }
-        bannerCell.observeBannerSelected(mUltraViewPager);
     }
 
     @Override
     public void postUnBindView(BaseCell cell) {
         recycleView();
         getContext().unregisterReceiver(mScreenBroadcastReceiver);
-        BannerCell bannerCell = (BannerCell) cell;
-        bannerCell.disposeBannerSelected();
     }
 
     @Override

@@ -44,11 +44,11 @@ import com.tmall.wireless.tangram.example.data.TestView;
 import com.tmall.wireless.tangram.example.data.TestViewHolder;
 import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
 import com.tmall.wireless.tangram.example.data.VVTEST;
-import com.tmall.wireless.tangram.example.support.SampleBannerSupport;
 import com.tmall.wireless.tangram.example.support.SampleClickSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
 import com.tmall.wireless.tangram.support.BannerSupport;
+import com.tmall.wireless.tangram.support.RxBannerScrolledListener.ScrollEvent;
 import com.tmall.wireless.tangram.support.async.AsyncLoader;
 import com.tmall.wireless.tangram.support.async.AsyncPageLoader;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
@@ -58,6 +58,8 @@ import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
 import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -278,8 +280,33 @@ public class TangramActivity extends Activity {
                     }
                 }));
         engine.addSimpleClickSupport(new SampleClickSupport());
-        engine.register(BannerSupport.class, new SampleBannerSupport());
+        BannerSupport bannerSupport = new BannerSupport();
+        engine.register(BannerSupport.class, bannerSupport);
+        Disposable ob1 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                Log.d("Longer", "1 selected " + integer);
+            }
+        });
+        Disposable ob2 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                Log.d("Longer", "2 selected " + integer);
+            }
+        });
 
+        bannerSupport.observeScrollStateChanged("banner2").subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                Log.d("Longer", "state changed " + integer);
+            }
+        });
+        bannerSupport.observeScrolled("banner2").subscribe(new Consumer<ScrollEvent>() {
+            @Override
+            public void accept(ScrollEvent scrollEvent) throws Exception {
+                Log.d("Longer", "scrolled " + scrollEvent.toString());
+            }
+        });
         //Step 6: enable auto load more if your page's data is lazy loaded
         engine.enableAutoLoadMore(true);
 
