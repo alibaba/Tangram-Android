@@ -90,11 +90,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public Card parent;
 
     /**
-     * the parent of a cellized card
-     */
-    public ComponentLifecycle nestedParent;
-
-    /**
      * id of a cell
      */
     @Nullable

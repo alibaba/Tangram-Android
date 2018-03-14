@@ -73,8 +73,6 @@ public class TestView extends FrameLayout implements ITangramViewLifeCycle {
         String parent = "";
         if (cell.parent != null) {
             parent = cell.parent.getClass().getSimpleName();
-        } else if (cell.nestedParent != null) {
-            parent = cell.nestedParent.getClass().getSimpleName();
         }
         textView.setText(
                 cell.id + " pos: " + pos + " " + parent + " " + cell

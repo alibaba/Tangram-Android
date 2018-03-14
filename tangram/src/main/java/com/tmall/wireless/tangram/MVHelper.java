@@ -163,8 +163,6 @@ public class MVHelper {
             String parentId = "";
             if (cell.parent instanceof Card) {
                 parentId = ((Card) cell.parent).id;
-            } else if (cell.nestedParent instanceof BaseCell) {
-                parentId = ((BaseCell) cell.nestedParent).id;
             }
             flareId = String.format("%s_%s", cell.parent == null ? "null" : parentId, cell.pos);
             cellFlareIdMap.put(cell, flareId);

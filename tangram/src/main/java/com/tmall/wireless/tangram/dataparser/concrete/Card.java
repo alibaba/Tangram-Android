@@ -268,7 +268,7 @@ public abstract class Card extends ComponentLifecycle {
 
     }
 
-    protected BaseCell createCell(@NonNull MVHelper resolver, @Nullable JSONObject cellData, boolean appended) {
+    protected BaseCell createCell(@NonNull MVHelper resolver, @NonNull JSONObject cellData, boolean appended) {
         if (cellData != null) {
             BaseCell cell = null;
             String cellType = cellData.optString(Card.KEY_TYPE);
@@ -277,8 +277,9 @@ public abstract class Card extends ComponentLifecycle {
                     cell = Utils.newInstance(resolver.resolver().getCellClass(cellType));
 
                     //do not display when newInstance failed
-                    if (cell == null)
+                    if (cell == null) {
                         return null;
+                    }
 
                     cell.serviceManager = serviceManager; // ensure service manager
                 } else {
