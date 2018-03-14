@@ -61,7 +61,7 @@ public class VVCard extends OneItemCard {
         load = data.optString(KEY_API_LOAD, null);
         loadParams = data.optJSONObject(KEY_API_LOAD_PARAMS);
         loaded = data.optBoolean(KEY_LOADED, false);
-        createCell(resolver, extras, true);
+        createCell(this, resolver, extras, serviceManager, true);
         //do not need parse style, leave style empty
         this.extras.remove(KEY_STYLE);
         style = new Style();

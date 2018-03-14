@@ -81,7 +81,7 @@ public class BannerCard extends Card {
             obj.put("type", TangramBuilder.TYPE_CAROUSEL_CELL);
             obj.put("bizId", id);
 
-            resolver.parseCell(resolver, cell, obj);
+            resolver.parseCell(cell, obj);
 
             if (!super.getCells().isEmpty()) {
                 cell.mCells.addAll(super.getCells());
@@ -102,7 +102,7 @@ public class BannerCard extends Card {
 
     @Override
     protected void parseHeaderCell(@NonNull MVHelper resolver, @Nullable JSONObject header) {
-        cell.mHeader = createCell(resolver, header, false);
+        cell.mHeader = createCell(this, resolver, header, serviceManager, false);
         if (cell.mHeader != null) {
             cell.mHeader.parent = this;
             cell.mHeader.parentId = id;
@@ -116,7 +116,7 @@ public class BannerCard extends Card {
 
     @Override
     protected void parseFooterCell(@NonNull MVHelper resolver, @Nullable JSONObject footer) {
-        cell.mFooter = createCell(resolver, footer, false);
+        cell.mFooter = createCell(this, resolver, footer, serviceManager, false);
         if (cell.mFooter != null) {
             cell.mFooter.parent = this;
             cell.mFooter.parentId = id;

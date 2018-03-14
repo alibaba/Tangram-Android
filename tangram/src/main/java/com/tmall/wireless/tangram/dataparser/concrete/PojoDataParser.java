@@ -37,7 +37,6 @@ import com.tmall.wireless.tangram.structure.card.SlideCard;
 import com.tmall.wireless.tangram.structure.card.WrapCellCard;
 import com.tmall.wireless.tangram.util.LogUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
-import com.tmall.wireless.tangram.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -148,68 +147,13 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
             final int cellLength = componentArray.length();
             for (int i = 0; i < cellLength; i++) {
                 final JSONObject cellData = componentArray.optJSONObject(i);
-                BaseCell cell = createCell(cellResolver, cellData, serviceManager);
+                BaseCell cell = Card.createCell(card, cellResolver, cellData, serviceManager, true);
                 if (cell != null && cellResolver.isValid(cell, serviceManager)) {
                     result.add(cell);
                 }
             }
         }
         return result;
-    }
-
-    protected BaseCell createCell(@NonNull MVHelper resolver, @Nullable JSONObject cellData, ServiceManager serviceManager) {
-        if (cellData != null) {
-            BaseCell cell = null;
-            String cellType = cellData.optString(Card.KEY_TYPE);
-            if ((resolver != null && resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
-                if (resolver.resolver().isCompatibleType(cellType)) {
-                    cell = Utils.newInstance(resolver.resolver().getCellClass(cellType));
-
-                    //do not display when newInstance failed
-                    if (cell == null) {
-                        return null;
-                    }
-
-                    cell.serviceManager = serviceManager;
-                } else {
-                    if (Utils.isCard(cellData)) {
-                        switch (cellType) {
-                            //TODO support parse inline flow card, inline banner and scroller
-                            //case TangramBuilder.TYPE_CONTAINER_BANNER:
-                            //    cell = new BannerEntityCard();
-                            //    break;
-                            //case TangramBuilder.TYPE_CONTAINER_SCROLL:
-                            //    cell = new LinearScrollEntityCard();
-                            //    break;
-                        }
-                        if (cell != null) {
-                            cell.serviceManager = serviceManager;
-                        }
-                    } else {
-                        cell = new BaseCell(cellType);
-                        cell.serviceManager = serviceManager;
-                    }
-                }
-                if (cell != null) {
-                    resolver.parseCell(resolver, cell, cellData);
-                    cell.setStringType(cellType);
-                }
-                return cell;
-            } else {
-                //support virtual view at layout
-                BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
-                if (componentBinderResolver.has(cellType)) {
-                    cell = new BaseCell(cellType);
-                    cell.serviceManager = serviceManager;
-                    resolver.parseCell(resolver, cell, cellData);
-                    cell.setStringType(cellType);
-                    return cell;
-                } else {
-                    return null;
-                }
-            }
-        }
-        return null;
     }
 
 }

@@ -253,7 +253,7 @@ public abstract class Card extends ComponentLifecycle {
             final int cellLength = Math.min(componentArray.length(), maxChildren);
             for (int i = 0; i < cellLength; i++) {
                 final JSONObject cellData = componentArray.optJSONObject(i);
-                createCell(resolver, cellData, true);
+                createCell(this, resolver, cellData, serviceManager, true);
             }
         }
         // parsing footer
@@ -268,11 +268,12 @@ public abstract class Card extends ComponentLifecycle {
 
     }
 
-    protected BaseCell createCell(@NonNull MVHelper resolver, @NonNull JSONObject cellData, boolean appended) {
+    public static BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,
+        @NonNull ServiceManager serviceManager, boolean appended) {
         if (cellData != null) {
             BaseCell cell = null;
             String cellType = cellData.optString(Card.KEY_TYPE);
-            if ((resolver != null && resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
+            if ((resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
                 if (resolver.resolver().isCompatibleType(cellType)) {
                     cell = Utils.newInstance(resolver.resolver().getCellClass(cellType));
 
@@ -283,7 +284,7 @@ public abstract class Card extends ComponentLifecycle {
 
                     cell.serviceManager = serviceManager; // ensure service manager
                 } else {
-                    if (Utils.isCard(cellData)) {
+                    if (Utils.isCard(cellData) && parent != null) {
                         switch (cellType) {
                             case TangramBuilder.TYPE_CONTAINER_FLOW:
                             case TangramBuilder.TYPE_CONTAINER_1C_FLOW:
@@ -295,36 +296,50 @@ public abstract class Card extends ComponentLifecycle {
                                 Card gridCard = cardResolver.create(cellType);
                                 gridCard.serviceManager = serviceManager;
                                 gridCard.parseWith(cellData, resolver);
-                                addChildCard(gridCard);
+                                parent.addChildCard(gridCard);
                                 break;
                             case TangramBuilder.TYPE_CONTAINER_BANNER:
                                 BannerCard bannerCard = new BannerCard();
                                 bannerCard.serviceManager = serviceManager;
                                 bannerCard.parseWith(cellData, resolver);
-                                cell = bannerCard.getCells().get(0);
+                                List<BaseCell> bannerChildren = bannerCard.getCells();
+                                if (bannerChildren.size() > 0) {
+                                    cell = bannerCard.getCells().get(0);
+                                }
                                 break;
                             case TangramBuilder.TYPE_CONTAINER_SCROLL:
                                 LinearScrollCard linearScrollCard = new LinearScrollCard();
                                 linearScrollCard.serviceManager = serviceManager;
                                 linearScrollCard.parseWith(cellData, resolver);
-                                cell = linearScrollCard.getCells().get(0);
+                                List<BaseCell> scrollChildren = linearScrollCard.getCells();
+                                if (scrollChildren.size() > 0) {
+                                    cell = linearScrollCard.getCells().get(0);
+                                }
                                 break;
                         }
                         if (cell != null) {
                             cell.serviceManager = serviceManager;
-                            cell.parent = this;
-                            cell.parentId = id;
+                            if (parent != null) {
+                                cell.parent = parent;
+                                cell.parentId = parent.id;
+                            }
                         } else {
                             return null;
                         }
                     } else {
                         cell = new BaseCell(cellType);
                         cell.serviceManager = serviceManager;
-                        cell.parent = this;
-                        cell.parentId = id;
+                        if (parent != null) {
+                            cell.parent = parent;
+                            cell.parentId = parent.id;
+                        }
                     }
                 }
-                parseCell(resolver, cellData, cell, appended);
+                if (parent != null) {
+                    parent.parseCell(resolver, cellData, cell, appended);
+                } else {
+                    resolver.parseCell(cell, cellData);
+                }
                 cell.setStringType(cellType);
                 return cell;
             } else {
@@ -333,9 +348,13 @@ public abstract class Card extends ComponentLifecycle {
                 if (componentBinderResolver.has(cellType)) {
                     cell = new BaseCell(cellType);
                     cell.serviceManager = serviceManager;
-                    cell.parent = this;
-                    cell.parentId = id;
-                    parseCell(resolver, cellData, cell, appended);
+                    if (parent != null) {
+                        cell.parent = parent;
+                        cell.parentId = parent.id;
+                        parent.parseCell(resolver, cellData, cell, appended);
+                    } else {
+                        resolver.parseCell(cell, cellData);
+                    }
                     cell.setStringType(cellType);
                     return cell;
                 } else {
@@ -347,7 +366,7 @@ public abstract class Card extends ComponentLifecycle {
     }
 
     protected void parseCell(@NonNull MVHelper resolver, @NonNull JSONObject data, @NonNull final BaseCell cell, boolean appended) {
-        resolver.parseCell(resolver, cell, data);
+        resolver.parseCell(cell, data);
         //noinspection unchecked
         if (appended && !addCellInternal(cell, false)) {
             if (TangramBuilder.isPrintLog())

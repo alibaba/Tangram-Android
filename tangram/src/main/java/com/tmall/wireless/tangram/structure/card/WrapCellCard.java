@@ -49,7 +49,7 @@ public class WrapCellCard extends GridCard {
         id = data.optString(KEY_ID, id == null ? "" : id);
         this.type = TangramBuilder.TYPE_SINGLE_COLUMN;
         this.stringType = TangramBuilder.TYPE_CONTAINER_1C_FLOW;
-        createCell(resolver, data, true);
+        createCell(this, resolver, data, serviceManager, true);
         //do not need parse style, leave style empty
         this.extras.remove(KEY_STYLE);
         style = new Style();

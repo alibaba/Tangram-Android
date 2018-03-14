@@ -58,13 +58,13 @@ public class OnePlusNCard extends Card {
 
     @Override
     protected void parseHeaderCell(@NonNull MVHelper resolver, @Nullable JSONObject header) {
-        BaseCell mHeader = createCell(resolver, header, true);
+        BaseCell mHeader = createCell(this, resolver, header, serviceManager, true);
         ensureBlock(mHeader);
     }
 
     @Override
     protected void parseFooterCell(@NonNull MVHelper resolver, @Nullable JSONObject footer) {
-        BaseCell mFooter = createCell(resolver, footer, true);
+        BaseCell mFooter = createCell(this, resolver, footer, serviceManager, true);
         ensureBlock(mFooter);
     }
 

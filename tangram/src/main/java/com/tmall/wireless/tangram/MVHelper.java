@@ -86,8 +86,8 @@ public class MVHelper {
         mVafContext = vafContext;
     }
 
-    public void parseCell(MVHelper resolver, BaseCell cell, JSONObject json) {
-        mvResolver.parseCell(resolver, cell, json);
+    public void parseCell(BaseCell cell, JSONObject json) {
+        mvResolver.parseCell(this, cell, json);
     }
 
     /**
