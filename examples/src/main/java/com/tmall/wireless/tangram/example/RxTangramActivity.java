@@ -24,10 +24,31 @@
 
 package com.tmall.wireless.tangram.example;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import com.alibaba.android.vlayout.Range;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import com.libra.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.LoadedFrom;
@@ -53,14 +74,11 @@ import com.tmall.wireless.tangram.support.async.AsyncLoader;
 import com.tmall.wireless.tangram.support.async.AsyncPageLoader;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
-
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
 import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -69,32 +87,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.AssetManager;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-
 /**
- * Created by villadora on 15/8/18.
+ * Created by longerian on 2018/3/14.
+ *
+ * @author longerian
+ * @date 2018/03/14
  */
-public class TangramActivity extends Activity {
+
+public class RxTangramActivity extends Activity {
 
     private static final String TAG = TangramActivity.class.getSimpleName();
 
@@ -151,8 +151,8 @@ public class TangramActivity extends Activity {
         TangramBuilder.init(this, new IInnerImageSetter() {
             @Override
             public <IMAGE extends ImageView> void doLoadImageUrl(@NonNull IMAGE view,
-                    @Nullable String url) {
-                Picasso.with(TangramActivity.this).load(url).into(view);
+                @Nullable String url) {
+                Picasso.with(RxTangramActivity.this).load(url).into(view);
             }
         }, ImageView.class);
 
@@ -168,8 +168,8 @@ public class TangramActivity extends Activity {
         builder.registerCell(2, SimpleImgView.class);
         builder.registerCell(4, RatioTextView.class);
         builder.registerCell(110,
-                TestViewHolderCell.class,
-                new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TextView.class));
+            TestViewHolderCell.class,
+            new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TextView.class));
         builder.registerCell(199,SingleImageView.class);
         builder.registerVirtualView("vvtest");
         //Step 4: new engine
@@ -177,28 +177,28 @@ public class TangramActivity extends Activity {
         engine.setVirtualViewTemplate(VVTEST.BIN);
         engine.getService(VafContext.class).setImageLoaderAdapter(new IImageLoaderAdapter() {
 
-            private List<ImageTarget> cache = new ArrayList<ImageTarget>();
+            private List<RxTangramActivity.ImageTarget> cache = new ArrayList<RxTangramActivity.ImageTarget>();
 
             @Override
             public void bindImage(String uri, final ImageBase imageBase, int reqWidth, int reqHeight) {
-                RequestCreator requestCreator = Picasso.with(TangramActivity.this).load(uri);
+                RequestCreator requestCreator = Picasso.with(RxTangramActivity.this).load(uri);
                 Log.d("TangramActivity", "bindImage request width height " + reqHeight + " " + reqWidth);
                 if (reqHeight > 0 || reqWidth > 0) {
                     requestCreator.resize(reqWidth, reqHeight);
                 }
-                ImageTarget imageTarget = new ImageTarget(imageBase);
+                RxTangramActivity.ImageTarget imageTarget = new RxTangramActivity.ImageTarget(imageBase);
                 cache.add(imageTarget);
                 requestCreator.into(imageTarget);
             }
 
             @Override
             public void getBitmap(String uri, int reqWidth, int reqHeight, final Listener lis) {
-                RequestCreator requestCreator = Picasso.with(TangramActivity.this).load(uri);
+                RequestCreator requestCreator = Picasso.with(RxTangramActivity.this).load(uri);
                 Log.d("TangramActivity", "getBitmap request width height " + reqHeight + " " + reqWidth);
                 if (reqHeight > 0 || reqWidth > 0) {
                     requestCreator.resize(reqWidth, reqHeight);
                 }
-                ImageTarget imageTarget = new ImageTarget(lis);
+                RxTangramActivity.ImageTarget imageTarget = new RxTangramActivity.ImageTarget(lis);
                 cache.add(imageTarget);
                 requestCreator.into(imageTarget);
             }
@@ -207,80 +207,106 @@ public class TangramActivity extends Activity {
 
         //Step 5: add card load support if you have card that loading cells async
         engine.addCardLoadSupport(new CardLoadSupport(
-                new AsyncLoader() {
-                    @Override
-                    public void loadData(Card card, @NonNull final LoadedCallback callback) {
-                        Log.w("Load Card", card.load);
+            new AsyncLoader() {
+                @Override
+                public void loadData(Card card, @NonNull final LoadedCallback callback) {
+                    Log.w("Load Card", card.load);
 
-                        mMainHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                // do loading
-                                JSONArray cells = new JSONArray();
+                    mMainHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // do loading
+                            JSONArray cells = new JSONArray();
 
-                                for (int i = 0; i < 10; i++) {
-                                    try {
-                                        JSONObject obj = new JSONObject();
-                                        obj.put("type", 1);
-                                        obj.put("msg", "async loaded");
-                                        JSONObject style = new JSONObject();
-                                        style.put("bgColor", "#FF1111");
-                                        obj.put("style", style.toString());
-                                        cells.put(obj);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                            for (int i = 0; i < 10; i++) {
+                                try {
+                                    JSONObject obj = new JSONObject();
+                                    obj.put("type", 1);
+                                    obj.put("msg", "async loaded");
+                                    JSONObject style = new JSONObject();
+                                    style.put("bgColor", "#FF1111");
+                                    obj.put("style", style.toString());
+                                    cells.put(obj);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-
-                                // callback.fail(false);
-                                callback.finish(engine.parseComponent(cells));
                             }
-                        }, 200);
-                    }
-                },
 
-                new AsyncPageLoader() {
-                    @Override
-                    public void loadData(final int page, @NonNull final Card card, @NonNull final LoadedCallback callback) {
-                        mMainHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Log.w("Load page", card.load + " page " + page);
-                                JSONArray cells = new JSONArray();
-                                for (int i = 0; i < 9; i++) {
-                                    try {
-                                        JSONObject obj = new JSONObject();
-                                        obj.put("type", 1);
-                                        obj.put("msg", "async page loaded, params: " + card.getParams().toString());
-                                        cells.put(obj);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                            // callback.fail(false);
+                            callback.finish(engine.parseComponent(cells));
+                        }
+                    }, 200);
+                }
+            },
+
+            new AsyncPageLoader() {
+                @Override
+                public void loadData(final int page, @NonNull final Card card, @NonNull final LoadedCallback callback) {
+                    mMainHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.w("Load page", card.load + " page " + page);
+                            JSONArray cells = new JSONArray();
+                            for (int i = 0; i < 9; i++) {
+                                try {
+                                    JSONObject obj = new JSONObject();
+                                    obj.put("type", 1);
+                                    obj.put("msg", "async page loaded, params: " + card.getParams().toString());
+                                    cells.put(obj);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                                List<BaseCell> cs = engine.parseComponent(cells);
-
-                                if (card.page == 1) {
-                                    GroupBasicAdapter<Card, ?> adapter = engine.getGroupBasicAdapter();
-
-                                    card.setCells(cs);
-                                    adapter.refreshWithoutNotify();
-                                    Range<Integer> range = adapter.getCardRange(card);
-
-                                    adapter.notifyItemRemoved(range.getLower());
-                                    adapter.notifyItemRangeInserted(range.getLower(), cs.size());
-
-                                } else
-                                    card.addCells(cs);
-
-                                //mock load 6 pages
-                                callback.finish(card.page != 6);
-                                card.notifyDataChange();
                             }
-                        }, 400);
-                    }
-                }));
+                            List<BaseCell> cs = engine.parseComponent(cells);
+
+                            if (card.page == 1) {
+                                GroupBasicAdapter<Card, ?> adapter = engine.getGroupBasicAdapter();
+
+                                card.setCells(cs);
+                                adapter.refreshWithoutNotify();
+                                Range<Integer> range = adapter.getCardRange(card);
+
+                                adapter.notifyItemRemoved(range.getLower());
+                                adapter.notifyItemRangeInserted(range.getLower(), cs.size());
+
+                            } else
+                                card.addCells(cs);
+
+                            //mock load 6 pages
+                            callback.finish(card.page != 6);
+                            card.notifyDataChange();
+                        }
+                    }, 400);
+                }
+            }));
         engine.addSimpleClickSupport(new SampleClickSupport());
+        BannerSupport bannerSupport = new BannerSupport();
+        engine.register(BannerSupport.class, bannerSupport);
+        Disposable ob1 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                Log.d("TangramActivity", "1 selected " + integer);
+            }
+        });
+        Disposable ob2 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                Log.d("TangramActivity", "2 selected " + integer);
+            }
+        });
 
+        bannerSupport.observeScrollStateChanged("banner2").subscribe(new Consumer<Integer>() {
+            @Override
+            public void accept(Integer integer) throws Exception {
+                Log.d("TangramActivity", "state changed " + integer);
+            }
+        });
+        bannerSupport.observeScrolled("banner2").subscribe(new Consumer<ScrollEvent>() {
+            @Override
+            public void accept(ScrollEvent scrollEvent) throws Exception {
+                Log.d("TangramActivity", "scrolled " + scrollEvent.toString());
+            }
+        });
         //Step 6: enable auto load more if your page's data is lazy loaded
         engine.enableAutoLoadMore(true);
 
@@ -300,14 +326,69 @@ public class TangramActivity extends Activity {
         engine.getLayoutManager().setFixOffset(0, 40, 0, 0);
 
         //Step 10: get tangram data and pass it to engine
-        String json = new String(getAssertsFile(this, "data.json"));
-        JSONArray data = null;
-        try {
-            data = new JSONArray(json);
-            engine.setData(data);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        // method 1, use simple consumer api
+        //Observable.fromCallable(new Callable<byte[]>() {
+        //    @Override
+        //    public byte[] call() throws Exception {
+        //        Log.d("TangramActivity", "call asset in thread " + Thread.currentThread().getName());
+        //
+        //        return getAssertsFile(getApplicationContext(), "data.json");
+        //    }
+        //}).subscribeOn(Schedulers.io())
+        //    .observeOn(Schedulers.computation())
+        //    .map(new Function<byte[], String>() {
+        //    @Override
+        //    public String apply(byte[] bytes) throws Exception {
+        //        Log.d("TangramActivity", "to string in thread " + Thread.currentThread().getName());
+        //
+        //        return new String(bytes);
+        //    }
+        //}).map(new Function<String, JSONArray>() {
+        //    @Override
+        //    public JSONArray apply(String s) throws Exception {
+        //        Log.d("TangramActivity", "to json in thread " + Thread.currentThread().getName());
+        //        return new JSONArray(s);
+        //    }
+        //}).observeOn(AndroidSchedulers.mainThread())
+        //    .doOnSubscribe(new Consumer<Disposable>() {
+        //        @Override
+        //        public void accept(Disposable disposable) throws Exception {
+        //            Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
+        //        }
+        //    })
+        //    .subscribe(engine.consumeOriginal());
+
+        // method 2, use transformer api
+        Observable.fromCallable(new Callable<byte[]>() {
+            @Override
+            public byte[] call() throws Exception {
+                Log.d("TangramActivity", "call asset in thread " + Thread.currentThread().getName());
+
+                return getAssertsFile(getApplicationContext(), "data.json");
+            }
+        }).map(new Function<byte[], String>() {
+            @Override
+            public String apply(byte[] bytes) throws Exception {
+                Log.d("TangramActivity", "to string in thread " + Thread.currentThread().getName());
+
+                return new String(bytes);
+            }
+        }).map(new Function<String, JSONArray>() {
+            @Override
+            public JSONArray apply(String s) throws Exception {
+                Log.d("TangramActivity", "to json in thread " + Thread.currentThread().getName());
+                return new JSONArray(s);
+            }
+        }).subscribeOn(Schedulers.io())
+            .compose(engine.getDataTransformer())
+            .doOnSubscribe(new Consumer<Disposable>() {
+                @Override
+                public void accept(Disposable disposable) throws Exception {
+                    Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
+                }
+            })
+            .subscribe(engine.consumeParsed());
+
         findViewById(R.id.first).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

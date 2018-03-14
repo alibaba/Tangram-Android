@@ -90,11 +90,6 @@ public class TangramDataParserActivity extends Activity {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            Picasso.setSingletonInstance(new Picasso.Builder(this).loggingEnabled(true).build());
-        } catch (Exception e) {
-
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         recyclerView = (RecyclerView) findViewById(R.id.main_view);
