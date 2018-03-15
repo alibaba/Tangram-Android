@@ -215,7 +215,7 @@ public class RxTangramActivity extends Activity {
 
             @Override
             public Pair<Card, List<BaseCell>> apply(Card card) throws Exception {
-                Log.d("Longer", "loadCardObservable in map");
+                Log.d("TangramActivity", "loadCardObservable in map");
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
@@ -253,7 +253,7 @@ public class RxTangramActivity extends Activity {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    Log.w("Longer", "loadMoreObservable " + card.load + " page " + card.page);
+                    Log.w("TangramActivity", "loadMoreObservable " + card.load + " page " + card.page);
                     JSONArray cells = new JSONArray();
                     for (int i = 0; i < 9; i++) {
                         try {

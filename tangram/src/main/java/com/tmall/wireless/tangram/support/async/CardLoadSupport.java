@@ -31,6 +31,7 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Predicate;
 
@@ -172,7 +173,10 @@ public class CardLoadSupport {
         }
     }
 
-    //FIXME cancel\ reset
+    private Observable<Card> mLoadCardObservable;
+
+    private Observable<Card> mLoadMoreCardObservable;
+
     private ObservableEmitter<Card> mLoadCardObserver;
 
     private ObservableEmitter<Card> mLoadMoreObserver;
@@ -182,24 +186,29 @@ public class CardLoadSupport {
      * @return An observable start loading a card
      */
     public Observable<Card> observeCardLoading() {
-        Observable<Card> mLoadCardObservable = Observable.create(new ObservableOnSubscribe<Card>() {
-            @Override
-            public void subscribe(ObservableEmitter<Card> emitter) throws Exception {
-                mLoadCardObserver = emitter;
-            }
-        }).filter(new Predicate<Card>() {
-            @Override
-            public boolean test(Card card) throws Exception {
-                Log.d("Longer", "observeCardLoading in test filter");
-                return !card.loading && !card.loaded;
-            }
-        }).doOnNext(new Consumer<Card>() {
-            @Override
-            public void accept(Card card) throws Exception {
-                Log.d("Longer", "observeCardLoading in doOnNext");
-                card.loading = true;
-            }
-        });
+        if (mLoadCardObservable == null) {
+            mLoadCardObservable = Observable.create(new ObservableOnSubscribe<Card>() {
+                @Override
+                public void subscribe(ObservableEmitter<Card> emitter) throws Exception {
+                    mLoadCardObserver = emitter;
+                }
+            }).filter(new Predicate<Card>() {
+                @Override
+                public boolean test(Card card) throws Exception {
+                    return !card.loading && !card.loaded;
+                }
+            }).doOnNext(new Consumer<Card>() {
+                @Override
+                public void accept(Card card) throws Exception {
+                    card.loading = true;
+                }
+            }).doOnDispose(new Action() {
+                @Override
+                public void run() throws Exception {
+                    mLoadCardObserver = null;
+                }
+            });
+        }
         return mLoadCardObservable;
     }
 
@@ -243,27 +252,32 @@ public class CardLoadSupport {
      * @return An observable start loading more for a card
      */
     public Observable<Card> observeCardLoadingMore() {
-        Observable<Card> mLoadMoreCardObservable = Observable.create(new ObservableOnSubscribe<Card>() {
-            @Override
-            public void subscribe(ObservableEmitter<Card> emitter) throws Exception {
-                mLoadMoreObserver = emitter;
-            }
-        }).filter(new Predicate<Card>() {
-            @Override
-            public boolean test(Card card) throws Exception {
-                Log.d("Longer", "observeCardLoadingMore in test filter");
-                return !card.loading && card.loadMore && card.hasMore;
-            }
-        }).doOnNext(new Consumer<Card>() {
-            @Override
-            public void accept(Card card) throws Exception {
-                Log.d("Longer", "observeCardLoadingMore in doOnNext");
-                card.loading = true;
-                if (!card.loaded) {
-                    card.page = sInitialPage;
+        if (mLoadMoreCardObservable == null) {
+            mLoadMoreCardObservable = Observable.create(new ObservableOnSubscribe<Card>() {
+                @Override
+                public void subscribe(ObservableEmitter<Card> emitter) throws Exception {
+                    mLoadMoreObserver = emitter;
                 }
-            }
-        });
+            }).filter(new Predicate<Card>() {
+                @Override
+                public boolean test(Card card) throws Exception {
+                    return !card.loading && card.loadMore && card.hasMore;
+                }
+            }).doOnNext(new Consumer<Card>() {
+                @Override
+                public void accept(Card card) throws Exception {
+                    card.loading = true;
+                    if (!card.loaded) {
+                        card.page = sInitialPage;
+                    }
+                }
+            }).doOnDispose(new Action() {
+                @Override
+                public void run() throws Exception {
+                    mLoadMoreObserver = null;
+                }
+            });
+        }
         return mLoadMoreCardObservable;
     }
 
