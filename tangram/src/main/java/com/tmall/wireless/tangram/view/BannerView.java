@@ -219,7 +219,6 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     @Override
     public void onPageSelected(int position) {
-        direction = 1;
         currentItemPos = mUltraViewPager.getCurrentItem();
         mIndicator.setCurrItem(currentItemPos);
 
@@ -818,6 +817,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     private boolean scrollNextPage() {
+        direction = 1;
         boolean isChange = false;
         if (mUltraViewPager != null && mUltraViewPager.getAdapter() != null && mUltraViewPager.getAdapter().getCount() > 0) {
             final int curr = mUltraViewPager.getCurrentItemFake();
