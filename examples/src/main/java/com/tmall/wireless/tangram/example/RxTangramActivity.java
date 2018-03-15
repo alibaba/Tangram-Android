@@ -46,6 +46,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -209,79 +210,93 @@ public class RxTangramActivity extends Activity {
         Utils.setUedScreenWidth(720);
 
         //Step 5: add card load support if you have card that loading cells async
-        engine.addCardLoadSupport(new CardLoadSupport(
-            new AsyncLoader() {
-                @Override
-                public void loadData(Card card, @NonNull final LoadedCallback callback) {
-                    Log.w("Load Card", card.load);
+        CardLoadSupport cardLoadSupport = new CardLoadSupport();
+        engine.addCardLoadSupport(cardLoadSupport);
+        Observable<Card> loadCardObservable = cardLoadSupport.observeCardLoading();
+        loadCardObservable
+            .observeOn(Schedulers.io())
+            .map(new Function<Card, Pair<Card, List<BaseCell>>>() {
 
-                    mMainHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            // do loading
-                            JSONArray cells = new JSONArray();
-
-                            for (int i = 0; i < 10; i++) {
-                                try {
-                                    JSONObject obj = new JSONObject();
-                                    obj.put("type", 1);
-                                    obj.put("msg", "async loaded");
-                                    JSONObject style = new JSONObject();
-                                    style.put("bgColor", "#FF1111");
-                                    obj.put("style", style.toString());
-                                    cells.put(obj);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            // callback.fail(false);
-                            callback.finish(engine.parseComponent(cells));
-                        }
-                    }, 200);
+            @Override
+            public Pair<Card, List<BaseCell>> apply(Card card) throws Exception {
+                Log.d("Longer", "in map");
+                JSONArray cells = new JSONArray();
+                for (int i = 0; i < 10; i++) {
+                    try {
+                        JSONObject obj = new JSONObject();
+                        obj.put("type", 1);
+                        obj.put("msg", "async loaded");
+                        JSONObject style = new JSONObject();
+                        style.put("bgColor", "#FF1111");
+                        obj.put("style", style.toString());
+                        cells.put(obj);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
-            },
+                List<BaseCell> result = engine.parseComponent(cells);
+                Pair<Card, List<BaseCell>> pair = new Pair<>(card ,result);
+                return pair;
+            }
+        }).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(cardLoadSupport.asDoLoadSuccessConsumer());
 
-            new AsyncPageLoader() {
-                @Override
-                public void loadData(final int page, @NonNull final Card card, @NonNull final LoadedCallback callback) {
-                    mMainHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.w("Load page", card.load + " page " + page);
-                            JSONArray cells = new JSONArray();
-                            for (int i = 0; i < 9; i++) {
-                                try {
-                                    JSONObject obj = new JSONObject();
-                                    obj.put("type", 1);
-                                    obj.put("msg", "async page loaded, params: " + card.getParams().toString());
-                                    cells.put(obj);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            List<BaseCell> cs = engine.parseComponent(cells);
-
-                            if (card.page == 1) {
-                                GroupBasicAdapter<Card, ?> adapter = engine.getGroupBasicAdapter();
-
-                                card.setCells(cs);
-                                adapter.refreshWithoutNotify();
-                                Range<Integer> range = adapter.getCardRange(card);
-
-                                adapter.notifyItemRemoved(range.getLower());
-                                adapter.notifyItemRangeInserted(range.getLower(), cs.size());
-
-                            } else
-                                card.addCells(cs);
-
-                            //mock load 6 pages
-                            callback.finish(card.page != 6);
-                            card.notifyDataChange();
-                        }
-                    }, 400);
-                }
-            }));
+        //engine.addCardLoadSupport(new CardLoadSupport(
+        //    new AsyncLoader() {
+        //        @Override
+        //        public void loadData(Card card, @NonNull final LoadedCallback callback) {
+        //            Log.w("Load Card", card.load);
+        //
+        //            mMainHandler.postDelayed(new Runnable() {
+        //                @Override
+        //                public void run() {
+        //                    // do loading
+        //
+        //                }
+        //            }, 200);
+        //        }
+        //    },
+        //
+        //    new AsyncPageLoader() {
+        //        @Override
+        //        public void loadData(final int page, @NonNull final Card card, @NonNull final LoadedCallback callback) {
+        //            mMainHandler.postDelayed(new Runnable() {
+        //                @Override
+        //                public void run() {
+        //                    Log.w("Load page", card.load + " page " + page);
+        //                    JSONArray cells = new JSONArray();
+        //                    for (int i = 0; i < 9; i++) {
+        //                        try {
+        //                            JSONObject obj = new JSONObject();
+        //                            obj.put("type", 1);
+        //                            obj.put("msg", "async page loaded, params: " + card.getParams().toString());
+        //                            cells.put(obj);
+        //                        } catch (JSONException e) {
+        //                            e.printStackTrace();
+        //                        }
+        //                    }
+        //                    List<BaseCell> cs = engine.parseComponent(cells);
+        //
+        //                    if (card.page == 1) {
+        //                        GroupBasicAdapter<Card, ?> adapter = engine.getGroupBasicAdapter();
+        //
+        //                        card.setCells(cs);
+        //                        adapter.refreshWithoutNotify();
+        //                        Range<Integer> range = adapter.getCardRange(card);
+        //
+        //                        adapter.notifyItemRemoved(range.getLower());
+        //                        adapter.notifyItemRangeInserted(range.getLower(), cs.size());
+        //
+        //                    } else
+        //                        card.addCells(cs);
+        //
+        //                    //mock load 6 pages
+        //                    callback.finish(card.page != 6);
+        //                    card.notifyDataChange();
+        //                }
+        //            }, 400);
+        //        }
+        //    }));
         engine.addSimpleClickSupport(new SampleClickSupport());
         BannerSupport bannerSupport = new BannerSupport();
         engine.register(BannerSupport.class, bannerSupport);

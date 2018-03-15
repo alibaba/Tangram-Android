@@ -42,7 +42,7 @@ public abstract class RxBannerListener<T> extends MainThreadDisposable implement
 
     protected List<Observer<? super T>> mObservers = new ArrayList<>();
 
-    public void setObserver(Observer<? super T> observer) {
+    public void addObserver(Observer<? super T> observer) {
         mObservers.add(observer);
     }
 
@@ -64,6 +64,6 @@ public abstract class RxBannerListener<T> extends MainThreadDisposable implement
 
     @Override
     protected void onDispose() {
-
+        mObservers.clear();
     }
 }

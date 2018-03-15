@@ -24,7 +24,6 @@
 
 package com.tmall.wireless.tangram.support;
 
-import com.tmall.wireless.tangram.view.BannerViewPager;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 
@@ -46,6 +45,6 @@ public class BannerSelectedObservable extends Observable<Integer> {
     @Override
     protected void subscribeActual(Observer<? super Integer> observer) {
         observer.onSubscribe(mBannerListener);
-        mBannerListener.setObserver(observer);
+        mBannerListener.addObserver(observer);
     }
 }

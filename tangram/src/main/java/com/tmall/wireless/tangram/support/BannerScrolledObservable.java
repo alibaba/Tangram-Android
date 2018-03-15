@@ -46,7 +46,7 @@ public class BannerScrolledObservable extends Observable<ScrollEvent> {
     @Override
     protected void subscribeActual(Observer<? super ScrollEvent> observer) {
         observer.onSubscribe(mBannerListener);
-        mBannerListener.setObserver(observer);
+        mBannerListener.addObserver(observer);
     }
 
 }

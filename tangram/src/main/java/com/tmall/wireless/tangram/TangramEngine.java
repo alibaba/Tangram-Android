@@ -210,6 +210,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                     loadedMore = true;
                 } else {
                     loadSupport.doLoad(c);
+                    loadSupport.reactiveDoLoad(c);
                 }
                 c.loaded = true;
             }
@@ -272,6 +273,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                     loadedMore = true;
                 } else {
                     loadSupport.doLoad(card);
+                    loadSupport.reactiveDoLoad(card);
                 }
                 card.loaded = true;
             }

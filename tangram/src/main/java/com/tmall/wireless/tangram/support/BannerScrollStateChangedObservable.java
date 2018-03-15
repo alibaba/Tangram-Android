@@ -45,6 +45,6 @@ public class BannerScrollStateChangedObservable extends Observable<Integer> {
     @Override
     protected void subscribeActual(Observer<? super Integer> observer) {
         observer.onSubscribe(mBannerListener);
-        mBannerListener.setObserver(observer);
+        mBannerListener.addObserver(observer);
     }
 }

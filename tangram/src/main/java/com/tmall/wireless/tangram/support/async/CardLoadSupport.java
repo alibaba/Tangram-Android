@@ -24,10 +24,20 @@
 
 package com.tmall.wireless.tangram.support.async;
 
+import android.util.Log;
+import android.util.Pair;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.structure.BaseCell;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Observer;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * A helper class supports loading data of a card
@@ -92,8 +102,9 @@ public class CardLoadSupport {
      * @param card the card need async loading data
      */
     public void doLoad(final Card card) {
-        if (mAsyncLoader == null)
+        if (mAsyncLoader == null) {
             return;
+        }
         if (!card.loading && !card.loaded) {
             card.loading = true;
             mAsyncLoader.loadData(card, new AsyncLoader.LoadedCallback() {
@@ -123,8 +134,9 @@ public class CardLoadSupport {
      * @param card the card need async loading data
      */
     public void loadMore(final Card card) {
-        if (mAsyncPageLoader == null)
+        if (mAsyncPageLoader == null) {
             return;
+        }
         if (!card.loading && card.loadMore && card.hasMore) {
             card.loading = true;
             if (!card.loaded)
@@ -160,4 +172,67 @@ public class CardLoadSupport {
             });
         }
     }
+
+    private ObservableEmitter<Card> mLoadCardObserver;
+
+    /**
+     *
+     * @return An observable start loading a card
+     */
+    public Observable<Card> observeCardLoading() {
+        Observable<Card> mLoadCardObservable = Observable.create(new ObservableOnSubscribe<Card>() {
+            @Override
+            public void subscribe(ObservableEmitter<Card> emitter) throws Exception {
+                mLoadCardObserver = emitter;
+            }
+        }).filter(new Predicate<Card>() {
+            @Override
+            public boolean test(Card card) throws Exception {
+                Log.d("Longer", "in test filter");
+                return !card.loading && !card.loaded;
+            }
+        }).doOnNext(new Consumer<Card>() {
+            @Override
+            public void accept(Card card) throws Exception {
+                Log.d("Longer", "in doOnNext");
+                card.loading = true;
+            }
+        });
+        return mLoadCardObservable;
+    }
+
+    /**
+     * start load data for a card, usually called by {@link com.tmall.wireless.tangram.TangramEngine}
+     * @param card the card need reactively loading data
+     */
+    public void reactiveDoLoad(Card card) {
+        if (mLoadCardObserver == null) {
+            return;
+        }
+        mLoadCardObserver.onNext(card);
+        mLoadCardObserver.onComplete();
+    }
+
+    /**
+     * Combine with {@link #observeCardLoading()}, use this method as success consumer to subscribe to the Observable
+     * @return
+     */
+    public Consumer<Pair<Card, List<BaseCell>>> asDoLoadSuccessConsumer() {
+        return new Consumer<Pair<Card, List<BaseCell>>>() {
+            @Override
+            public void accept(Pair<Card, List<BaseCell>> result) throws Exception {
+                Card card = result.first;
+                card.loading = false;
+                List<BaseCell> cells = result.second;
+                if (cells != null && !cells.isEmpty()) {
+                    card.loaded = true;
+                    card.setCells(cells);
+                    card.notifyDataChange();
+                } else {
+                    card.loaded = false;
+                }
+            }
+        };
+    }
+
 }
