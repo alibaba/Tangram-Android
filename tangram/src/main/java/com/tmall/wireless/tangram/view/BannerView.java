@@ -103,7 +103,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
     private boolean init;
 
-    private int direction; // 1 for right, -1 for left
+    private int direction; // > 0 for right, < 0 for left
 
     private TimerHandler timer;
 
@@ -649,8 +649,21 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (timer != null) {
+            final int action = ev.getAction();
+            if (action == MotionEvent.ACTION_DOWN) {
+                stopTimer();
+            }
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                startTimer();
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
 
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
         int action = ev.getAction();
         float x = ev.getRawX();
         float y = ev.getRawY();
@@ -673,7 +686,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                direction = 0;
+                direction = 1;
                 break;
             default:
                 break;
@@ -822,6 +835,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     private boolean scrollNextPage() {
+        direction = 1;
         boolean isChange = false;
         if (mUltraViewPager != null && mUltraViewPager.getAdapter() != null && mUltraViewPager.getAdapter().getCount() > 0) {
             final int curr = mUltraViewPager.getCurrentItemFake();
