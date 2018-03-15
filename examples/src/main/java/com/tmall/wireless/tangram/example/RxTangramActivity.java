@@ -29,9 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-
-import com.alibaba.android.vlayout.Range;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -44,9 +41,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -57,7 +54,6 @@ import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.TangramEngine;
-import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.example.data.RatioTextView;
 import com.tmall.wireless.tangram.example.data.SimpleImgView;
@@ -71,8 +67,6 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
 import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.support.RxBannerScrolledListener.ScrollEvent;
-import com.tmall.wireless.tangram.support.async.AsyncLoader;
-import com.tmall.wireless.tangram.support.async.AsyncPageLoader;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.vaf.framework.VafContext;
@@ -83,6 +77,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -103,9 +98,10 @@ public class RxTangramActivity extends Activity {
     private static final String TAG = TangramActivity.class.getSimpleName();
 
     private Handler mMainHandler;
-    TangramEngine engine;
-    TangramBuilder.InnerBuilder builder;
-    RecyclerView recyclerView;
+    private TangramEngine engine;
+    private TangramBuilder.InnerBuilder builder;
+    private RecyclerView recyclerView;
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     private static class ImageTarget implements Target {
 
@@ -213,13 +209,18 @@ public class RxTangramActivity extends Activity {
         CardLoadSupport cardLoadSupport = new CardLoadSupport();
         engine.addCardLoadSupport(cardLoadSupport);
         Observable<Card> loadCardObservable = cardLoadSupport.observeCardLoading();
-        loadCardObservable
+        Disposable dsp6 = loadCardObservable
             .observeOn(Schedulers.io())
             .map(new Function<Card, Pair<Card, List<BaseCell>>>() {
 
             @Override
             public Pair<Card, List<BaseCell>> apply(Card card) throws Exception {
-                Log.d("Longer", "in map");
+                Log.d("Longer", "loadCardObservable in map");
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 JSONArray cells = new JSONArray();
                 for (int i = 0; i < 10; i++) {
                     try {
@@ -239,92 +240,71 @@ public class RxTangramActivity extends Activity {
                 return pair;
             }
         }).observeOn(AndroidSchedulers.mainThread())
-            .subscribe(cardLoadSupport.asDoLoadSuccessConsumer());
+            .subscribe(cardLoadSupport.asDoLoadFinishConsumer());
+        mCompositeDisposable.add(dsp6);
 
-        //engine.addCardLoadSupport(new CardLoadSupport(
-        //    new AsyncLoader() {
-        //        @Override
-        //        public void loadData(Card card, @NonNull final LoadedCallback callback) {
-        //            Log.w("Load Card", card.load);
-        //
-        //            mMainHandler.postDelayed(new Runnable() {
-        //                @Override
-        //                public void run() {
-        //                    // do loading
-        //
-        //                }
-        //            }, 200);
-        //        }
-        //    },
-        //
-        //    new AsyncPageLoader() {
-        //        @Override
-        //        public void loadData(final int page, @NonNull final Card card, @NonNull final LoadedCallback callback) {
-        //            mMainHandler.postDelayed(new Runnable() {
-        //                @Override
-        //                public void run() {
-        //                    Log.w("Load page", card.load + " page " + page);
-        //                    JSONArray cells = new JSONArray();
-        //                    for (int i = 0; i < 9; i++) {
-        //                        try {
-        //                            JSONObject obj = new JSONObject();
-        //                            obj.put("type", 1);
-        //                            obj.put("msg", "async page loaded, params: " + card.getParams().toString());
-        //                            cells.put(obj);
-        //                        } catch (JSONException e) {
-        //                            e.printStackTrace();
-        //                        }
-        //                    }
-        //                    List<BaseCell> cs = engine.parseComponent(cells);
-        //
-        //                    if (card.page == 1) {
-        //                        GroupBasicAdapter<Card, ?> adapter = engine.getGroupBasicAdapter();
-        //
-        //                        card.setCells(cs);
-        //                        adapter.refreshWithoutNotify();
-        //                        Range<Integer> range = adapter.getCardRange(card);
-        //
-        //                        adapter.notifyItemRemoved(range.getLower());
-        //                        adapter.notifyItemRangeInserted(range.getLower(), cs.size());
-        //
-        //                    } else
-        //                        card.addCells(cs);
-        //
-        //                    //mock load 6 pages
-        //                    callback.finish(card.page != 6);
-        //                    card.notifyDataChange();
-        //                }
-        //            }, 400);
-        //        }
-        //    }));
+        Observable<Card> loadMoreObservable = cardLoadSupport.observeCardLoadingMore();
+        Disposable dsp7 = loadMoreObservable.observeOn(Schedulers.io())
+            .map(new Function<Card, Pair<Card, Pair<List<BaseCell>, Boolean>>>() {
+                @Override
+                public Pair<Card, Pair<List<BaseCell>, Boolean>> apply(Card card) throws Exception {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Log.w("Longer", "loadMoreObservable " + card.load + " page " + card.page);
+                    JSONArray cells = new JSONArray();
+                    for (int i = 0; i < 9; i++) {
+                        try {
+                            JSONObject obj = new JSONObject();
+                            obj.put("type", 1);
+                            obj.put("msg", "async page loaded, params: " + card.getParams().toString());
+                            cells.put(obj);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    List<BaseCell> cs = engine.parseComponent(cells);
+                    //mock loading 6 pages
+                    Pair<List<BaseCell>, Boolean> data = new Pair<>(cs, card.page != 6);
+                    Pair<Card, Pair<List<BaseCell>, Boolean>> result = new Pair<>(card, data);
+                    return result;
+                }
+            }).observeOn(AndroidSchedulers.mainThread()).subscribe(cardLoadSupport.asDoLoadMoreFinishConsumer());
+        mCompositeDisposable.add(dsp7);
         engine.addSimpleClickSupport(new SampleClickSupport());
         BannerSupport bannerSupport = new BannerSupport();
         engine.register(BannerSupport.class, bannerSupport);
-        Disposable ob1 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
+        Disposable dsp1 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
                 Log.d("TangramActivity", "1 selected " + integer);
             }
         });
-        Disposable ob2 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
+        mCompositeDisposable.add(dsp1);
+        Disposable dsp2 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
                 Log.d("TangramActivity", "2 selected " + integer);
             }
         });
+        mCompositeDisposable.add(dsp2);
 
-        bannerSupport.observeScrollStateChanged("banner2").subscribe(new Consumer<Integer>() {
+        Disposable dsp3 = bannerSupport.observeScrollStateChanged("banner2").subscribe(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
                 Log.d("TangramActivity", "state changed " + integer);
             }
         });
-        bannerSupport.observeScrolled("banner2").subscribe(new Consumer<ScrollEvent>() {
+        mCompositeDisposable.add(dsp3);
+        Disposable dsp4 = bannerSupport.observeScrolled("banner2").subscribe(new Consumer<ScrollEvent>() {
             @Override
             public void accept(ScrollEvent scrollEvent) throws Exception {
                 Log.d("TangramActivity", "scrolled " + scrollEvent.toString());
             }
         });
+        mCompositeDisposable.add(dsp4);
         //Step 6: enable auto load more if your page's data is lazy loaded
         engine.enableAutoLoadMore(true);
 
@@ -407,7 +387,7 @@ public class RxTangramActivity extends Activity {
         //    })
         //    .subscribe(engine.asParsedDataConsume());
         // mock
-        Observable.create(new ObservableOnSubscribe<Card>() {
+        Disposable dsp5 = Observable.create(new ObservableOnSubscribe<Card>() {
             @Override
             public void subscribe(ObservableEmitter<Card> emitter) throws Exception {
                 Log.d("TangramActivity", "subscribe in thread " + Thread.currentThread().getName());
@@ -423,7 +403,7 @@ public class RxTangramActivity extends Activity {
                     emitter.onNext(cards.get(i));
                     Log.d("TangramActivity", "emitter " + i);
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(1000);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -433,6 +413,7 @@ public class RxTangramActivity extends Activity {
         }).subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(engine.asAppendConsumer());
+        mCompositeDisposable.add(dsp5);
 
         findViewById(R.id.first).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -448,6 +429,7 @@ public class RxTangramActivity extends Activity {
         if (engine != null) {
             engine.destroy();
         }
+        mCompositeDisposable.dispose();
     }
 
     public static byte[] getAssertsFile(Context context, String fileName) {

@@ -24,20 +24,17 @@
 
 package com.tmall.wireless.tangram.support.async;
 
+import android.support.v4.util.Pair;
 import android.util.Log;
-import android.util.Pair;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * A helper class supports loading data of a card
@@ -139,8 +136,9 @@ public class CardLoadSupport {
         }
         if (!card.loading && card.loadMore && card.hasMore) {
             card.loading = true;
-            if (!card.loaded)
+            if (!card.loaded) {
                 card.page = sInitialPage;
+            }
 
 
             mAsyncPageLoader.loadData(card.page, card, new AsyncPageLoader.LoadedCallback() {
@@ -156,8 +154,9 @@ public class CardLoadSupport {
                 public void finish(List<BaseCell> cells, boolean hasMore) {
                     if (card.page == sInitialPage) {
                         card.setCells(cells);
-                    } else
+                    } else {
                         card.addCells(cells);
+                    }
 
                     finish(hasMore);
                     card.notifyDataChange();
@@ -173,7 +172,10 @@ public class CardLoadSupport {
         }
     }
 
+    //FIXME cancel\ reset
     private ObservableEmitter<Card> mLoadCardObserver;
+
+    private ObservableEmitter<Card> mLoadMoreObserver;
 
     /**
      *
@@ -188,13 +190,13 @@ public class CardLoadSupport {
         }).filter(new Predicate<Card>() {
             @Override
             public boolean test(Card card) throws Exception {
-                Log.d("Longer", "in test filter");
+                Log.d("Longer", "observeCardLoading in test filter");
                 return !card.loading && !card.loaded;
             }
         }).doOnNext(new Consumer<Card>() {
             @Override
             public void accept(Card card) throws Exception {
-                Log.d("Longer", "in doOnNext");
+                Log.d("Longer", "observeCardLoading in doOnNext");
                 card.loading = true;
             }
         });
@@ -210,14 +212,15 @@ public class CardLoadSupport {
             return;
         }
         mLoadCardObserver.onNext(card);
-        mLoadCardObserver.onComplete();
     }
 
     /**
-     * Combine with {@link #observeCardLoading()}, use this method as success consumer to subscribe to the Observable
-     * @return
+     * Combine with {@link #observeCardLoading()}, use this method as success consumer to subscribe to the Observable.<br />
+     * If your request success, provide a Pair with original card and non-empty List<BaseCell>.
+     * Otherwise, provide a Pair with original card and empty List<BaseCell>.
+     * @return A consumer to consume load event.
      */
-    public Consumer<Pair<Card, List<BaseCell>>> asDoLoadSuccessConsumer() {
+    public Consumer<Pair<Card, List<BaseCell>>> asDoLoadFinishConsumer() {
         return new Consumer<Pair<Card, List<BaseCell>>>() {
             @Override
             public void accept(Pair<Card, List<BaseCell>> result) throws Exception {
@@ -234,5 +237,79 @@ public class CardLoadSupport {
             }
         };
     }
+
+    /**
+     *
+     * @return An observable start loading more for a card
+     */
+    public Observable<Card> observeCardLoadingMore() {
+        Observable<Card> mLoadMoreCardObservable = Observable.create(new ObservableOnSubscribe<Card>() {
+            @Override
+            public void subscribe(ObservableEmitter<Card> emitter) throws Exception {
+                mLoadMoreObserver = emitter;
+            }
+        }).filter(new Predicate<Card>() {
+            @Override
+            public boolean test(Card card) throws Exception {
+                Log.d("Longer", "observeCardLoadingMore in test filter");
+                return !card.loading && card.loadMore && card.hasMore;
+            }
+        }).doOnNext(new Consumer<Card>() {
+            @Override
+            public void accept(Card card) throws Exception {
+                Log.d("Longer", "observeCardLoadingMore in doOnNext");
+                card.loading = true;
+                if (!card.loaded) {
+                    card.page = sInitialPage;
+                }
+            }
+        });
+        return mLoadMoreCardObservable;
+    }
+
+    /**
+     * start load more data for a card, usually called by {@link com.tmall.wireless.tangram.TangramEngine}
+     * @param card the card need reactively loading data
+     */
+    public void reactiveDoLoadMore(Card card) {
+        if (mLoadMoreObserver == null) {
+            return;
+        }
+        mLoadMoreObserver.onNext(card);
+    }
+
+
+    /**
+     * Combine with {@link #observeCardLoadingMore()}, use this method as success consumer to subscribe to the Observable<br />
+     * If your request success, provide a Pair with original card and another Pair with non-empty List<BaseCell> and boolean value to indicate if there is more.
+     * Otherwise, provide a Pair with original card and another Pair with empty List<BaseCell> and boolean value to indicate if there is more.
+     * @return A consumer to consume load more event.
+     */
+    public Consumer<Pair<Card, Pair<List<BaseCell>, Boolean>>> asDoLoadMoreFinishConsumer() {
+        return new Consumer<Pair<Card, Pair<List<BaseCell>, Boolean>>>() {
+            @Override
+            public void accept(Pair<Card, Pair<List<BaseCell>, Boolean>> result) throws Exception {
+                Card card = result.first;
+                card.loading = false;
+                card.loaded = true;
+                Pair<List<BaseCell>, Boolean> data = result.second;
+                List<BaseCell> cells = data.first;
+                boolean hasMore = data.second;
+                if (cells != null && !cells.isEmpty()) {
+                    if (card.page == sInitialPage) {
+                        card.setCells(cells);
+                    } else {
+                        card.addCells(cells);
+                    }
+                    card.page++;
+                    card.hasMore = hasMore;
+                    card.notifyDataChange();
+                } else {
+                    card.hasMore = hasMore;
+                }
+            }
+        };
+    }
+
 
 }

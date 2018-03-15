@@ -215,8 +215,10 @@ public class FusionCard extends Card implements IDelegateCard {
                             engine.scrollToPosition(headerCard);
                             engine.replaceCard(currentCard, indexCache.card);
                             currentCard = indexCache.card;
-                            if (!currentCard.loaded)
+                            if (!currentCard.loaded) {
                                 loadSupport.loadMore(currentCard);
+                                loadSupport.reactiveDoLoadMore(currentCard);
+                            }
                         }
 
                         currentIndex = index;

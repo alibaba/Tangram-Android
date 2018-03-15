@@ -191,6 +191,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 // page load
                 if (current.loadMore) {
                     loadSupport.loadMore(current);
+                    loadSupport.reactiveDoLoadMore(current);
                 }
                 return;
             }
@@ -207,6 +208,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 if (c.loadMore && !loadedMore) {
                     // only load one load more card
                     loadSupport.loadMore(c);
+                    loadSupport.reactiveDoLoadMore(c);
                     loadedMore = true;
                 } else {
                     loadSupport.doLoad(c);
@@ -270,6 +272,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 if (card.loadMore && !loadedMore) {
                     // only load one load more card
                     loadSupport.loadMore(card);
+                    loadSupport.reactiveDoLoadMore(card);
                     loadedMore = true;
                 } else {
                     loadSupport.doLoad(card);
@@ -308,6 +311,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
         if (groups.size() != 0) {
             loadSupport.loadMore(groups.get(groups.size() - 1));
+            loadSupport.reactiveDoLoadMore(groups.get(groups.size() - 1));
         }
     }
 
