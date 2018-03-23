@@ -41,9 +41,14 @@ import io.reactivex.disposables.Disposables;
  */
 
 final class ViewClickObservable extends Observable<Object> {
+
+    public static ViewClickObservable from(View view) {
+        return new ViewClickObservable(view);
+    }
+
     private final View view;
 
-    ViewClickObservable(View view) {
+    private ViewClickObservable(View view) {
         this.view = view;
     }
 

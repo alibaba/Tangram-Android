@@ -62,6 +62,8 @@ import com.tmall.wireless.tangram.example.data.TestViewHolder;
 import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
 import com.tmall.wireless.tangram.example.data.VVTEST;
 import com.tmall.wireless.tangram.example.support.SampleClickSupport;
+import com.tmall.wireless.tangram.op.AppendGroupOp;
+import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
 import com.tmall.wireless.tangram.support.BannerSupport;
@@ -386,9 +388,9 @@ public class RxTangramActivity extends Activity {
         //    })
         //    .subscribe(engine.asParsedDataConsume());
         // mock
-        Disposable dsp5 = Observable.create(new ObservableOnSubscribe<Card>() {
+        Disposable dsp5 = Observable.create(new ObservableOnSubscribe<AppendGroupOp>() {
             @Override
-            public void subscribe(ObservableEmitter<Card> emitter) throws Exception {
+            public void subscribe(ObservableEmitter<AppendGroupOp> emitter) throws Exception {
                 Log.d("TangramActivity", "subscribe in thread " + Thread.currentThread().getName());
                 String json = new String(getAssertsFile(getApplicationContext(), "data.json"));
                 JSONArray data = null;
@@ -399,7 +401,7 @@ public class RxTangramActivity extends Activity {
                 }
                 List<Card> cards = engine.parseData(data);
                 for (int i = 0, size = cards.size(); i < size; i++) {
-                    emitter.onNext(cards.get(i));
+                    emitter.onNext(new AppendGroupOp(cards.get(i)));
                     Log.d("TangramActivity", "emitter " + i);
                     try {
                         Thread.sleep(1000);
@@ -414,14 +416,14 @@ public class RxTangramActivity extends Activity {
         .subscribe(engine.asAppendGroupConsumer());
         mCompositeDisposable.add(dsp5);
 
-        new ViewClickObservable(findViewById(R.id.last)).map(new Function<Object, BaseCell>() {
+        mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.last)).map(new Function<Object, UpdateCellOp>() {
             @Override
-            public BaseCell apply(Object o) throws Exception {
+            public UpdateCellOp apply(Object o) throws Exception {
                 BaseCell cell = (BaseCell)engine.getGroupBasicAdapter().getComponents().get(0);
                 cell.extras.put("title", "Rx标题1");
-                return cell;
+                return new UpdateCellOp(cell);
             }
-        }).subscribe(engine.asUpdateCellConsumer());
+        }).subscribe(engine.asUpdateCellConsumer()));
     }
 
     @Override
