@@ -22,48 +22,49 @@
  * SOFTWARE.
  */
 
-package com.tmall.wireless.tangram.eventbus;
-
-import android.support.annotation.NonNull;
-import android.support.v4.util.Pools;
+package com.tmall.wireless.tangram.op;
 
 /**
- * Created by longerian on 16/4/26.
+ * Created by longerian on 2018/3/23.
  *
- * TangramOp1 pool to recycle consumed event.
+ * @author longerian
+ * @date 2018/03/23
  */
-class EventPool {
 
-    private Pools.SynchronizedPool<Event> recyclePool = new Pools.SynchronizedPool<Event>(25);
+public class TangramOp1<V1> {
 
-    private static class EventPoolHolder {
-        private static final EventPool sharedInstance = new EventPool();
+    public TangramOp1(int type, V1 arg1) {
+        mType = type;
+        this.arg1 = arg1;
     }
 
-    private EventPool() {
+    public static class OP_TYPE {
+        public static final int INSERT_CELL = 0;
+        public static final int INSERT_CELL_LIST = 1;
+        public static final int INSERT_GROUP = 2;
+        public static final int INSERT_GROUP_LIST = 3;
+        public static final int APPEND_GROUP = 4;
+        public static final int APPEND_GROUP_LIST = 5;
+        public static final int REMOVE_CELL_POSITION = 6;
+        public static final int REMOVE_CELL = 7;
+        public static final int REMOVE_GROUP_IDX = 8;
+        public static final int REMOVE_GROUP = 9;
+        public static final int REPLACE_CELL = 10;
+        public static final int REPLACE_GROUP_CONTENT = 11;
+        public static final int REPLACE_GROUP = 12;
+        public static final int UPDATE_CELL = 13;
     }
 
-    public static EventPool sharedInstance()  {
-        return EventPoolHolder.sharedInstance;
+    private final int mType;
+
+    private final V1 arg1;
+
+    public int getType() {
+        return mType;
     }
 
-    @NonNull
-    public Event acquire() {
-        Event instance = recyclePool.acquire();
-        if (instance == null) {
-            instance = new Event();
-        }
-        return instance;
-    }
-
-    public boolean release(@NonNull Event event) {
-        event.type = null;
-        event.sourceId = null;
-        if (event.args != null) {
-            event.args.clear();
-        }
-        event.eventContext = null;
-        return recyclePool.release(event);
+    public V1 getArg1() {
+        return arg1;
     }
 
 }

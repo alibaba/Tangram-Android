@@ -32,17 +32,17 @@ import android.support.v4.util.ArrayMap;
 public class Event {
 
     /**
-     * Event type
+     * TangramOp1 type
      */
     public String type;
 
     /**
-     * Event producer's Id
+     * TangramOp1 producer's Id
      */
     public String sourceId;
 
     /**
-     * Event args
+     * TangramOp1 args
      */
     public ArrayMap<String, String> args;
 
@@ -68,7 +68,7 @@ public class Event {
 
     @Override
     public String toString() {
-        return "Event{" +
+        return "TangramOp1{" +
                 "args=" + args +
                 ", sourceId='" + sourceId + '\'' +
                 ", type=" + type +

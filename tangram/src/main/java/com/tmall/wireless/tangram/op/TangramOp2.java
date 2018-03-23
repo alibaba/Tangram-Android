@@ -22,48 +22,25 @@
  * SOFTWARE.
  */
 
-package com.tmall.wireless.tangram.eventbus;
-
-import android.support.annotation.NonNull;
-import android.support.v4.util.Pools;
+package com.tmall.wireless.tangram.op;
 
 /**
- * Created by longerian on 16/4/26.
+ * Created by longerian on 2018/3/23.
  *
- * TangramOp1 pool to recycle consumed event.
+ * @author longerian
+ * @date 2018/03/23
  */
-class EventPool {
 
-    private Pools.SynchronizedPool<Event> recyclePool = new Pools.SynchronizedPool<Event>(25);
+public class TangramOp2<V1, V2> extends TangramOp1<V1> {
 
-    private static class EventPoolHolder {
-        private static final EventPool sharedInstance = new EventPool();
+    private final V2 arg2;
+
+    public TangramOp2(int type, V1 arg1, V2 arg2) {
+        super(type, arg1);
+        this.arg2 = arg2;
     }
 
-    private EventPool() {
+    public V2 getArg2() {
+        return arg2;
     }
-
-    public static EventPool sharedInstance()  {
-        return EventPoolHolder.sharedInstance;
-    }
-
-    @NonNull
-    public Event acquire() {
-        Event instance = recyclePool.acquire();
-        if (instance == null) {
-            instance = new Event();
-        }
-        return instance;
-    }
-
-    public boolean release(@NonNull Event event) {
-        event.type = null;
-        event.sourceId = null;
-        if (event.args != null) {
-            event.args.clear();
-        }
-        event.eventContext = null;
-        return recyclePool.release(event);
-    }
-
 }

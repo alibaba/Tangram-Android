@@ -790,6 +790,15 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
     }
 
+    public Consumer<Object> asReplaceCardConsumer() {
+        return new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+
+            }
+        };
+    }
+
 
     /**
      * Make engine as a consumer to accept data to append at the end of list
