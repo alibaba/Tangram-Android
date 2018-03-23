@@ -47,14 +47,17 @@
 
         <TextView
             android:id="@+id/first"
-            style="@style/IndicateText" />
+            style="@style/IndicateText"
+            android:text="first"/>
 
         <TextView
             android:id="@+id/last"
-            style="@style/IndicateText" />
+            style="@style/IndicateText"
+            android:text="last"/>
 
         <TextView
             android:id="@+id/count"
-            style="@style/IndicateText" />
+            style="@style/IndicateText"
+            android:text="count"/>
     </LinearLayout>
 </FrameLayout>

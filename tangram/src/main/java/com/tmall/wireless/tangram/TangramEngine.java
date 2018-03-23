@@ -776,6 +776,22 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
+     * Update a view's UI by its cell's data, you should change cell's data first.
+     * @param cell
+     */
+    public void update(BaseCell cell) {
+        VirtualLayoutManager layoutManager = getLayoutManager();
+        if (cell != null && mGroupBasicAdapter != null) {
+            int position = mGroupBasicAdapter.getPositionByItem(cell);
+            if (position >= 0) {
+                mGroupBasicAdapter.notifyItemChanged(position);
+            }
+        }
+
+    }
+
+
+    /**
      * Make engine as a consumer to accept data to append at the end of list
      * @return
      */
@@ -797,6 +813,19 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
             @Override
             public void accept(Card card) throws Exception {
                 appendWith(card);
+            }
+        };
+    }
+
+    /**
+     * Make engine as a consumer to accept cell'data change
+     * @return
+     */
+    public Consumer<BaseCell> asRefreshCellConsumer() {
+        return new Consumer<BaseCell>() {
+            @Override
+            public void accept(BaseCell cell) throws Exception {
+                update(cell);
             }
         };
     }

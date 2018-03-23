@@ -415,12 +415,14 @@ public class RxTangramActivity extends Activity {
         .subscribe(engine.asAppendConsumer());
         mCompositeDisposable.add(dsp5);
 
-        findViewById(R.id.first).setOnClickListener(new View.OnClickListener() {
+        new ViewClickObservable(findViewById(R.id.last)).map(new Function<Object, BaseCell>() {
             @Override
-            public void onClick(View v) {
-                engine.refresh(true);
+            public BaseCell apply(Object o) throws Exception {
+                BaseCell cell = (BaseCell)engine.getGroupBasicAdapter().getComponents().get(0);
+                cell.extras.put("title", "Rx标题1");
+                return cell;
             }
-        });
+        }).subscribe(engine.asRefreshCellConsumer());
     }
 
     @Override

@@ -308,12 +308,6 @@ public class TangramActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        findViewById(R.id.first).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                engine.refresh(true);
-            }
-        });
     }
 
     @Override
