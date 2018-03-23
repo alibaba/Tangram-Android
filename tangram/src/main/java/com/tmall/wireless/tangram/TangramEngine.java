@@ -46,6 +46,20 @@ import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.ext.PullFromEndListener;
 import com.tmall.wireless.tangram.ext.SwipeItemTouchListener;
+import com.tmall.wireless.tangram.op.AppendGroupOp;
+import com.tmall.wireless.tangram.op.AppendGroupsOp;
+import com.tmall.wireless.tangram.op.InsertCellOp;
+import com.tmall.wireless.tangram.op.InsertCellsOp;
+import com.tmall.wireless.tangram.op.InsertGroupOp;
+import com.tmall.wireless.tangram.op.InsertGroupsOp;
+import com.tmall.wireless.tangram.op.RemoveCellOp;
+import com.tmall.wireless.tangram.op.RemoveCellPositionOp;
+import com.tmall.wireless.tangram.op.RemoveGroupIdxOp;
+import com.tmall.wireless.tangram.op.RemoveGroupOp;
+import com.tmall.wireless.tangram.op.ReplaceCellOp;
+import com.tmall.wireless.tangram.op.ReplaceGroupContentOp;
+import com.tmall.wireless.tangram.op.ReplaceGroupOp;
+import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
@@ -778,9 +792,9 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     /**
      * Update a view's UI by its cell's data, you should change cell's data first.
      * @param cell
+     * @since 3.0.0
      */
     public void update(BaseCell cell) {
-        VirtualLayoutManager layoutManager = getLayoutManager();
         if (cell != null && mGroupBasicAdapter != null) {
             int position = mGroupBasicAdapter.getPositionByItem(cell);
             if (position >= 0) {
@@ -790,38 +804,162 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
     }
 
-    public Consumer<Object> asReplaceCardConsumer() {
-        return new Consumer<Object>() {
-            @Override
-            public void accept(Object o) throws Exception {
-
-            }
-        };
-    }
-
-
     /**
-     * Make engine as a consumer to accept data to append at the end of list
-     * @return
+     * @since 3.0.0
      */
-    public Consumer<List<Card>> asBatchAppendConsumer() {
-        return new Consumer<List<Card>>() {
+    public Consumer<InsertCellOp> asInsertCellConsumer() {
+        return new Consumer<InsertCellOp>() {
             @Override
-            public void accept(List<Card> cards) throws Exception {
-                appendBatchWith(cards);
+            public void accept(InsertCellOp op) throws Exception {
+                insertWith(op.getArg1(), op.getArg2());
             }
         };
     }
 
     /**
+     * @since 3.0.0
+     */
+    public Consumer<InsertCellsOp> asInsertCellsConsumer() {
+        return new Consumer<InsertCellsOp>() {
+            @Override
+            public void accept(InsertCellsOp op) throws Exception {
+                insertWith(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<InsertGroupOp> asInsertGroupConsumer() {
+        return new Consumer<InsertGroupOp>() {
+            @Override
+            public void accept(InsertGroupOp op) throws Exception {
+                insertBatchWith(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<InsertGroupsOp> asInsertGroupsConsumer() {
+        return new Consumer<InsertGroupsOp>() {
+            @Override
+            public void accept(InsertGroupsOp op) throws Exception {
+                insertBatchWith(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
      * Make engine as a consumer to accept data to append at the end of list
      * @return
+     * @since 3.0.0
      */
-    public Consumer<Card> asAppendConsumer() {
-        return new Consumer<Card>() {
+    public Consumer<AppendGroupOp> asAppendGroupConsumer() {
+        return new Consumer<AppendGroupOp>() {
             @Override
-            public void accept(Card card) throws Exception {
-                appendWith(card);
+            public void accept(AppendGroupOp op) throws Exception {
+                appendWith(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * Make engine as a consumer to accept data to append at the end of list
+     * @return
+     * @since 3.0.0
+     */
+    public Consumer<AppendGroupsOp> asAppendGroupsConsumer() {
+        return new Consumer<AppendGroupsOp>() {
+            @Override
+            public void accept(AppendGroupsOp op) throws Exception {
+                appendBatchWith(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected Consumer<RemoveCellPositionOp> asRemoveCellPositionConsumer() {
+        return new Consumer<RemoveCellPositionOp>() {
+            @Override
+            public void accept(RemoveCellPositionOp op) throws Exception {
+                removeBy(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected Consumer<RemoveCellOp> asRemoveCellConsumer() {
+        return new Consumer<RemoveCellOp>() {
+            @Override
+            public void accept(RemoveCellOp op) throws Exception {
+                removeBy(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected Consumer<RemoveGroupIdxOp> asRemoveGroupIdxConsumer() {
+        return new Consumer<RemoveGroupIdxOp>() {
+            @Override
+            public void accept(RemoveGroupIdxOp op) throws Exception {
+                removeBatchBy(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected Consumer<RemoveGroupOp> asRemoveGroupConsumer() {
+        return new Consumer<RemoveGroupOp>() {
+            @Override
+            public void accept(RemoveGroupOp op) throws Exception {
+                removeBatchBy(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<ReplaceCellOp> asReplaceCellConsumer() {
+        return new Consumer<ReplaceCellOp>() {
+            @Override
+            public void accept(ReplaceCellOp op) throws Exception {
+                replace(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<ReplaceGroupContentOp> asReplaceGroupContentConsumer() {
+        return new Consumer<ReplaceGroupContentOp>() {
+            @Override
+            public void accept(ReplaceGroupContentOp op) throws Exception {
+                replace(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<ReplaceGroupOp> asReplaceGroupConsumer() {
+        return new Consumer<ReplaceGroupOp>() {
+            @Override
+            public void accept(ReplaceGroupOp op) throws Exception {
+                replace(op.getArg1(), op.getArg2());
             }
         };
     }
@@ -829,12 +967,13 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     /**
      * Make engine as a consumer to accept cell'data change
      * @return
+     * @since 3.0.0
      */
-    public Consumer<BaseCell> asRefreshCellConsumer() {
-        return new Consumer<BaseCell>() {
+    public Consumer<UpdateCellOp> asUpdateCellConsumer() {
+        return new Consumer<UpdateCellOp>() {
             @Override
-            public void accept(BaseCell cell) throws Exception {
-                update(cell);
+            public void accept(UpdateCellOp op) throws Exception {
+                update(op.getArg1());
             }
         };
     }

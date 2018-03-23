@@ -35,8 +35,8 @@ import com.tmall.wireless.tangram.structure.BaseCell;
  * @date 2018/03/23
  */
 
-public class InsertCellListOp extends TangramOp2<Integer, List<BaseCell>> {
-    public InsertCellListOp(Integer arg1, List<BaseCell> arg2) {
+public class InsertCellsOp extends TangramOp2<Integer, List<BaseCell>> {
+    public InsertCellsOp(Integer arg1, List<BaseCell> arg2) {
         super(OP_TYPE.INSERT_CELL_LIST, arg1, arg2);
     }
 }

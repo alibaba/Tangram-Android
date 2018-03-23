@@ -44,7 +44,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.libra.Utils;
@@ -412,7 +411,7 @@ public class RxTangramActivity extends Activity {
             }
         }).subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(engine.asAppendConsumer());
+        .subscribe(engine.asAppendGroupConsumer());
         mCompositeDisposable.add(dsp5);
 
         new ViewClickObservable(findViewById(R.id.last)).map(new Function<Object, BaseCell>() {
@@ -422,7 +421,7 @@ public class RxTangramActivity extends Activity {
                 cell.extras.put("title", "Rx标题1");
                 return cell;
             }
-        }).subscribe(engine.asRefreshCellConsumer());
+        }).subscribe(engine.asUpdateCellConsumer());
     }
 
     @Override
