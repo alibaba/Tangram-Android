@@ -45,12 +45,24 @@ public class Style {
 
     private static final LruCache<String, Integer> colorCache = new LruCache<>(100);
 
+    /**
+     * Use {@link #KEY_BACKGROUND_COLOR} instead
+     */
+    @Deprecated
     public static final String KEY_BG_COLOR = "bgColor";
 
     public static final String KEY_BACKGROUND_COLOR = "background-color";
 
+    /**
+     * Use {@link #KEY_BACKGROUND_IMAGE} instead
+     */
+    @Deprecated
     public static final String KEY_BG_IMAGE = "bgImage";
 
+    /**
+     * Use {@link #KEY_BACKGROUND_IMAGE} instead
+     */
+    @Deprecated
     public static final String KEY_STYLE_BG_IMAGE = "bgImgUrl";
 
     public static final String KEY_BACKGROUND_IMAGE = "background-image";
@@ -102,7 +114,7 @@ public class Style {
     public int bgColor;
 
     /**
-     * alias of bgImgUrl
+     * Alias of bgImgUrl, use {@link #bgImgUrl} instead
      */
 	@Deprecated
     public String bgImage;
@@ -131,6 +143,7 @@ public class Style {
     public final int[] padding = new int[]{0, 0, 0, 0};
 
     public int width = VirtualLayoutManager.LayoutParams.MATCH_PARENT;
+
     public int height = VirtualLayoutManager.LayoutParams.WRAP_CONTENT;
 
     public float aspectRatio = Float.NaN;

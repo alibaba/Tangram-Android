@@ -68,7 +68,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public static boolean sIsGenIds = false;
 
     /**
-     * cell's type
+     * cell's type, use {@link #stringType} instead
      */
     @Deprecated
     public int type;
@@ -144,6 +144,10 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         objectId = sIsGenIds ? sIdGen.getAndIncrement() : 0;
     }
 
+    /**
+     * Use {@link #BaseCell(String)} instead
+     * @param type
+     */
     @Deprecated
     public BaseCell(int type) {
         this.type = type;

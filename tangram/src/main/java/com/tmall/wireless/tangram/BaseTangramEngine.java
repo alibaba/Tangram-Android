@@ -349,6 +349,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
 
     /**
      * @return An ObservableTransformer help to transformer original data to parsed data.
+     * @since 3.0.0
      */
     public ObservableTransformer<T, List<C>> getDataTransformer() {
         return new ObservableTransformer<T, List<C>>() {
@@ -367,6 +368,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     /**
      * Make engine as a consumer to accept origin data from user
      * @return A consumer will call {@link BaseTangramEngine#setData(Object)}
+     * @since 3.0.0
      */
     public Consumer<T> asOriginalDataConsume() {
         return new Consumer<T>() {
@@ -380,6 +382,7 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     /**
      * Make engine as a consumer to accept parsed data from user
      * @return A consumer will call {@link BaseTangramEngine#setData(List)}
+     * @since 3.0.0
      */
     public Consumer<List<C>> asParsedDataConsume() {
         return new Consumer<List<C>>() {
