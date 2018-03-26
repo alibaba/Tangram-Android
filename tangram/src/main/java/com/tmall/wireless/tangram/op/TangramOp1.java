@@ -53,6 +53,8 @@ public class TangramOp1<V1> {
         public static final int REPLACE_GROUP_CONTENT = 11;
         public static final int REPLACE_GROUP = 12;
         public static final int UPDATE_CELL = 13;
+        public static final int LOAD_GROUP = 14;
+        public static final int LOAD_MORE = 15;
     }
 
     private final int mType;

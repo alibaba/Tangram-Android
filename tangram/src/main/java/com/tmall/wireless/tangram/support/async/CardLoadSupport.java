@@ -27,6 +27,8 @@ package com.tmall.wireless.tangram.support.async;
 import android.support.v4.util.Pair;
 import android.util.Log;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.op.LoadGroupOp;
+import com.tmall.wireless.tangram.op.LoadMoreOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -213,7 +215,7 @@ public class CardLoadSupport {
     }
 
     /**
-     * start load data for a card, usually called by {@link com.tmall.wireless.tangram.TangramEngine}
+     * Start to load data for a card, usually called by {@link com.tmall.wireless.tangram.TangramEngine}
      * @param card the card need reactively loading data
      */
     public void reactiveDoLoad(Card card) {
@@ -225,17 +227,17 @@ public class CardLoadSupport {
 
     /**
      * Combine with {@link #observeCardLoading()}, use this method as success consumer to subscribe to the Observable.<br />
-     * If your request success, provide a Pair with original card and non-empty List<BaseCell>.
-     * Otherwise, provide a Pair with original card and empty List<BaseCell>.
+     * If your request success, provide a {@link LoadGroupOp} with original card and non-empty List<BaseCell>.<br />
+     * Otherwise, provide a {@link LoadGroupOp} with original card and empty List<BaseCell>.
      * @return A consumer to consume load event.
      */
-    public Consumer<Pair<Card, List<BaseCell>>> asDoLoadFinishConsumer() {
-        return new Consumer<Pair<Card, List<BaseCell>>>() {
+    public Consumer<LoadGroupOp> asDoLoadFinishConsumer() {
+        return new Consumer<LoadGroupOp>() {
             @Override
-            public void accept(Pair<Card, List<BaseCell>> result) throws Exception {
-                Card card = result.first;
+            public void accept(LoadGroupOp result) throws Exception {
+                Card card = result.getArg1();
                 card.loading = false;
-                List<BaseCell> cells = result.second;
+                List<BaseCell> cells = result.getArg2();
                 if (cells != null && !cells.isEmpty()) {
                     card.loaded = true;
                     card.setCells(cells);
@@ -282,7 +284,7 @@ public class CardLoadSupport {
     }
 
     /**
-     * start load more data for a card, usually called by {@link com.tmall.wireless.tangram.TangramEngine}
+     * Start to load more data for a card, usually called by {@link com.tmall.wireless.tangram.TangramEngine}
      * @param card the card need reactively loading data
      */
     public void reactiveDoLoadMore(Card card) {
@@ -294,21 +296,20 @@ public class CardLoadSupport {
 
 
     /**
-     * Combine with {@link #observeCardLoadingMore()}, use this method as success consumer to subscribe to the Observable<br />
-     * If your request success, provide a Pair with original card and another Pair with non-empty List<BaseCell> and boolean value to indicate if there is more.
-     * Otherwise, provide a Pair with original card and another Pair with empty List<BaseCell> and boolean value to indicate if there is more.
+     * Combine with {@link #observeCardLoadingMore()}, use this method as success consumer to subscribe to the Observable.<br />
+     * If your request success, provide a {@link LoadMoreOp} with original card, non-empty List<BaseCell> and boolean value to indicate whether there is more.<br />
+     * Otherwise, provide a {@link LoadMoreOp} with original card, empty List<BaseCell> and boolean value to indicate whether there is more.
      * @return A consumer to consume load more event.
      */
-    public Consumer<Pair<Card, Pair<List<BaseCell>, Boolean>>> asDoLoadMoreFinishConsumer() {
-        return new Consumer<Pair<Card, Pair<List<BaseCell>, Boolean>>>() {
+    public Consumer<LoadMoreOp> asDoLoadMoreFinishConsumer() {
+        return new Consumer<LoadMoreOp>() {
             @Override
-            public void accept(Pair<Card, Pair<List<BaseCell>, Boolean>> result) throws Exception {
-                Card card = result.first;
+            public void accept(LoadMoreOp result) throws Exception {
+                Card card = result.getArg1();
                 card.loading = false;
                 card.loaded = true;
-                Pair<List<BaseCell>, Boolean> data = result.second;
-                List<BaseCell> cells = data.first;
-                boolean hasMore = data.second;
+                List<BaseCell> cells = result.getArg2();
+                boolean hasMore = result.getArg3();
                 if (cells != null && !cells.isEmpty()) {
                     if (card.page == sInitialPage) {
                         card.setCells(cells);

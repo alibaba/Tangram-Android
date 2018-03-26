@@ -31,7 +31,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ChildDrawingOrderCallback;
-import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 

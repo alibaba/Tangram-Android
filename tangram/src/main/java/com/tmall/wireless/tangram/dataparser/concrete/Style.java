@@ -109,7 +109,7 @@ public class Style {
 
     public static final int DISPLAY_INNER_BLOCK = 1;
 
-    private static final int[] DEFAULT_MARGIN = new int[]{0, 0, 0, 0};
+    private static final int[] DEFAULT_MARGIN = new int[] {0, 0, 0, 0};
 
     public int bgColor;
 
