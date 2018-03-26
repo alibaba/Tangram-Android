@@ -37,6 +37,7 @@ import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.TangramEngine;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.example.data.DEBUG;
 import com.tmall.wireless.tangram.example.data.RatioTextView;
 import com.tmall.wireless.tangram.example.data.SimpleImgView;
 import com.tmall.wireless.tangram.example.data.SingleImageView;
@@ -172,9 +173,11 @@ public class TangramActivity extends Activity {
                 new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TextView.class));
         builder.registerCell(199,SingleImageView.class);
         builder.registerVirtualView("vvtest");
+        builder.registerVirtualView("Debug");
         //Step 4: new engine
         engine = builder.build();
         engine.setVirtualViewTemplate(VVTEST.BIN);
+        engine.setVirtualViewTemplate(DEBUG.BIN);
         engine.getService(VafContext.class).setImageLoaderAdapter(new IImageLoaderAdapter() {
 
             private List<ImageTarget> cache = new ArrayList<ImageTarget>();
