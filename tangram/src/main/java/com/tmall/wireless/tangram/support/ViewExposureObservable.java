@@ -36,20 +36,20 @@ import io.reactivex.internal.disposables.CancellableDisposable;
  * @date 2018/03/07
  */
 
-public class ViewExposureObservable extends Observable<TangramRxEvent> {
+public class ViewExposureObservable extends Observable<RxClickExposureEvent> {
 
-    private TangramRxEvent mTangramRxEvent;
+    private RxClickExposureEvent mRxClickExposureEvent;
     private RxExposureCancellable mRxExposureCancellable;
 
-    public ViewExposureObservable(TangramRxEvent tangramRxEvent, RxExposureCancellable rxExposureCancellable) {
-        Preconditions.checkNotNull(tangramRxEvent);
-        Preconditions.checkNotNull(tangramRxEvent.getView());
-        this.mTangramRxEvent = tangramRxEvent;
+    public ViewExposureObservable(RxClickExposureEvent rxClickExposureEvent, RxExposureCancellable rxExposureCancellable) {
+        Preconditions.checkNotNull(rxClickExposureEvent);
+        Preconditions.checkNotNull(rxClickExposureEvent.getView());
+        this.mRxClickExposureEvent = rxClickExposureEvent;
         this.mRxExposureCancellable = rxExposureCancellable;
     }
 
-    public void setTangramRxEvent(TangramRxEvent tangramRxEvent) {
-        mTangramRxEvent = tangramRxEvent;
+    public void setRxClickExposureEvent(RxClickExposureEvent rxClickExposureEvent) {
+        mRxClickExposureEvent = rxClickExposureEvent;
     }
 
     public void setRxExposureCancellable(RxExposureCancellable rxExposureCancellable) {
@@ -57,11 +57,11 @@ public class ViewExposureObservable extends Observable<TangramRxEvent> {
     }
 
     @Override
-    protected void subscribeActual(Observer<? super TangramRxEvent> observer) {
+    protected void subscribeActual(Observer<? super RxClickExposureEvent> observer) {
         if (mRxExposureCancellable != null) {
             observer.onSubscribe(new CancellableDisposable(mRxExposureCancellable));
         }
-        observer.onNext(mTangramRxEvent);
+        observer.onNext(mRxClickExposureEvent);
     }
 
 }

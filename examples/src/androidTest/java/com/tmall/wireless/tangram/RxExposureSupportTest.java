@@ -43,7 +43,7 @@ import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.RxExposureCancellable;
-import com.tmall.wireless.tangram.support.TangramRxEvent;
+import com.tmall.wireless.tangram.support.RxClickExposureEvent;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
@@ -112,10 +112,10 @@ public class RxExposureSupportTest extends AndroidTestCase {
             }
 
             @Override
-            public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+            public RxExposureCancellable getRxExposureCancellable(RxClickExposureEvent rxEvent) {
                 RxExposureCancellable cancellable = new RxExposureCancellable() {
                     @Override
-                    public void accept(TangramRxEvent tangramEvent) throws Exception {
+                    public void accept(RxClickExposureEvent tangramEvent) throws Exception {
                         assertTrue(Looper.myLooper() == Looper.getMainLooper());
                         assertEquals(tangramEvent.getView(), mView1);
                         assertEquals(tangramEvent.getCell(), mBaseCell1);
@@ -146,10 +146,10 @@ public class RxExposureSupportTest extends AndroidTestCase {
             }
 
             @Override
-            public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+            public RxExposureCancellable getRxExposureCancellable(RxClickExposureEvent rxEvent) {
                 RxExposureCancellable cancellable = new RxExposureCancellable() {
                     @Override
-                    public void accept(TangramRxEvent tangramEvent) throws Exception {
+                    public void accept(RxClickExposureEvent tangramEvent) throws Exception {
                         assertTrue(Looper.myLooper() == Looper.getMainLooper());
                         assertTrue(tangramEvent.getView() == mView1 || tangramEvent.getView() == mView2);
                         assertTrue(tangramEvent.getCell() == mBaseCell1);
@@ -182,22 +182,22 @@ public class RxExposureSupportTest extends AndroidTestCase {
             }
 
             @Override
-            public ObservableTransformer<TangramRxEvent, TangramRxEvent> getObservableTransformer(
-                TangramRxEvent rxEvent) {
-                return new ObservableTransformer<TangramRxEvent, TangramRxEvent>() {
+            public ObservableTransformer<RxClickExposureEvent, RxClickExposureEvent> getObservableTransformer(
+                RxClickExposureEvent rxEvent) {
+                return new ObservableTransformer<RxClickExposureEvent, RxClickExposureEvent>() {
                     @Override
-                    public ObservableSource<TangramRxEvent> apply(Observable<TangramRxEvent> upstream) {
+                    public ObservableSource<RxClickExposureEvent> apply(Observable<RxClickExposureEvent> upstream) {
                         return upstream.subscribeOn(Schedulers.newThread());
                     }
                 };
             }
 
             @Override
-            public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+            public RxExposureCancellable getRxExposureCancellable(RxClickExposureEvent rxEvent) {
                 RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
 
                     @Override
-                    public void accept(TangramRxEvent tangramEvent) throws Exception {
+                    public void accept(RxClickExposureEvent tangramEvent) throws Exception {
                         assertTrue(Looper.myLooper() != Looper.getMainLooper());
                         assertEquals(tangramEvent.getView(), mView1);
                         assertEquals(tangramEvent.getCell(), mBaseCell1);
@@ -233,24 +233,24 @@ public class RxExposureSupportTest extends AndroidTestCase {
             }
 
             @Override
-            public ObservableTransformer<TangramRxEvent, TangramRxEvent> getObservableTransformer(
-                TangramRxEvent rxEvent) {
-                return new ObservableTransformer<TangramRxEvent, TangramRxEvent>() {
+            public ObservableTransformer<RxClickExposureEvent, RxClickExposureEvent> getObservableTransformer(
+                RxClickExposureEvent rxEvent) {
+                return new ObservableTransformer<RxClickExposureEvent, RxClickExposureEvent>() {
                     @Override
-                    public ObservableSource<TangramRxEvent> apply(Observable<TangramRxEvent> upstream) {
+                    public ObservableSource<RxClickExposureEvent> apply(Observable<RxClickExposureEvent> upstream) {
                         return upstream.subscribeOn(Schedulers.newThread());
                     }
                 };
             }
 
             @Override
-            public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+            public RxExposureCancellable getRxExposureCancellable(RxClickExposureEvent rxEvent) {
                 RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
 
                     boolean cancel = false;
 
                     @Override
-                    public void accept(TangramRxEvent tangramEvent) throws Exception {
+                    public void accept(RxClickExposureEvent tangramEvent) throws Exception {
                         assertTrue(Looper.myLooper() != Looper.getMainLooper());
                         //should not run here
                         assertTrue(false);

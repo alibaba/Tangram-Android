@@ -140,7 +140,7 @@ public abstract class SimpleClickSupport {
      * @param clickEventObservable
      * @param rxEvent
      */
-    public Disposable onRxClick(Observable<TangramRxEvent> clickEventObservable, TangramRxEvent rxEvent) {
+    public Disposable onRxClick(Observable<RxClickExposureEvent> clickEventObservable, RxClickExposureEvent rxEvent) {
         return clickEventObservable.subscribe(mConsumer);
     }
 
@@ -209,14 +209,14 @@ public abstract class SimpleClickSupport {
         }
     }
 
-    private Consumer<TangramRxEvent> mConsumer = new Consumer<TangramRxEvent>() {
+    private Consumer<RxClickExposureEvent> mConsumer = new Consumer<RxClickExposureEvent>() {
         @Override
-        public void accept(TangramRxEvent tangramRxEvent) throws Exception {
-            defaultClick(tangramRxEvent.getView(), tangramRxEvent.getCell(), tangramRxEvent.getEventType());
+        public void accept(RxClickExposureEvent rxClickExposureEvent) throws Exception {
+            defaultClick(rxClickExposureEvent.getView(), rxClickExposureEvent.getCell(), rxClickExposureEvent.getEventType());
         }
     };
 
-    public void setConsumer(Consumer<TangramRxEvent> consumer) {
+    public void setConsumer(Consumer<RxClickExposureEvent> consumer) {
         mConsumer = consumer;
     }
 

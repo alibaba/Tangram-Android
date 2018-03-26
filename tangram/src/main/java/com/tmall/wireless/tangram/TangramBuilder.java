@@ -30,7 +30,6 @@ import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
-import com.tmall.wireless.tangram.dataparser.concrete.Cell;
 import com.tmall.wireless.tangram.dataparser.concrete.PojoAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.PojoDataParser;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
@@ -59,6 +58,7 @@ import com.tmall.wireless.tangram.structure.card.StickyEndCard;
 import com.tmall.wireless.tangram.structure.card.TripleColumnCard;
 import com.tmall.wireless.tangram.structure.view.SimpleEmptyView;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
+import com.tmall.wireless.tangram.support.RxTangramSupport;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -509,6 +509,7 @@ public class TangramBuilder {
             // add other features service
             tangramEngine.register(TimerSupport.class, new TimerSupport());
             tangramEngine.register(BusSupport.class, new BusSupport());
+            tangramEngine.register(RxTangramSupport.class, new RxTangramSupport(tangramEngine));
 
             // add virtual view context
             VafContext mVafContext = new VafContext(mContext.getApplicationContext());

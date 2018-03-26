@@ -37,33 +37,33 @@ import android.view.View;
 
 public class RxClickListener extends MainThreadDisposable implements View.OnClickListener {
 
-    private TangramRxEvent mTangramRxEvent;
+    private RxClickExposureEvent mRxClickExposureEvent;
 
-    private Observer<? super TangramRxEvent> mObserver;
+    private Observer<? super RxClickExposureEvent> mObserver;
 
-    public RxClickListener(TangramRxEvent tangramRxEvent, Observer<? super TangramRxEvent> observer) {
-        this.mTangramRxEvent = tangramRxEvent;
+    public RxClickListener(RxClickExposureEvent rxClickExposureEvent, Observer<? super RxClickExposureEvent> observer) {
+        this.mRxClickExposureEvent = rxClickExposureEvent;
         this.mObserver = observer;
     }
 
-    public void setTangramRxEvent(TangramRxEvent tangramRxEvent) {
-        mTangramRxEvent = tangramRxEvent;
+    public void setRxClickExposureEvent(RxClickExposureEvent rxClickExposureEvent) {
+        mRxClickExposureEvent = rxClickExposureEvent;
     }
 
-    public void setObserver(Observer<? super TangramRxEvent> observer) {
+    public void setObserver(Observer<? super RxClickExposureEvent> observer) {
         mObserver = observer;
     }
 
     @Override
     public void onClick(View v) {
         if (!isDisposed()) {
-            mObserver.onNext(mTangramRxEvent);
+            mObserver.onNext(mRxClickExposureEvent);
         }
     }
 
     @Override
     protected void onDispose() {
-        mTangramRxEvent.getView().setOnClickListener(null);
+        mRxClickExposureEvent.getView().setOnClickListener(null);
     }
 
 }

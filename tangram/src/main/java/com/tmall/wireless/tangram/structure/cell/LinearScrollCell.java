@@ -88,7 +88,7 @@ public class LinearScrollCell extends BaseCell {
     public boolean retainScrollState = true;
 
     @Override
-    protected void onAdded() {
+    public void onAdded() {
         super.onAdded();
         adapter = new Adapter(getAdapter());
     }

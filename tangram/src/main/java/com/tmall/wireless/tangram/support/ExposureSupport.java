@@ -32,10 +32,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
-import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Cancellable;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -273,7 +270,7 @@ public abstract class ExposureSupport {
      * @param rxEvent
      * @return exposure handle task by rxEvent
      */
-    public RxExposureCancellable getRxExposureCancellable(TangramRxEvent rxEvent) {
+    public RxExposureCancellable getRxExposureCancellable(RxClickExposureEvent rxEvent) {
         return null;
     }
 
@@ -282,7 +279,7 @@ public abstract class ExposureSupport {
      * @param rxEvent
      * @return
      */
-    public ObservableTransformer<TangramRxEvent, TangramRxEvent> getObservableTransformer(TangramRxEvent rxEvent) {
+    public ObservableTransformer<RxClickExposureEvent, RxClickExposureEvent> getObservableTransformer(RxClickExposureEvent rxEvent) {
         return null;
     }
 

@@ -63,6 +63,8 @@ import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
 import com.tmall.wireless.tangram.example.data.VVTEST;
 import com.tmall.wireless.tangram.example.support.SampleClickSupport;
 import com.tmall.wireless.tangram.op.AppendGroupOp;
+import com.tmall.wireless.tangram.op.LoadGroupOp;
+import com.tmall.wireless.tangram.op.LoadMoreOp;
 import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
@@ -80,6 +82,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -212,10 +215,10 @@ public class RxTangramActivity extends Activity {
         Observable<Card> loadCardObservable = cardLoadSupport.observeCardLoading();
         Disposable dsp6 = loadCardObservable
             .observeOn(Schedulers.io())
-            .map(new Function<Card, Pair<Card, List<BaseCell>>>() {
+            .map(new Function<Card, LoadGroupOp>() {
 
             @Override
-            public Pair<Card, List<BaseCell>> apply(Card card) throws Exception {
+            public LoadGroupOp apply(Card card) throws Exception {
                 Log.d("TangramActivity", "loadCardObservable in map");
                 try {
                     Thread.sleep(5000);
@@ -237,8 +240,8 @@ public class RxTangramActivity extends Activity {
                     }
                 }
                 List<BaseCell> result = engine.parseComponent(cells);
-                Pair<Card, List<BaseCell>> pair = new Pair<>(card ,result);
-                return pair;
+                LoadGroupOp loadGroupOp = new LoadGroupOp(card, result);
+                return loadGroupOp;
             }
         }).observeOn(AndroidSchedulers.mainThread())
             .subscribe(cardLoadSupport.asDoLoadFinishConsumer());
@@ -246,9 +249,9 @@ public class RxTangramActivity extends Activity {
 
         Observable<Card> loadMoreObservable = cardLoadSupport.observeCardLoadingMore();
         Disposable dsp7 = loadMoreObservable.observeOn(Schedulers.io())
-            .map(new Function<Card, Pair<Card, Pair<List<BaseCell>, Boolean>>>() {
+            .map(new Function<Card, LoadMoreOp>() {
                 @Override
-                public Pair<Card, Pair<List<BaseCell>, Boolean>> apply(Card card) throws Exception {
+                public LoadMoreOp apply(Card card) throws Exception {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -268,9 +271,8 @@ public class RxTangramActivity extends Activity {
                     }
                     List<BaseCell> cs = engine.parseComponent(cells);
                     //mock loading 6 pages
-                    Pair<List<BaseCell>, Boolean> data = new Pair<>(cs, card.page != 6);
-                    Pair<Card, Pair<List<BaseCell>, Boolean>> result = new Pair<>(card, data);
-                    return result;
+                    LoadMoreOp loadMoreOp = new LoadMoreOp(card, cs, card.page != 6);
+                    return loadMoreOp;
                 }
             }).observeOn(AndroidSchedulers.mainThread()).subscribe(cardLoadSupport.asDoLoadMoreFinishConsumer());
         mCompositeDisposable.add(dsp7);
@@ -404,7 +406,7 @@ public class RxTangramActivity extends Activity {
                     emitter.onNext(new AppendGroupOp(cards.get(i)));
                     Log.d("TangramActivity", "emitter " + i);
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -413,10 +415,25 @@ public class RxTangramActivity extends Activity {
             }
         }).subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
+        .doOnComplete(new Action() {
+            @Override
+            public void run() throws Exception {
+                final BaseCell cell = (BaseCell) engine.getGroupBasicAdapter().getComponents().get(1);
+                mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.last)).map(
+                    new Function<Object, JSONObject>() {
+                        @Override
+                        public JSONObject apply(Object o) throws Exception {
+                            cell.extras.put("title", "Rx标题2");
+                            JSONObject jsonObject = cell.extras;
+                            return jsonObject;
+                        }
+                    }).subscribe(cell.asUpdateConsumer()));
+            }
+        })
         .subscribe(engine.asAppendGroupConsumer());
         mCompositeDisposable.add(dsp5);
 
-        mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.last)).map(new Function<Object, UpdateCellOp>() {
+        mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.first)).map(new Function<Object, UpdateCellOp>() {
             @Override
             public UpdateCellOp apply(Object o) throws Exception {
                 BaseCell cell = (BaseCell)engine.getGroupBasicAdapter().getComponents().get(0);
@@ -424,6 +441,7 @@ public class RxTangramActivity extends Activity {
                 return new UpdateCellOp(cell);
             }
         }).subscribe(engine.asUpdateCellConsumer()));
+
     }
 
     @Override

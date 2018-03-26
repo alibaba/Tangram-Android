@@ -35,35 +35,35 @@ import io.reactivex.Observer;
  * @date 2018/03/07
  */
 
-public class ViewClickObservable extends Observable<TangramRxEvent> {
+public class ViewClickObservable extends Observable<RxClickExposureEvent> {
 
-    private TangramRxEvent mTangramRxEvent;
+    private RxClickExposureEvent mRxClickExposureEvent;
 
     private RxClickListener mListener;
 
-    public ViewClickObservable(TangramRxEvent tangramRxEvent) {
-        Preconditions.checkNotNull(tangramRxEvent);
-        Preconditions.checkNotNull(tangramRxEvent.getView());
-        this.mTangramRxEvent = tangramRxEvent;
+    public ViewClickObservable(RxClickExposureEvent rxClickExposureEvent) {
+        Preconditions.checkNotNull(rxClickExposureEvent);
+        Preconditions.checkNotNull(rxClickExposureEvent.getView());
+        this.mRxClickExposureEvent = rxClickExposureEvent;
     }
 
-    public void setTangramRxEvent(TangramRxEvent tangramRxEvent) {
-        mTangramRxEvent = tangramRxEvent;
+    public void setRxClickExposureEvent(RxClickExposureEvent rxClickExposureEvent) {
+        mRxClickExposureEvent = rxClickExposureEvent;
     }
 
     @Override
-    protected void subscribeActual(Observer<? super TangramRxEvent> observer) {
+    protected void subscribeActual(Observer<? super RxClickExposureEvent> observer) {
         if (!Preconditions.checkMainThread(observer)) {
             return;
         }
         if (mListener == null) {
-            mListener = new RxClickListener(mTangramRxEvent, observer);
+            mListener = new RxClickListener(mRxClickExposureEvent, observer);
         } else {
-            mListener.setTangramRxEvent(mTangramRxEvent);
+            mListener.setRxClickExposureEvent(mRxClickExposureEvent);
             mListener.setObserver(observer);
         }
         observer.onSubscribe(mListener);
-        mTangramRxEvent.getView().setOnClickListener(mListener);
+        mRxClickExposureEvent.getView().setOnClickListener(mListener);
     }
 
 }

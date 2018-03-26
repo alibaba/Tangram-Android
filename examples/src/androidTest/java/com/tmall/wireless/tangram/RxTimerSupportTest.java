@@ -40,8 +40,6 @@ import android.view.View;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.support.ITimer.TimerStatus;
-import com.tmall.wireless.tangram.support.SimpleClickSupport;
-import com.tmall.wireless.tangram.support.TangramRxEvent;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.support.TimerSupport.OnTickListener;
 import io.reactivex.functions.Action;

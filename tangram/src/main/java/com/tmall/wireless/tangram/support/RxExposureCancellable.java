@@ -34,7 +34,7 @@ import io.reactivex.functions.Consumer;
  * @date 2018/03/07
  */
 
-public abstract class RxExposureCancellable implements Consumer<TangramRxEvent>, Cancellable {
+public abstract class RxExposureCancellable implements Consumer<RxClickExposureEvent>, Cancellable {
 
     public RxExposureCancellable() {
     }

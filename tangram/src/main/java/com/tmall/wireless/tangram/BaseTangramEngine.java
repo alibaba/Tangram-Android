@@ -52,6 +52,7 @@ import com.tmall.wireless.tangram.eventbus.BusSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.support.BannerSupport;
+import com.tmall.wireless.tangram.support.RxTangramSupport;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
@@ -277,15 +278,14 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
         if (bannerSupport != null) {
             bannerSupport.destroy();
         }
+        RxTangramSupport rxTangramSupport = getService(RxTangramSupport.class);
+        if (rxTangramSupport != null) {
+            rxTangramSupport.destroy();
+        }
         VafContext vafContext = getService(VafContext.class);
         if (vafContext != null) {
             vafContext.onDestroy();
         }
-    }
-
-    public boolean isFullScreen() {
-        mLayoutManager.findLastVisibleItemPosition();
-        return false;
     }
 
     /**

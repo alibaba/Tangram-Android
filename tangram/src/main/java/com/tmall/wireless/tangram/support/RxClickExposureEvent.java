@@ -34,7 +34,7 @@ import com.tmall.wireless.tangram.structure.BaseCell;
  * @date 2018/03/05
  */
 
-public class TangramRxEvent {
+public class RxClickExposureEvent {
 
     private View mView;
 
@@ -42,7 +42,7 @@ public class TangramRxEvent {
 
     private int mEventType;
 
-    public TangramRxEvent(View view, BaseCell cell, int eventType) {
+    public RxClickExposureEvent(View view, BaseCell cell, int eventType) {
         mView = view;
         mCell = cell;
         mEventType = eventType;

@@ -38,7 +38,7 @@ import android.util.Log;
 import android.view.View;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.support.TangramRxEvent;
+import com.tmall.wireless.tangram.support.RxClickExposureEvent;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import io.reactivex.functions.Consumer;
 import org.junit.Before;
@@ -100,9 +100,9 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellClicks() {
-        Consumer<TangramRxEvent> consumer1 = new Consumer<TangramRxEvent>() {
+        Consumer<RxClickExposureEvent> consumer1 = new Consumer<RxClickExposureEvent>() {
             @Override
-            public void accept(TangramRxEvent clickEvent) throws Exception {
+            public void accept(RxClickExposureEvent clickEvent) throws Exception {
                 assertEquals(clickEvent.getView(), mView1);
                 assertEquals(clickEvent.getCell(), mBaseCell1);
                 assertEquals(clickEvent.getEventType(), 10);
@@ -118,10 +118,10 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testTwoCellClicks() {
-        Consumer<TangramRxEvent> consumer1 = new Consumer<TangramRxEvent>() {
+        Consumer<RxClickExposureEvent> consumer1 = new Consumer<RxClickExposureEvent>() {
 
             @Override
-            public void accept(TangramRxEvent clickEvent) throws Exception {
+            public void accept(RxClickExposureEvent clickEvent) throws Exception {
                 assertEquals(clickEvent.getView(), mView1);
                 assertEquals(clickEvent.getCell(), mBaseCell1);
                 assertEquals(clickEvent.getEventType(), 10);
@@ -133,10 +133,10 @@ public class RxClickSupportTest extends AndroidTestCase {
         mBaseCell1.click(mView1);
         mView1.performClick();
 
-        Consumer<TangramRxEvent> consumer2 = new Consumer<TangramRxEvent>() {
+        Consumer<RxClickExposureEvent> consumer2 = new Consumer<RxClickExposureEvent>() {
 
             @Override
-            public void accept(TangramRxEvent clickEvent) throws Exception {
+            public void accept(RxClickExposureEvent clickEvent) throws Exception {
                 assertEquals(clickEvent.getView(), mView2);
                 assertEquals(clickEvent.getCell(), mBaseCell2);
                 assertEquals(clickEvent.getEventType(), 1);
@@ -154,10 +154,10 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneConsumerSubscribeTwoCellClicks() {
-        Consumer<TangramRxEvent> consumer = new Consumer<TangramRxEvent>() {
+        Consumer<RxClickExposureEvent> consumer = new Consumer<RxClickExposureEvent>() {
 
             @Override
-            public void accept(TangramRxEvent clickEvent) throws Exception {
+            public void accept(RxClickExposureEvent clickEvent) throws Exception {
                 assertTrue(clickEvent.getView() == mView1 || clickEvent.getView() == mView2);
                 assertTrue(clickEvent.getCell() == mBaseCell1 || clickEvent.getCell() == mBaseCell2);
                 Log.d("RxClickSupportTest", "testOneConsumerSubscribeTwoCellClicks mEventType " + clickEvent.getEventType());
@@ -177,10 +177,10 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testCellClickDispose() {
-        Consumer<TangramRxEvent> consumer = new Consumer<TangramRxEvent>() {
+        Consumer<RxClickExposureEvent> consumer = new Consumer<RxClickExposureEvent>() {
 
             @Override
-            public void accept(TangramRxEvent clickEvent) throws Exception {
+            public void accept(RxClickExposureEvent clickEvent) throws Exception {
                 //should not execute this code
                 assertTrue(false);
             }
@@ -196,10 +196,10 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellWithMultiViewClick() {
-        Consumer<TangramRxEvent> consumer = new Consumer<TangramRxEvent>() {
+        Consumer<RxClickExposureEvent> consumer = new Consumer<RxClickExposureEvent>() {
 
             @Override
-            public void accept(TangramRxEvent clickEvent) throws Exception {
+            public void accept(RxClickExposureEvent clickEvent) throws Exception {
                 assertTrue(clickEvent.getView() == mView1 || clickEvent.getView() == mView2);
                 assertTrue(clickEvent.getCell() == mBaseCell1);
                 Log.d("RxClickSupportTest", "testOneCellWithMultiViewClick mEventType " + clickEvent.getEventType());
@@ -218,10 +218,10 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellWithMultiViewClickDispose() {
-        Consumer<TangramRxEvent> consumer = new Consumer<TangramRxEvent>() {
+        Consumer<RxClickExposureEvent> consumer = new Consumer<RxClickExposureEvent>() {
 
             @Override
-            public void accept(TangramRxEvent clickEvent) throws Exception {
+            public void accept(RxClickExposureEvent clickEvent) throws Exception {
                 assertTrue(clickEvent.getView() == mView1 || clickEvent.getView() == mView2);
                 assertTrue(clickEvent.getCell() == mBaseCell1);
                 Log.d("RxClickSupportTest", "testOneCellWithMultiViewClickDispose mEventType " + clickEvent.getEventType());
