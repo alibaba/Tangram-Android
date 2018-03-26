@@ -42,6 +42,7 @@ import com.tmall.wireless.tangram.support.ViewExposureObservable;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
 
+import com.tmall.wireless.vaf.virtualview.core.ViewCache;
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.disposables.Disposable;

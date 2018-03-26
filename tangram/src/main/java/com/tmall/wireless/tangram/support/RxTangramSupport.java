@@ -23,7 +23,7 @@ public class RxTangramSupport {
     }
 
     public void observeCell(Observable<UpdateCellOp> observable) {
-        observable.subscribe(mTangramEngine.asUpdateCellConsumer());
+        mCompositeDisposable.add(observable.subscribe(mTangramEngine.asUpdateCellConsumer()));
     }
 
     public void destroy() {

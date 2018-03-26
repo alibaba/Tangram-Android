@@ -136,8 +136,8 @@ public class MVHelper {
                 renderView(cell, view);
                 renderStyle(cell, view);
             }
-            if (resolver().isCompatibleType(cell.stringType)) {
-                resolver().getCellClass(cell.stringType).cast(cell).bindView(view);
+            if (mvResolver.isCompatibleType(cell.stringType)) {
+                mvResolver.getCellClass(cell.stringType).cast(cell).bindView(view);
             }
             postMountView(cell, view);
             if (cell.serviceManager != null) {
@@ -182,8 +182,8 @@ public class MVHelper {
                 cellSupport.unBindView(cell, view);
             }
         }
-        if (resolver().isCompatibleType(cell.stringType)) {
-            resolver().getCellClass(cell.stringType).cast(cell).unbindView(view);
+        if (mvResolver.isCompatibleType(cell.stringType)) {
+            mvResolver.getCellClass(cell.stringType).cast(cell).unbindView(view);
         }
     }
 
@@ -423,8 +423,8 @@ public class MVHelper {
                 }
             }
         }
-        if (resolver().isCompatibleType(cell.stringType)) {
-            resolver().getCellClass(cell.stringType).cast(cell).postBindView(view);
+        if (mvResolver.isCompatibleType(cell.stringType)) {
+            mvResolver.getCellClass(cell.stringType).cast(cell).postBindView(view);
         }
     }
 

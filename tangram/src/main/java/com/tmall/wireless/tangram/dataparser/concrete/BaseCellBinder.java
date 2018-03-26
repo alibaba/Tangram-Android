@@ -89,8 +89,6 @@ public class BaseCellBinder<T extends ViewHolderCreator.ViewHolder, V extends Vi
 
     @Override
     public void mountView(@NonNull BaseCell data, @NonNull V view) {
-        // TODO: generate mounter like properties setter
-        // delegate to cell
         mMvHelper.mountView(data, view);
     }
 
