@@ -27,9 +27,7 @@ package com.tmall.wireless.tangram.structure.cell;
 import com.alibaba.android.vlayout.RecyclablePagerAdapter;
 import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 
-import android.support.v4.util.ArrayMap;
 import android.util.SparseIntArray;
-import android.view.View;
 import com.tmall.ultraviewpager.UltraViewPagerAdapter;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
@@ -37,11 +35,6 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
-import com.tmall.wireless.tangram.support.BannerSelectedObservable;
-import com.tmall.wireless.tangram.support.BannerSupport;
-import com.tmall.wireless.tangram.support.ViewExposureObservable;
-import com.tmall.wireless.tangram.view.BannerViewPager;
-import io.reactivex.disposables.Disposable;
 import org.json.JSONObject;
 
 import java.util.ArrayList;

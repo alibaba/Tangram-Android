@@ -35,13 +35,13 @@ import io.reactivex.Observer;
  * @date 2018/03/07
  */
 
-public class ViewClickObservable extends Observable<RxClickExposureEvent> {
+public class CellClickObservable extends Observable<RxClickExposureEvent> {
 
     private RxClickExposureEvent mRxClickExposureEvent;
 
     private RxClickListener mListener;
 
-    public ViewClickObservable(RxClickExposureEvent rxClickExposureEvent) {
+    public CellClickObservable(RxClickExposureEvent rxClickExposureEvent) {
         Preconditions.checkNotNull(rxClickExposureEvent);
         Preconditions.checkNotNull(rxClickExposureEvent.getView());
         this.mRxClickExposureEvent = rxClickExposureEvent;

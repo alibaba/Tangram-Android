@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
-package com.tmall.wireless.tangram.example;
+package com.tmall.wireless.tangram.reactive;
 
 import android.os.Looper;
 import android.view.View;
 import android.view.View.OnClickListener;
-import io.reactivex.Notification;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.MainThreadDisposable;
@@ -40,7 +39,7 @@ import io.reactivex.disposables.Disposables;
  * @date 2018/03/23
  */
 
-final class ViewClickObservable extends Observable<Object> {
+public class ViewClickObservable extends Observable<Object> {
 
     public static ViewClickObservable from(View view) {
         return new ViewClickObservable(view);

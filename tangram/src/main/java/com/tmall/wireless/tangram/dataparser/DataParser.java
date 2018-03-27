@@ -24,11 +24,12 @@
 
 package com.tmall.wireless.tangram.dataparser;
 
-import android.support.annotation.Nullable;
-
-import com.tmall.wireless.tangram.core.service.ServiceManager;
-
 import java.util.List;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import com.tmall.wireless.tangram.core.service.ServiceManager;
+import io.reactivex.ObservableTransformer;
 
 /**
  * DataParser parse data into structures
@@ -47,4 +48,15 @@ public abstract class DataParser<O, T, C, L> {
     @Nullable
     public abstract L parseSingleComponent(@Nullable O data, C parent, ServiceManager serviceManager);
 
+    @NonNull
+    public abstract ObservableTransformer<T, List<C>> getGroupTransformer(ServiceManager serviceManager);
+
+    @NonNull
+    public abstract ObservableTransformer<T, List<L>> getComponentTransformer(ServiceManager serviceManager);
+
+    @NonNull
+    public abstract ObservableTransformer<O, C> getSingleGroupTransformer(ServiceManager serviceManager);
+
+    @NonNull
+    public abstract ObservableTransformer<O, L> getSingleComponentTransformer(ServiceManager serviceManager);
 }

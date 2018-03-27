@@ -101,7 +101,6 @@
       "indicatorHeight": "1.5",
       "itemRatio": "2.654",
       "scrollMarginRight": "10",
-      "autoScroll": "5000",
       "indicatorGravity": "center",
       "hGap": "20"
     },
@@ -160,7 +159,6 @@
           "indicatorHeight": "1.5",
           "itemRatio": "2.654",
           "scrollMarginRight": "10",
-          "autoScroll": "5000",
           "indicatorGravity": "center",
           "hGap": "20",
           "height": 200
@@ -223,7 +221,6 @@
           "indicatorHeight": "1.5",
           "itemRatio": "2.654",
           "scrollMarginRight": "10",
-          "autoScroll": "5000",
           "indicatorGravity": "center",
           "hGap": "20"
         },

@@ -36,12 +36,12 @@ import io.reactivex.internal.disposables.CancellableDisposable;
  * @date 2018/03/07
  */
 
-public class ViewExposureObservable extends Observable<RxClickExposureEvent> {
+public class CellExposureObservable extends Observable<RxClickExposureEvent> {
 
     private RxClickExposureEvent mRxClickExposureEvent;
     private RxExposureCancellable mRxExposureCancellable;
 
-    public ViewExposureObservable(RxClickExposureEvent rxClickExposureEvent, RxExposureCancellable rxExposureCancellable) {
+    public CellExposureObservable(RxClickExposureEvent rxClickExposureEvent, RxExposureCancellable rxExposureCancellable) {
         Preconditions.checkNotNull(rxClickExposureEvent);
         Preconditions.checkNotNull(rxClickExposureEvent.getView());
         this.mRxClickExposureEvent = rxClickExposureEvent;

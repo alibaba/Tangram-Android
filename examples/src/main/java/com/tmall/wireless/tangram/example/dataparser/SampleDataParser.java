@@ -24,6 +24,7 @@
 
 package com.tmall.wireless.tangram.example.dataparser;
 
+import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -41,6 +42,7 @@ import com.tmall.wireless.tangram.structure.card.BannerCard;
 import com.tmall.wireless.tangram.structure.card.GridCard;
 import com.tmall.wireless.tangram.util.Preconditions;
 
+import io.reactivex.ObservableTransformer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -151,6 +153,30 @@ public class SampleDataParser extends DataParser<JSONObject, JSONArray, Card, Ba
     @Nullable
     @Override
     public BaseCell parseSingleComponent(@Nullable JSONObject data, Card parent, ServiceManager serviceManager) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public ObservableTransformer<JSONArray, List<Card>> getGroupTransformer(ServiceManager serviceManager) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public ObservableTransformer<JSONArray, List<BaseCell>> getComponentTransformer(ServiceManager serviceManager) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public ObservableTransformer<JSONObject, Card> getSingleGroupTransformer(ServiceManager serviceManager) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public ObservableTransformer<JSONObject, BaseCell> getSingleComponentTransformer(ServiceManager serviceManager) {
         return null;
     }
 }

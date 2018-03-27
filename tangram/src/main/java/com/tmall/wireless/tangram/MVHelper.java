@@ -31,6 +31,7 @@ import com.alibaba.android.vlayout.VirtualLayoutManager;
 import android.os.Build.VERSION;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
@@ -114,6 +115,7 @@ public class MVHelper {
 
     public void mountView(BaseCell cell, View view) {
         try {
+            Log.d("Longer", "mount view " + cell.stringType);
             mvResolver.register(getCellUniqueId(cell), cell, view);
             if (cell.serviceManager != null) {
                 CellSupport cellSupport = cell.serviceManager.getService(CellSupport.class);
