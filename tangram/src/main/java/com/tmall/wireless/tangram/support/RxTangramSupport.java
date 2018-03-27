@@ -1,6 +1,7 @@
 package com.tmall.wireless.tangram.support;
 
 import com.tmall.wireless.tangram.TangramEngine;
+import com.tmall.wireless.tangram.op.ReplaceGroupContentOp;
 import com.tmall.wireless.tangram.op.UpdateCellOp;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
@@ -24,6 +25,10 @@ public class RxTangramSupport {
 
     public void observeCell(Observable<UpdateCellOp> observable) {
         mCompositeDisposable.add(observable.subscribe(mTangramEngine.asUpdateCellConsumer()));
+    }
+
+    public void observeCard(Observable<ReplaceGroupContentOp> observable) {
+        mCompositeDisposable.add(observable.subscribe(mTangramEngine.asReplaceGroupContentConsumer()));
     }
 
     public void destroy() {

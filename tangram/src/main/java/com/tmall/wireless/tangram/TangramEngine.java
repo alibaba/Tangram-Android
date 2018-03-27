@@ -69,18 +69,19 @@ import com.tmall.wireless.vaf.virtualview.core.ViewCache;
 import io.reactivex.functions.Consumer;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by villadora on 15/8/24.
  *
  * The core of Tangram used to access data, bind view, register service.
  */
-public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> implements Engine {
+public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card, BaseCell> implements Engine {
 
     private static final int NO_SWIPE = -1;
 
     public TangramEngine(@NonNull Context context,
-        @NonNull DataParser<JSONArray, Card, BaseCell> dataParser,
+        @NonNull DataParser<JSONObject, JSONArray, Card, BaseCell> dataParser,
         @NonNull IAdapterBuilder<Card, BaseCell> adapterBuilder) {
         super(context, dataParser, adapterBuilder);
         this.register(DataParser.class, dataParser);

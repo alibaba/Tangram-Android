@@ -57,7 +57,7 @@ import java.util.List;
  * Created by liupeng on 13/12/2017.
  */
 
-public class SampleDataParser extends DataParser<JSONArray, Card, BaseCell> {
+public class SampleDataParser extends DataParser<JSONObject, JSONArray, Card, BaseCell> {
 
     @Nullable
     @Override
@@ -76,7 +76,6 @@ public class SampleDataParser extends DataParser<JSONArray, Card, BaseCell> {
                 if (!TextUtils.isEmpty(cardType)) {
                     final Card card = cardResolver.create(cardType);
                     if (card != null) {
-                        card.rowId = i;
                         card.serviceManager = serviceManager;
                         //add card style
                         addCardStyle(cardData, card);
@@ -140,6 +139,18 @@ public class SampleDataParser extends DataParser<JSONArray, Card, BaseCell> {
     @Nullable
     @Override
     public List<BaseCell> parseComponent(@Nullable JSONArray data, ServiceManager serviceManager) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public Card parseSingleGroup(@Nullable JSONObject data, ServiceManager serviceManager) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public BaseCell parseSingleComponent(@Nullable JSONObject data, Card parent, ServiceManager serviceManager) {
         return null;
     }
 }

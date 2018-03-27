@@ -79,7 +79,7 @@ import java.util.Map;
  * @author villadora
  * @since 1.0.0
  */
-public class BaseTangramEngine<T, C, L> implements ServiceManager {
+public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
 
     private Map<Class<?>, Object> mServices = new ArrayMap<>();
@@ -93,12 +93,12 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
 
     protected GroupBasicAdapter<C, L> mGroupBasicAdapter;
 
-    private final DataParser<T, C, L> mDataParser;
+    private final DataParser<O, T, C, L> mDataParser;
 
     private final IAdapterBuilder<C, L> mAdapterBuilder;
 
     public BaseTangramEngine(@NonNull final Context context,
-        @NonNull final DataParser<T, C, L> dataParser,
+        @NonNull final DataParser<O, T, C, L> dataParser,
         @NonNull final IAdapterBuilder<C, L> adapterBuilder) {
         //noinspection ConstantConditions
         Preconditions.checkArgument(context != null, "context is null");

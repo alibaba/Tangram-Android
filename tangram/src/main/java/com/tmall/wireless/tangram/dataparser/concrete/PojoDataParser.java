@@ -47,7 +47,7 @@ import java.util.List;
 /**
  * DataParser parse JSONArray into Card/Cell
  */
-public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> {
+public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card, BaseCell> {
 
     private static final String TAG = "PojoDataParser";
 
@@ -58,66 +58,34 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
         Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
         final MVHelper cellResolver = serviceManager.getService(MVHelper.class);
         Preconditions.checkState(cellResolver != null, "Must register CellResolver into ServiceManager first");
-
         final int size = data.length();
         final List<Card> result = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             JSONObject cardData = data.optJSONObject(i);
-            if (cardData != null) {
-                final String cardType = cardData.optString(Card.KEY_TYPE);
-                if (!TextUtils.isEmpty(cardType)) {
-                    final Card card = cardResolver.create(cardType);
-                    if (card != null) {
-                        card.rowId = i;
-                        card.serviceManager = serviceManager;
-                        card.parseWith(cardData, cellResolver);
-                        card.type = cardData.optInt(Card.KEY_TYPE, -1);
-                        card.stringType = cardType;
-                        if (card.isValid()) {
-                            if (card instanceof IDelegateCard) {
-                                List<Card> cards = ((IDelegateCard) card).getCards(new CardResolver() {
-                                    @Override
-                                    public Card create(String type) {
-                                        Card c = cardResolver.create(type);
-                                        c.serviceManager = serviceManager;
-                                        c.id = card.id;
-                                        c.setStringType(cardType);
-                                        c.stringType = cardType;
-                                        c.rowId = card.rowId;
-                                        return c;
-                                    }
-                                });
-                                for (Card c : cards) {
-                                    if (c.isValid()) {
-                                        result.add(c);
-                                    }
-                                }
-                            } else {
-                                if (card.style.slidable) {
-                                    result.add(new SlideCard(card));
-                                } else {
-                                    result.add(card);
-                                }
-                            }
+            final Card card = parseSingleGroup(cardData, serviceManager);
+            if (card != null) {
+                if (card instanceof IDelegateCard) {
+                    List<Card> cards = ((IDelegateCard) card).getCards(new CardResolver() {
+                        @Override
+                        public Card create(String type) {
+                            Card c = cardResolver.create(type);
+                            c.serviceManager = serviceManager;
+                            c.id = card.id;
+                            c.setStringType(type);
+                            c.rowId = card.rowId;
+                            return c;
                         }
-                    } else {
-                        final Card cellCard = new WrapCellCard();
-                        if (cellCard != null) {
-                            cellCard.rowId = i;
-                            cellCard.serviceManager = serviceManager;
-                            cellCard.parseWith(cardData, cellResolver);
-                            cellCard.setStringType(TangramBuilder.TYPE_CONTAINER_1C_FLOW);
-                            if (cellCard.isValid()) {
-                                result.add(cellCard);
-                            }
+                    });
+                    for (Card c : cards) {
+                        if (c.isValid()) {
+                            result.add(c);
                         }
                     }
                 } else {
-                    LogUtils.w(TAG, "Invalid card type when parse JSON data");
+                    result.add(card);
                 }
             }
         }
-
         cellResolver.resolver().setCards(result);
         return result;
     }
@@ -129,16 +97,70 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
     }
 
     @Nullable
-    public List<BaseCell> parseComponent(JSONArray data, ServiceManager serviceManager, Card card) {
+    @Override
+    public Card parseSingleGroup(@Nullable JSONObject data, final ServiceManager serviceManager) {
         if (data == null) {
-            return new ArrayList<>();
+            return null;
         }
-
         final CardResolver cardResolver = serviceManager.getService(CardResolver.class);
         Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
         final MVHelper cellResolver = serviceManager.getService(MVHelper.class);
         Preconditions.checkState(cellResolver != null, "Must register CellResolver into ServiceManager first");
+        final String cardType = data.optString(Card.KEY_TYPE);
+        if (!TextUtils.isEmpty(cardType)) {
+            final Card card = cardResolver.create(cardType);
+            if (card != null) {
+                card.serviceManager = serviceManager;
+                card.parseWith(data, cellResolver);
+                card.type = data.optInt(Card.KEY_TYPE, -1);
+                card.stringType = cardType;
+                if (card.isValid()) {
+                    if (card.style.slidable) {
+                        return new SlideCard(card);
+                    } else {
+                        return card;
+                    }
+                }
+            } else {
+                final Card cellCard = new WrapCellCard();
+                if (cellCard != null) {
+                    cellCard.serviceManager = serviceManager;
+                    cellCard.parseWith(data, cellResolver);
+                    cellCard.setStringType(TangramBuilder.TYPE_CONTAINER_1C_FLOW);
+                    if (cellCard.isValid()) {
+                        return card;
+                    }
+                }
+            }
+        } else {
+            LogUtils.w(TAG, "Invalid card type when parse JSON data");
+        }
+        return null;
+    }
 
+    @Nullable
+    @Override
+    public BaseCell parseSingleComponent(@Nullable JSONObject data, Card parent, ServiceManager serviceManager) {
+        if (data == null) {
+            return null;
+        }
+        final CardResolver cardResolver = serviceManager.getService(CardResolver.class);
+        Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
+        final MVHelper cellResolver = serviceManager.getService(MVHelper.class);
+        Preconditions.checkState(cellResolver != null, "Must register CellResolver into ServiceManager first");
+        BaseCell cell = Card.createCell(parent, cellResolver, data, serviceManager, true);
+        if (cell != null && cellResolver.isValid(cell, serviceManager)) {
+            return cell;
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    private List<BaseCell> parseComponent(JSONArray data, ServiceManager serviceManager, Card card) {
+        if (data == null) {
+            return new ArrayList<>();
+        }
         final int size = data.length();
         final List<BaseCell> result = new ArrayList<>(size);
         //parse body
@@ -147,8 +169,8 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
             final int cellLength = componentArray.length();
             for (int i = 0; i < cellLength; i++) {
                 final JSONObject cellData = componentArray.optJSONObject(i);
-                BaseCell cell = Card.createCell(card, cellResolver, cellData, serviceManager, true);
-                if (cell != null && cellResolver.isValid(cell, serviceManager)) {
+                BaseCell cell = parseSingleComponent(cellData, card, serviceManager);
+                if (cell != null) {
                     result.add(cell);
                 }
             }

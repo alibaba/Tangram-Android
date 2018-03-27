@@ -73,6 +73,7 @@ public class MVResolver {
 
     private ArrayMap<View, BaseCell> vmMap = new ArrayMap<>(128);
 
+    @Deprecated
     private ArrayMap<String, View> idViewMap = new ArrayMap<>(128);
 
     private ServiceManager mServiceManager;
@@ -126,6 +127,7 @@ public class MVResolver {
         return mvMap.get(cell);
     }
 
+    @Deprecated
     public View getView(String uniqueId) {
         return idViewMap.get(uniqueId);
     }

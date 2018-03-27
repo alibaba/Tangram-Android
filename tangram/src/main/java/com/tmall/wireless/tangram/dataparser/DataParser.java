@@ -33,11 +33,18 @@ import java.util.List;
 /**
  * DataParser parse data into structures
  */
-public abstract class DataParser<T, C, L> {
+public abstract class DataParser<O, T, C, L> {
 
     @Nullable
     public abstract List<C> parseGroup(@Nullable T data, ServiceManager serviceManager);
 
     @Nullable
     public abstract List<L> parseComponent(@Nullable T data, ServiceManager serviceManager);
+
+    @Nullable
+    public abstract C parseSingleGroup(@Nullable O data, ServiceManager serviceManager);
+
+    @Nullable
+    public abstract L parseSingleComponent(@Nullable O data, C parent, ServiceManager serviceManager);
+
 }

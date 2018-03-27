@@ -170,6 +170,10 @@ public abstract class Card extends ComponentLifecycle {
      */
     public boolean hasMore = false;
 
+    /**
+     * Not used
+     */
+    @Deprecated
     public int rowId;
 
     /**
@@ -183,8 +187,6 @@ public abstract class Card extends ComponentLifecycle {
     @Nullable
     public ServiceManager serviceManager;
 
-
-    // TODO: back store refactor
     @Nullable
     private Map<String, Object> mParams;
 

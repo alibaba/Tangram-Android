@@ -101,13 +101,7 @@ public class Style {
 
     public static final int MARGIN_LEFT_INDEX = 3;
 
-    public static final String DISPLAY_INLINE = "inline-block";
-
     public static final String DISPLAY_BLOCK = "block";
-
-    public static final int DISPLAY_INNER_INLINE = 0;
-
-    public static final int DISPLAY_INNER_BLOCK = 1;
 
     private static final int[] DEFAULT_MARGIN = new int[] {0, 0, 0, 0};
 
