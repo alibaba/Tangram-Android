@@ -36,16 +36,16 @@ import io.reactivex.ObservableTransformer;
  */
 public abstract class DataParser<O, T, C, L> {
 
-    @Nullable
+    @NonNull
     public abstract List<C> parseGroup(@Nullable T data, ServiceManager serviceManager);
 
-    @Nullable
+    @NonNull
     public abstract List<L> parseComponent(@Nullable T data, ServiceManager serviceManager);
 
-    @Nullable
+    @NonNull
     public abstract C parseSingleGroup(@Nullable O data, ServiceManager serviceManager);
 
-    @Nullable
+    @NonNull
     public abstract L parseSingleComponent(@Nullable O data, C parent, ServiceManager serviceManager);
 
     @NonNull

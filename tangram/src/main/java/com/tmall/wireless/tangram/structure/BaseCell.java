@@ -62,6 +62,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by mikeafc on 16/4/25.
  */
 public class BaseCell<V extends View> extends ComponentLifecycle implements View.OnClickListener {
+
+    public static final BaseCell NaN = new BaseCell();
+
     private static AtomicLong sIdGen = new AtomicLong();
 
     public static boolean sIsGenIds = false;

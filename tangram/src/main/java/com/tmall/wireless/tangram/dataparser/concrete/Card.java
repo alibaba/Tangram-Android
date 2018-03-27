@@ -73,6 +73,8 @@ import java.util.Map;
  */
 public abstract class Card extends ComponentLifecycle {
 
+    public static final Card NaN = new Card() {};
+
     private static final String TAG = "Card";
 
     public static final String KEY_TYPE = "type";

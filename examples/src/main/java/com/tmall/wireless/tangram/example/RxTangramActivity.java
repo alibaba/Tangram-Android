@@ -52,6 +52,7 @@ import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.TangramEngine;
+import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.example.data.RatioTextView;
 import com.tmall.wireless.tangram.example.data.SimpleImgView;
@@ -65,6 +66,7 @@ import com.tmall.wireless.tangram.op.AppendGroupOp;
 import com.tmall.wireless.tangram.op.LoadGroupOp;
 import com.tmall.wireless.tangram.op.LoadMoreOp;
 import com.tmall.wireless.tangram.op.UpdateCellOp;
+import com.tmall.wireless.tangram.reactive.JSONArrayObservable;
 import com.tmall.wireless.tangram.reactive.ViewClickObservable;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
@@ -79,12 +81,14 @@ import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -390,10 +394,9 @@ public class RxTangramActivity extends Activity {
         //    })
         //    .subscribe(engine.asParsedDataConsume());
         // mock
-        Disposable dsp5 = Observable.create(new ObservableOnSubscribe<AppendGroupOp>() {
+        Disposable dsp8 = Observable.create(new ObservableOnSubscribe<JSONArray>() {
             @Override
-            public void subscribe(ObservableEmitter<AppendGroupOp> emitter) throws Exception {
-                Log.d("TangramActivity", "subscribe in thread " + Thread.currentThread().getName());
+            public void subscribe(ObservableEmitter<JSONArray> emitter) throws Exception {
                 String json = new String(getAssertsFile(getApplicationContext(), "data.json"));
                 JSONArray data = null;
                 try {
@@ -401,37 +404,98 @@ public class RxTangramActivity extends Activity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                List<Card> cards = engine.parseData(data);
-                for (int i = 0, size = cards.size(); i < size; i++) {
-                    emitter.onNext(new AppendGroupOp(cards.get(i)));
-                    Log.d("TangramActivity", "emitter " + i);
-                    try {
-                        Thread.sleep(500);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+                emitter.onNext(data);
                 emitter.onComplete();
+            }
+        }).flatMap(new Function<JSONArray, ObservableSource<JSONObject>>() {
+            @Override
+            public ObservableSource<JSONObject> apply(JSONArray jsonArray) throws Exception {
+                return JSONArrayObservable.fromJsonArray(jsonArray);
+            }
+        }).map(new Function<JSONObject, Card>() {
+            @Override
+            public Card apply(JSONObject jsonObject) throws Exception {
+                Thread.sleep(300);
+                return (Card)engine.getService(DataParser.class).parseSingleGroup(jsonObject, engine);
+            }
+        }).filter(new Predicate<Card>() {
+            @Override
+            public boolean test(Card card) throws Exception {
+                return card != Card.NaN;
+            }
+        }).map(new Function<Card, AppendGroupOp>() {
+            @Override
+            public AppendGroupOp apply(Card card) throws Exception {
+                return new AppendGroupOp(card);
             }
         }).subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-        .doOnComplete(new Action() {
+            .doOnComplete(new Action() {
+                @Override
+                public void run() throws Exception {
+                    final BaseCell cell = (BaseCell)engine.getGroupBasicAdapter().getComponents().get(1);
+                    mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.last)).map(
+                        new Function<Object, JSONObject>() {
+                            @Override
+                            public JSONObject apply(Object o) throws Exception {
+                                cell.extras.put("title", "Rx标题2");
+                                JSONObject jsonObject = cell.extras;
+                                return jsonObject;
+                            }
+                        }).subscribe(cell.asUpdateConsumer()));
+
+                }
+            })
+        .subscribe(engine.asAppendGroupConsumer(), new Consumer<Throwable>() {
             @Override
-            public void run() throws Exception {
-                final BaseCell cell = (BaseCell) engine.getGroupBasicAdapter().getComponents().get(1);
-                mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.last)).map(
-                    new Function<Object, JSONObject>() {
-                        @Override
-                        public JSONObject apply(Object o) throws Exception {
-                            cell.extras.put("title", "Rx标题2");
-                            JSONObject jsonObject = cell.extras;
-                            return jsonObject;
-                        }
-                    }).subscribe(cell.asUpdateConsumer()));
+            public void accept(Throwable throwable) throws Exception {
+                throwable.printStackTrace();
             }
-        })
-        .subscribe(engine.asAppendGroupConsumer());
-        mCompositeDisposable.add(dsp5);
+        });
+        mCompositeDisposable.add(dsp8);
+
+        //Disposable dsp5 = Observable.create(new ObservableOnSubscribe<AppendGroupOp>() {
+        //    @Override
+        //    public void subscribe(ObservableEmitter<AppendGroupOp> emitter) throws Exception {
+        //        Log.d("TangramActivity", "subscribe in thread " + Thread.currentThread().getName());
+        //        String json = new String(getAssertsFile(getApplicationContext(), "data.json"));
+        //        JSONArray data = null;
+        //        try {
+        //            data = new JSONArray(json);
+        //        } catch (JSONException e) {
+        //            e.printStackTrace();
+        //        }
+        //        List<Card> cards = engine.parseData(data);
+        //        for (int i = 0, size = cards.size(); i < size; i++) {
+        //            emitter.onNext(new AppendGroupOp(cards.get(i)));
+        //            Log.d("TangramActivity", "emitter " + i);
+        //            try {
+        //                Thread.sleep(500);
+        //            } catch (Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        }
+        //        emitter.onComplete();
+        //    }
+        //}).subscribeOn(Schedulers.io())
+        //.observeOn(AndroidSchedulers.mainThread())
+        //.doOnComplete(new Action() {
+        //    @Override
+        //    public void run() throws Exception {
+        //        final BaseCell cell = (BaseCell) engine.getGroupBasicAdapter().getComponents().get(1);
+        //        mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.last)).map(
+        //            new Function<Object, JSONObject>() {
+        //                @Override
+        //                public JSONObject apply(Object o) throws Exception {
+        //                    cell.extras.put("title", "Rx标题2");
+        //                    JSONObject jsonObject = cell.extras;
+        //                    return jsonObject;
+        //                }
+        //            }).subscribe(cell.asUpdateConsumer()));
+        //    }
+        //})
+        //.subscribe(engine.asAppendGroupConsumer());
+        //mCompositeDisposable.add(dsp5);
 
         mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.first)).map(new Function<Object, UpdateCellOp>() {
             @Override

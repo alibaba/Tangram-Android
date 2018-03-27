@@ -32,7 +32,6 @@ import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.dataparser.DataParser;
-import com.tmall.wireless.tangram.reactive.JSONArrayObservable;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.SlideCard;
 import com.tmall.wireless.tangram.structure.card.WrapCellCard;
@@ -42,14 +41,12 @@ import com.tmall.wireless.tangram.util.Preconditions;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
-import io.reactivex.functions.BiConsumer;
 import io.reactivex.functions.Function;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * DataParser parse JSONArray into Card/Cell
@@ -97,17 +94,17 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
         return result;
     }
 
-    @Nullable
+    @NonNull
     @Override
     public List<BaseCell> parseComponent(JSONArray data, ServiceManager serviceManager) {
         return parseComponent(data, serviceManager, null);
     }
 
-    @Nullable
+    @NonNull
     @Override
     public Card parseSingleGroup(@Nullable JSONObject data, final ServiceManager serviceManager) {
         if (data == null) {
-            return null;
+            return Card.NaN;
         }
         final CardResolver cardResolver = serviceManager.getService(CardResolver.class);
         Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
@@ -142,14 +139,14 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
         } else {
             LogUtils.w(TAG, "Invalid card type when parse JSON data");
         }
-        return null;
+        return Card.NaN;
     }
 
-    @Nullable
+    @NonNull
     @Override
     public BaseCell parseSingleComponent(@Nullable JSONObject data, Card parent, ServiceManager serviceManager) {
         if (data == null) {
-            return null;
+            return BaseCell.NaN;
         }
         final CardResolver cardResolver = serviceManager.getService(CardResolver.class);
         Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
@@ -159,7 +156,7 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
         if (cell != null && cellResolver.isValid(cell, serviceManager)) {
             return cell;
         } else {
-            return null;
+            return BaseCell.NaN;
         }
     }
 
