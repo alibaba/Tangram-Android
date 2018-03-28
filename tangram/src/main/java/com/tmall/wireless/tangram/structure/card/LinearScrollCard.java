@@ -94,7 +94,7 @@ public class LinearScrollCard extends Card {
         if (cell.mFooter.isValid()) {
             cell.mFooter.parent = this;
             cell.mFooter.parentId = id;
-            cell.mFooter.pos = cell.mHeader != null ? getCells().size() + 1: getCells().size();
+            cell.mFooter.pos = cell.mHeader.isValid() ? getCells().size() + 1: getCells().size();
             try {
                 cell.mFooter.extras.put(MVResolver.KEY_INDEX, cell.mFooter.pos);
             } catch (JSONException e) {

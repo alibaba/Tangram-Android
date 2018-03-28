@@ -706,7 +706,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     private void bindHeaderView(BaseCell cell) {
-        if (cell != null) {
+        if (cell.isValid()) {
             View header = getHeaderViewFromRecycler(cell);
             if (header != null) {
                 ViewGroup.LayoutParams lp = header.getLayoutParams();
@@ -724,7 +724,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     private void bindFooterView(BaseCell cell) {
-        if (cell != null) {
+        if (cell.isValid()) {
             View footer = getFooterViewFromRecycler(cell);
             if (footer != null) {
                 ViewGroup.LayoutParams lp = footer.getLayoutParams();

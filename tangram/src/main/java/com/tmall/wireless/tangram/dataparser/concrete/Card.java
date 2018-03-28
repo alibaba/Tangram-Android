@@ -114,13 +114,11 @@ public abstract class Card extends ComponentLifecycle {
     @Nullable
     public String id;
 
-    protected
     @Nullable
-    BaseCell mHeader;
+    protected BaseCell mHeader;
 
-    protected
     @Nullable
-    BaseCell mFooter;
+    protected BaseCell mFooter;
 
     @NonNull
     protected ArrayMap<Range<Integer>, Card> mChildren = new ArrayMap<>();
