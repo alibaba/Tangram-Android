@@ -54,6 +54,7 @@ import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.TangramEngine;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.dataparser.concrete.PojoDataParser;
 import com.tmall.wireless.tangram.example.data.RatioTextView;
 import com.tmall.wireless.tangram.example.data.SimpleImgView;
 import com.tmall.wireless.tangram.example.data.SingleImageView;
@@ -393,7 +394,7 @@ public class RxTangramActivity extends Activity {
         //        }
         //    })
         //    .subscribe(engine.asParsedDataConsume());
-        // mock
+        // method 3, emit json array and flat map to jsonobject
         Disposable dsp8 = Observable.create(new ObservableOnSubscribe<JSONArray>() {
             @Override
             public void subscribe(ObservableEmitter<JSONArray> emitter) throws Exception {
@@ -412,13 +413,8 @@ public class RxTangramActivity extends Activity {
             public ObservableSource<JSONObject> apply(JSONArray jsonArray) throws Exception {
                 return JSONArrayObservable.fromJsonArray(jsonArray);
             }
-        }).map(new Function<JSONObject, Card>() {
-            @Override
-            public Card apply(JSONObject jsonObject) throws Exception {
-                Thread.sleep(300);
-                return (Card)engine.getService(DataParser.class).parseSingleGroup(jsonObject, engine);
-            }
-        }).filter(new Predicate<Card>() {
+        }).compose(((PojoDataParser) engine.getService(DataParser.class)).getSingleGroupTransformer(engine)) //using map of transformer
+        .filter(new Predicate<Card>() {
             @Override
             public boolean test(Card card) throws Exception {
                 return card != Card.NaN;
@@ -426,6 +422,7 @@ public class RxTangramActivity extends Activity {
         }).map(new Function<Card, AppendGroupOp>() {
             @Override
             public AppendGroupOp apply(Card card) throws Exception {
+                Thread.sleep(300);
                 return new AppendGroupOp(card);
             }
         }).subscribeOn(Schedulers.io())
@@ -453,7 +450,7 @@ public class RxTangramActivity extends Activity {
             }
         });
         mCompositeDisposable.add(dsp8);
-
+        //method 4, create from json
         //Disposable dsp5 = Observable.create(new ObservableOnSubscribe<AppendGroupOp>() {
         //    @Override
         //    public void subscribe(ObservableEmitter<AppendGroupOp> emitter) throws Exception {

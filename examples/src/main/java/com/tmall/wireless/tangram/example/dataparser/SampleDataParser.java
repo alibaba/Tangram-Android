@@ -144,6 +144,12 @@ public class SampleDataParser extends DataParser<JSONObject, JSONArray, Card, Ba
         return null;
     }
 
+    @NonNull
+    @Override
+    public List<BaseCell> parseComponent(@Nullable JSONArray data, Card parent, ServiceManager serviceManager) {
+        return null;
+    }
+
     @Nullable
     @Override
     public Card parseSingleGroup(@Nullable JSONObject data, ServiceManager serviceManager) {

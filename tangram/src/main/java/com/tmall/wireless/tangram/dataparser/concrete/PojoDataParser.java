@@ -102,6 +102,12 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
 
     @NonNull
     @Override
+    public List<BaseCell> parseComponent(@Nullable JSONArray data, Card parent, ServiceManager serviceManager) {
+        return parseComponent(data, serviceManager, parent);
+    }
+
+    @NonNull
+    @Override
     public Card parseSingleGroup(@Nullable JSONObject data, final ServiceManager serviceManager) {
         if (data == null) {
             return Card.NaN;

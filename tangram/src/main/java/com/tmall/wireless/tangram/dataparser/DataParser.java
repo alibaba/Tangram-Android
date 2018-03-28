@@ -43,6 +43,9 @@ public abstract class DataParser<O, T, C, L> {
     public abstract List<L> parseComponent(@Nullable T data, ServiceManager serviceManager);
 
     @NonNull
+    public abstract List<L> parseComponent(@Nullable T data, C parent, ServiceManager serviceManager);
+
+    @NonNull
     public abstract C parseSingleGroup(@Nullable O data, ServiceManager serviceManager);
 
     @NonNull

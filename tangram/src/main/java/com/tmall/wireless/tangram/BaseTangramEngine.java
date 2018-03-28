@@ -533,6 +533,38 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     * Parse original data with type {@link T} into model data list with type {@link L}
+     * @param data Original data.
+     * @param parent the parent group to hold the parsed list.
+     * @return Parsed data list.
+     * @since 3.0.0
+     */
+    public List<L> parseComponent(@Nullable C parent, @Nullable T data) {
+        return mDataParser.parseComponent(data, parent, this);
+    }
+
+    /**
+     * Parse original data with type {@link O} into model data with type {@link C}
+     * @param data Original data.
+     * @return Parsed data.
+     * @since 3.0.0
+     */
+    public C parseSingleData(@Nullable O data) {
+        return mDataParser.parseSingleGroup(data, this);
+    }
+
+    /**
+     * Parse original data with type {@link O} into model data with type {@link L}
+     * @param parent the parent group to hold parsed object.
+     * @param data Original data.
+     * @return Parsed data.
+     * @since 3.0.0
+     */
+    public L parseSingleComponent(@Nullable C parent, @Nullable O data) {
+        return mDataParser.parseSingleComponent(data, parent, this);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
