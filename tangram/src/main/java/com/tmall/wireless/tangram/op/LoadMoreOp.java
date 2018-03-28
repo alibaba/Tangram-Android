@@ -15,7 +15,7 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 public class LoadMoreOp extends TangramOp3<Card, List<BaseCell>, Boolean> {
 
     public LoadMoreOp(Card arg1, List<BaseCell> arg2, Boolean arg3) {
-        super(OP_TYPE.LOAD_MORE, arg1, arg2, arg3);
+        super(arg1, arg2, arg3);
     }
 
 }

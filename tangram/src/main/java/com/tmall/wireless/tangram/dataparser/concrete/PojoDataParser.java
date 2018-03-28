@@ -32,6 +32,10 @@ import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.dataparser.DataParser;
+import com.tmall.wireless.tangram.op.ParseComponentsOp;
+import com.tmall.wireless.tangram.op.ParseGroupsOp;
+import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
+import com.tmall.wireless.tangram.op.ParseSingleComponentOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.SlideCard;
 import com.tmall.wireless.tangram.structure.card.WrapCellCard;
@@ -55,6 +59,9 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
 
     private static final String TAG = "PojoDataParser";
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public List<Card> parseGroup(@NonNull JSONArray data, @NonNull final ServiceManager serviceManager) {
@@ -94,18 +101,44 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public List<BaseCell> parseComponent(JSONArray data, ServiceManager serviceManager) {
-        return parseComponent(data, serviceManager, null);
+        return parseComponent(data, null, serviceManager);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public List<BaseCell> parseComponent(@Nullable JSONArray data, Card parent, ServiceManager serviceManager) {
-        return parseComponent(data, serviceManager, parent);
+        if (data == null) {
+            return new ArrayList<>();
+        }
+        final int size = data.length();
+        final List<BaseCell> result = new ArrayList<>(size);
+        //parse body
+        JSONArray componentArray = data;
+        if (componentArray != null) {
+            final int cellLength = componentArray.length();
+            for (int i = 0; i < cellLength; i++) {
+                final JSONObject cellData = componentArray.optJSONObject(i);
+                BaseCell cell = parseSingleComponent(cellData, parent, serviceManager);
+                if (cell != null) {
+                    result.add(cell);
+                }
+            }
+        }
+        return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public Card parseSingleGroup(@Nullable JSONObject data, final ServiceManager serviceManager) {
@@ -148,6 +181,9 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
         return Card.NaN;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public BaseCell parseSingleComponent(@Nullable JSONObject data, Card parent, ServiceManager serviceManager) {
@@ -166,90 +202,82 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
-    public ObservableTransformer<JSONArray, List<Card>> getGroupTransformer(final ServiceManager serviceManager) {
-        return new ObservableTransformer<JSONArray, List<Card>>() {
+    public ObservableTransformer<ParseGroupsOp, List<Card>> getGroupTransformer() {
+        return new ObservableTransformer<ParseGroupsOp, List<Card>>() {
             @Override
-            public ObservableSource<List<Card>> apply(Observable<JSONArray> upstream) {
-                return upstream.map(new Function<JSONArray, List<Card>>() {
+            public ObservableSource<List<Card>> apply(Observable<ParseGroupsOp> upstream) {
+                return upstream.map(new Function<ParseGroupsOp, List<Card>>() {
                     @Override
-                    public List<Card> apply(JSONArray jsonArray) throws Exception {
-                        return parseGroup(jsonArray, serviceManager);
+                    public List<Card> apply(ParseGroupsOp parseGroupsOp) throws Exception {
+                        return parseGroup(parseGroupsOp.getArg1(), parseGroupsOp.getArg2());
                     }
                 });
             }
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
-    public ObservableTransformer<JSONArray, List<BaseCell>> getComponentTransformer(final ServiceManager serviceManager) {
-        return new ObservableTransformer<JSONArray, List<BaseCell>>() {
+    public ObservableTransformer<ParseComponentsOp, List<BaseCell>> getComponentTransformer() {
+        return new ObservableTransformer<ParseComponentsOp, List<BaseCell>>() {
             @Override
-            public ObservableSource<List<BaseCell>> apply(Observable<JSONArray> upstream) {
-                return upstream.map(new Function<JSONArray, List<BaseCell>>() {
+            public ObservableSource<List<BaseCell>> apply(Observable<ParseComponentsOp> upstream) {
+                return upstream.map(new Function<ParseComponentsOp, List<BaseCell>>() {
                     @Override
-                    public List<BaseCell> apply(JSONArray jsonArray) throws Exception {
-                        return parseComponent(jsonArray, serviceManager);
+                    public List<BaseCell> apply(ParseComponentsOp parseComponentsOp) throws Exception {
+                        return parseComponent(parseComponentsOp.getArg1(), parseComponentsOp.getArg2(), parseComponentsOp.getArg3());
                     }
                 });
             }
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
-    public ObservableTransformer<JSONObject, Card> getSingleGroupTransformer(final ServiceManager serviceManager) {
-        return new ObservableTransformer<JSONObject, Card>() {
+    public ObservableTransformer<ParseSingleGroupOp, Card> getSingleGroupTransformer() {
+        return new ObservableTransformer<ParseSingleGroupOp, Card>() {
             @Override
-            public ObservableSource<Card> apply(Observable<JSONObject> upstream) {
-                return upstream.map(new Function<JSONObject, Card>() {
+            public ObservableSource<Card> apply(Observable<ParseSingleGroupOp> upstream) {
+                return upstream.map(new Function<ParseSingleGroupOp, Card>() {
                     @Override
-                    public Card apply(JSONObject jsonObject) throws Exception {
-                        return parseSingleGroup(jsonObject, serviceManager);
+                    public Card apply(ParseSingleGroupOp parseSingleGroupOp) throws Exception {
+                        return parseSingleGroup(parseSingleGroupOp.getArg1(), parseSingleGroupOp.getArg2());
                     }
                 });
             }
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
-    public ObservableTransformer<JSONObject, BaseCell> getSingleComponentTransformer(final ServiceManager serviceManager) {
-        return new ObservableTransformer<JSONObject, BaseCell>() {
+    public ObservableTransformer<ParseSingleComponentOp, BaseCell> getSingleComponentTransformer() {
+        return new ObservableTransformer<ParseSingleComponentOp, BaseCell>() {
             @Override
-            public ObservableSource<BaseCell> apply(Observable<JSONObject> upstream) {
-                return upstream.map(new Function<JSONObject, BaseCell>() {
+            public ObservableSource<BaseCell> apply(Observable<ParseSingleComponentOp> upstream) {
+                return upstream.map(new Function<ParseSingleComponentOp, BaseCell>() {
                     @Override
-                    public BaseCell apply(JSONObject jsonObject) throws Exception {
-                        return parseSingleComponent(jsonObject, null, serviceManager);
+                    public BaseCell apply(ParseSingleComponentOp parseSingleComponentOp) throws Exception {
+                        return parseSingleComponent(parseSingleComponentOp.getArg1(), parseSingleComponentOp.getArg2(), parseSingleComponentOp
+
+                            .getArg3());
                     }
                 });
             }
         };
-    }
-
-    @Nullable
-    private List<BaseCell> parseComponent(JSONArray data, ServiceManager serviceManager, Card card) {
-        if (data == null) {
-            return new ArrayList<>();
-        }
-        final int size = data.length();
-        final List<BaseCell> result = new ArrayList<>(size);
-        //parse body
-        JSONArray componentArray = data;
-        if (componentArray != null) {
-            final int cellLength = componentArray.length();
-            for (int i = 0; i < cellLength; i++) {
-                final JSONObject cellData = componentArray.optJSONObject(i);
-                BaseCell cell = parseSingleComponent(cellData, card, serviceManager);
-                if (cell != null) {
-                    result.add(cell);
-                }
-            }
-        }
-        return result;
     }
 
 }

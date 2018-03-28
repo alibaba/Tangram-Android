@@ -33,37 +33,11 @@ package com.tmall.wireless.tangram.op;
 
 public class TangramOp1<V1> {
 
-    public TangramOp1(int type, V1 arg1) {
-        mType = type;
+    public TangramOp1(V1 arg1) {
         this.arg1 = arg1;
     }
 
-    public static class OP_TYPE {
-        public static final int INSERT_CELL = 0;
-        public static final int INSERT_CELL_LIST = 1;
-        public static final int INSERT_GROUP = 2;
-        public static final int INSERT_GROUP_LIST = 3;
-        public static final int APPEND_GROUP = 4;
-        public static final int APPEND_GROUP_LIST = 5;
-        public static final int REMOVE_CELL_POSITION = 6;
-        public static final int REMOVE_CELL = 7;
-        public static final int REMOVE_GROUP_IDX = 8;
-        public static final int REMOVE_GROUP = 9;
-        public static final int REPLACE_CELL = 10;
-        public static final int REPLACE_GROUP_CONTENT = 11;
-        public static final int REPLACE_GROUP = 12;
-        public static final int UPDATE_CELL = 13;
-        public static final int LOAD_GROUP = 14;
-        public static final int LOAD_MORE = 15;
-    }
-
-    private final int mType;
-
     private final V1 arg1;
-
-    public int getType() {
-        return mType;
-    }
 
     public V1 getArg1() {
         return arg1;

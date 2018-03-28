@@ -37,6 +37,10 @@ import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
+import com.tmall.wireless.tangram.op.ParseComponentsOp;
+import com.tmall.wireless.tangram.op.ParseGroupsOp;
+import com.tmall.wireless.tangram.op.ParseSingleComponentOp;
+import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.BannerCard;
 import com.tmall.wireless.tangram.structure.card.GridCard;
@@ -164,25 +168,25 @@ public class SampleDataParser extends DataParser<JSONObject, JSONArray, Card, Ba
 
     @NonNull
     @Override
-    public ObservableTransformer<JSONArray, List<Card>> getGroupTransformer(ServiceManager serviceManager) {
+    public ObservableTransformer<ParseGroupsOp, List<Card>> getGroupTransformer() {
         return null;
     }
 
     @NonNull
     @Override
-    public ObservableTransformer<JSONArray, List<BaseCell>> getComponentTransformer(ServiceManager serviceManager) {
+    public ObservableTransformer<ParseComponentsOp, List<BaseCell>> getComponentTransformer() {
         return null;
     }
 
     @NonNull
     @Override
-    public ObservableTransformer<JSONObject, Card> getSingleGroupTransformer(ServiceManager serviceManager) {
+    public ObservableTransformer<ParseSingleGroupOp, Card> getSingleGroupTransformer() {
         return null;
     }
 
     @NonNull
     @Override
-    public ObservableTransformer<JSONObject, BaseCell> getSingleComponentTransformer(ServiceManager serviceManager) {
+    public ObservableTransformer<ParseSingleComponentOp, BaseCell> getSingleComponentTransformer() {
         return null;
     }
 }

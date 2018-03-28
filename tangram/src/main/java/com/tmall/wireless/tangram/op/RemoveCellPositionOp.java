@@ -33,6 +33,6 @@ package com.tmall.wireless.tangram.op;
 
 public class RemoveCellPositionOp extends TangramOp1<Integer> {
     public RemoveCellPositionOp(Integer arg1) {
-        super(OP_TYPE.REMOVE_CELL_POSITION, arg1);
+        super(arg1);
     }
 }

@@ -14,6 +14,6 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 
 public class LoadGroupOp extends TangramOp2<Card, List<BaseCell>> {
     public LoadGroupOp(Card arg1, List<BaseCell> arg2) {
-        super(OP_TYPE.LOAD_GROUP, arg1, arg2);
+        super(arg1, arg2);
     }
 }

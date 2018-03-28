@@ -35,6 +35,6 @@ import com.tmall.wireless.tangram.dataparser.concrete.Card;
 
 public class RemoveGroupOp extends TangramOp1<Card> {
     public RemoveGroupOp(Card arg1) {
-        super(OP_TYPE.REMOVE_GROUP, arg1);
+        super(arg1);
     }
 }

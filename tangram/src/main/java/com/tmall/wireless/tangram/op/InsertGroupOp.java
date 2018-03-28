@@ -35,6 +35,6 @@ import com.tmall.wireless.tangram.dataparser.concrete.Card;
 
 public class InsertGroupOp extends TangramOp2<Integer, Card> {
     public InsertGroupOp(Integer arg1, Card arg2) {
-        super(OP_TYPE.INSERT_GROUP, arg1, arg2);
+        super(arg1, arg2);
     }
 }

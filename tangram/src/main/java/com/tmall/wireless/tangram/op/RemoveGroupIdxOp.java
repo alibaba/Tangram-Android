@@ -24,8 +24,6 @@
 
 package com.tmall.wireless.tangram.op;
 
-import com.tmall.wireless.tangram.dataparser.concrete.Card;
-
 /**
  * Created by longerian on 2018/3/23.
  *
@@ -35,6 +33,6 @@ import com.tmall.wireless.tangram.dataparser.concrete.Card;
 
 public class RemoveGroupIdxOp extends TangramOp1<Integer> {
     public RemoveGroupIdxOp(Integer arg1) {
-        super(OP_TYPE.REMOVE_GROUP_IDX, arg1);
+        super(arg1);
     }
 }

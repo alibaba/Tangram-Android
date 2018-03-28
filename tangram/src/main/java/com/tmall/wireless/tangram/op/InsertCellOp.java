@@ -36,7 +36,7 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 public class InsertCellOp extends TangramOp2<Integer, BaseCell> {
 
     public InsertCellOp(int arg1, BaseCell arg2) {
-        super(OP_TYPE.INSERT_CELL, arg1, arg2);
+        super(arg1, arg2);
     }
 
 }

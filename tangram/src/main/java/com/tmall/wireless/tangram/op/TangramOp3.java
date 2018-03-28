@@ -11,8 +11,8 @@ public class TangramOp3<V1, V2, V3> extends TangramOp2<V1, V2> {
 
     private final V3 arg3;
 
-    public TangramOp3(int type, V1 arg1, V2 arg2, V3 arg3) {
-        super(type, arg1, arg2);
+    public TangramOp3(V1 arg1, V2 arg2, V3 arg3) {
+        super(arg1, arg2);
         this.arg3 = arg3;
     }
 

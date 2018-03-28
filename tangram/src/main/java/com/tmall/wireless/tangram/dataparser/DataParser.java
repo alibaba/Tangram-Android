@@ -29,6 +29,12 @@ import java.util.List;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
+import com.tmall.wireless.tangram.op.ParseComponentsOp;
+import com.tmall.wireless.tangram.op.ParseGroupsOp;
+import com.tmall.wireless.tangram.op.ParseSingleComponentOp;
+import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
+import com.tmall.wireless.tangram.op.TangramOp2;
+import com.tmall.wireless.tangram.op.TangramOp3;
 import io.reactivex.ObservableTransformer;
 
 /**
@@ -42,24 +48,67 @@ public abstract class DataParser<O, T, C, L> {
     @NonNull
     public abstract List<L> parseComponent(@Nullable T data, ServiceManager serviceManager);
 
+    /**
+     *
+     * @param data
+     * @param parent
+     * @param serviceManager
+     * @return
+     * @since 3.0.0
+     */
     @NonNull
     public abstract List<L> parseComponent(@Nullable T data, C parent, ServiceManager serviceManager);
 
+    /**
+     *
+     * @param data
+     * @param serviceManager
+     * @return
+     * @since 3.0.0
+     */
     @NonNull
     public abstract C parseSingleGroup(@Nullable O data, ServiceManager serviceManager);
 
+    /**
+     *
+     * @param data
+     * @param parent
+     * @param serviceManager
+     * @return
+     * @since 3.0.0
+     */
     @NonNull
     public abstract L parseSingleComponent(@Nullable O data, C parent, ServiceManager serviceManager);
 
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
     @NonNull
-    public abstract ObservableTransformer<T, List<C>> getGroupTransformer(ServiceManager serviceManager);
+    public abstract ObservableTransformer<ParseGroupsOp, List<C>> getGroupTransformer();
 
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
     @NonNull
-    public abstract ObservableTransformer<T, List<L>> getComponentTransformer(ServiceManager serviceManager);
+    public abstract ObservableTransformer<ParseComponentsOp, List<L>> getComponentTransformer();
 
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
     @NonNull
-    public abstract ObservableTransformer<O, C> getSingleGroupTransformer(ServiceManager serviceManager);
+    public abstract ObservableTransformer<ParseSingleGroupOp, C> getSingleGroupTransformer();
 
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
     @NonNull
-    public abstract ObservableTransformer<O, L> getSingleComponentTransformer(ServiceManager serviceManager);
+    public abstract ObservableTransformer<ParseSingleComponentOp, L> getSingleComponentTransformer();
 }

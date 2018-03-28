@@ -49,6 +49,12 @@ import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
+import com.tmall.wireless.tangram.op.ParseComponentsOp;
+import com.tmall.wireless.tangram.op.ParseGroupsOp;
+import com.tmall.wireless.tangram.op.ParseSingleComponentOp;
+import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
+import com.tmall.wireless.tangram.op.TangramOp2;
+import com.tmall.wireless.tangram.op.TangramOp3;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.support.BannerSupport;
@@ -73,7 +79,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link T} is the type of data, {@link C} is the class of Group, {@link L} is the class of Component
+ * {@link O} is the type of data, {@link T} is the array type of data, {@link C} is the class of Group, {@link L} is the class of Component
  *
  * @author kellen
  * @author villadora
@@ -565,12 +571,51 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
+     * @return
+     * @since 3.0.0
+     */
+    @NonNull
+    public ObservableTransformer<ParseGroupsOp, List<C>> getGroupTransformer() {
+        return mDataParser.getGroupTransformer();
+    }
+
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
+    @NonNull
+    public ObservableTransformer<ParseComponentsOp, List<L>> getComponentTransformer() {
+        return mDataParser.getComponentTransformer();
+    }
+
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
+    @NonNull
+    public ObservableTransformer<ParseSingleGroupOp, C> getSingleGroupTransformer() {
+        return mDataParser.getSingleGroupTransformer();
+    }
+
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
+    @NonNull
+    public ObservableTransformer<ParseSingleComponentOp, L> getSingleComponentTransformer() {
+        return mDataParser.getSingleComponentTransformer();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public <S> void register(@NonNull Class<S> type, @NonNull S service) {
         Preconditions.checkArgument(type != null, "type is null");
-
         mServices.put(type, type.cast(service));
     }
 

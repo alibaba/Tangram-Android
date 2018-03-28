@@ -24,17 +24,18 @@
 
 package com.tmall.wireless.tangram.op;
 
-import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.core.service.ServiceManager;
+import org.json.JSONObject;
 
 /**
- * Created by longerian on 2018/3/23.
+ * Created by longerian on 2018/3/28.
  *
  * @author longerian
- * @date 2018/03/23
+ * @date 2018/03/28
  */
 
-public class RemoveCellOp extends TangramOp1<BaseCell> {
-    public RemoveCellOp(BaseCell arg1) {
-        super(arg1);
+public class ParseSingleGroupOp extends TangramOp2<JSONObject, ServiceManager> {
+    public ParseSingleGroupOp(JSONObject arg1, ServiceManager arg2) {
+        super(arg1, arg2);
     }
 }

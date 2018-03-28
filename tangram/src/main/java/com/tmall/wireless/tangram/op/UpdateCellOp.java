@@ -35,6 +35,6 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 
 public class UpdateCellOp extends TangramOp1<BaseCell> {
     public UpdateCellOp(BaseCell arg1) {
-        super(OP_TYPE.UPDATE_CELL, arg1);
+        super(arg1);
     }
 }

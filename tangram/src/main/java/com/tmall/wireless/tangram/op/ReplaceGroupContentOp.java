@@ -38,6 +38,6 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 
 public class ReplaceGroupContentOp extends TangramOp2<Card, List<BaseCell>> {
     public ReplaceGroupContentOp(Card arg1, List<BaseCell> arg2) {
-        super(OP_TYPE.REPLACE_GROUP_CONTENT, arg1, arg2);
+        super(arg1, arg2);
     }
 }

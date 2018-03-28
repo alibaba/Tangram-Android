@@ -35,6 +35,6 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 
 public class ReplaceCellOp extends TangramOp2<BaseCell, BaseCell> {
     public ReplaceCellOp(BaseCell arg1, BaseCell arg2) {
-        super(OP_TYPE.REPLACE_CELL, arg1, arg2);
+        super(arg1, arg2);
     }
 }

@@ -24,17 +24,19 @@
 
 package com.tmall.wireless.tangram.op;
 
-import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.core.service.ServiceManager;
+import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import org.json.JSONArray;
 
 /**
- * Created by longerian on 2018/3/23.
+ * Created by longerian on 2018/3/28.
  *
  * @author longerian
- * @date 2018/03/23
+ * @date 2018/03/28
  */
 
-public class RemoveCellOp extends TangramOp1<BaseCell> {
-    public RemoveCellOp(BaseCell arg1) {
-        super(arg1);
+public class ParseComponentsOp extends TangramOp3<JSONArray, Card, ServiceManager> {
+    public ParseComponentsOp(JSONArray arg1, Card arg2, ServiceManager arg3) {
+        super(arg1, arg2, arg3);
     }
 }

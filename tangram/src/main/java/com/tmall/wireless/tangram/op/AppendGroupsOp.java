@@ -37,6 +37,6 @@ import com.tmall.wireless.tangram.dataparser.concrete.Card;
 
 public class AppendGroupsOp extends TangramOp1<List<Card>> {
     public AppendGroupsOp(List<Card> arg1) {
-        super(OP_TYPE.APPEND_GROUP_LIST, arg1);
+        super(arg1);
     }
 }

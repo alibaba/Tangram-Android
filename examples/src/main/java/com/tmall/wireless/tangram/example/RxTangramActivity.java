@@ -66,6 +66,8 @@ import com.tmall.wireless.tangram.example.support.SampleClickSupport;
 import com.tmall.wireless.tangram.op.AppendGroupOp;
 import com.tmall.wireless.tangram.op.LoadGroupOp;
 import com.tmall.wireless.tangram.op.LoadMoreOp;
+import com.tmall.wireless.tangram.op.ParseGroupsOp;
+import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
 import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.tmall.wireless.tangram.reactive.JSONArrayObservable;
 import com.tmall.wireless.tangram.reactive.ViewClickObservable;
@@ -83,6 +85,7 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -413,7 +416,12 @@ public class RxTangramActivity extends Activity {
             public ObservableSource<JSONObject> apply(JSONArray jsonArray) throws Exception {
                 return JSONArrayObservable.fromJsonArray(jsonArray);
             }
-        }).compose(((PojoDataParser) engine.getService(DataParser.class)).getSingleGroupTransformer(engine)) //using map of transformer
+        }).map(new Function<JSONObject, ParseSingleGroupOp>() {
+            @Override
+            public ParseSingleGroupOp apply(JSONObject jsonObject) throws Exception {
+                return new ParseSingleGroupOp(jsonObject, engine);
+            }
+        }).compose(engine.getSingleGroupTransformer())
         .filter(new Predicate<Card>() {
             @Override
             public boolean test(Card card) throws Exception {
