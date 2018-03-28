@@ -106,6 +106,7 @@ public class TimerSupport {
      * @param interval timer interval, in TimeUnit.SECOND
      * @param intermediate true, get event immediately
      * @return
+     * @since 3.0.0
      */
     public Observable<Long> getTickObservable(int interval, boolean intermediate) {
         return Observable.interval(intermediate ? 0 : interval, interval, TimeUnit.SECONDS);
@@ -117,6 +118,7 @@ public class TimerSupport {
      * @param total total event count
      * @param intermediate true, get event immediately
      * @return
+     * @since 3.0.0
      */
     public Observable<Long> getTickObservable(int interval, int total, boolean intermediate) {
         return Observable.intervalRange(0, total, intermediate ? 0 : interval, interval, TimeUnit.SECONDS);
