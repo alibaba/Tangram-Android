@@ -26,7 +26,6 @@ package com.tmall.wireless.tangram.reactive;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.annotations.Nullable;
 import io.reactivex.internal.functions.ObjectHelper;
 import io.reactivex.internal.observers.BasicQueueDisposable;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -91,7 +90,6 @@ public class JSONArrayObservable<T> extends Observable<T> {
             return NONE;
         }
 
-        @Nullable
         @Override
         public T poll() {
             int i = index;
