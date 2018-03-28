@@ -159,7 +159,7 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
         final MVHelper cellResolver = serviceManager.getService(MVHelper.class);
         Preconditions.checkState(cellResolver != null, "Must register CellResolver into ServiceManager first");
         BaseCell cell = Card.createCell(parent, cellResolver, data, serviceManager, true);
-        if (cell != null && cellResolver.isValid(cell, serviceManager)) {
+        if (cellResolver.isValid(cell, serviceManager)) {
             return cell;
         } else {
             return BaseCell.NaN;

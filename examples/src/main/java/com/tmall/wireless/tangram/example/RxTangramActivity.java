@@ -417,7 +417,7 @@ public class RxTangramActivity extends Activity {
         .filter(new Predicate<Card>() {
             @Override
             public boolean test(Card card) throws Exception {
-                return card != Card.NaN;
+                return card.isValid();
             }
         }).map(new Function<Card, AppendGroupOp>() {
             @Override

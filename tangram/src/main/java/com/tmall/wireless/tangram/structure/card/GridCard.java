@@ -261,7 +261,7 @@ public class GridCard extends Card {
     }
 
     private void ensureBlock(BaseCell cell) {
-        if (cell != null) {
+        if (cell.isValid()) {
             if (cell.style.extras == null) {
                 cell.style.extras = new JSONObject();
             }

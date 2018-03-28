@@ -103,7 +103,7 @@ public class BannerCard extends Card {
     @Override
     protected void parseHeaderCell(@NonNull MVHelper resolver, @Nullable JSONObject header) {
         cell.mHeader = createCell(this, resolver, header, serviceManager, false);
-        if (cell.mHeader != null) {
+        if (cell.mHeader.isValid()) {
             cell.mHeader.parent = this;
             cell.mHeader.parentId = id;
             cell.mHeader.pos = 0;
@@ -117,7 +117,7 @@ public class BannerCard extends Card {
     @Override
     protected void parseFooterCell(@NonNull MVHelper resolver, @Nullable JSONObject footer) {
         cell.mFooter = createCell(this, resolver, footer, serviceManager, false);
-        if (cell.mFooter != null) {
+        if (cell.mFooter.isValid()) {
             cell.mFooter.parent = this;
             cell.mFooter.parentId = id;
             cell.mFooter.pos = cell.mHeader != null ? getCells().size() + 1: getCells().size();

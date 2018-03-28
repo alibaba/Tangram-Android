@@ -73,7 +73,7 @@ import java.util.Map;
  */
 public abstract class Card extends ComponentLifecycle {
 
-    public static final Card NaN = new Card() {};
+    public static final Card NaN = new NaNCard();
 
     private static final String TAG = "Card";
 
@@ -283,7 +283,7 @@ public abstract class Card extends ComponentLifecycle {
 
                     //do not display when newInstance failed
                     if (cell == null) {
-                        return null;
+                        return BaseCell.NaN;
                     }
 
                     cell.serviceManager = serviceManager; // ensure service manager
@@ -328,7 +328,7 @@ public abstract class Card extends ComponentLifecycle {
                                 cell.parentId = parent.id;
                             }
                         } else {
-                            return null;
+                            return BaseCell.NaN;
                         }
                     } else {
                         cell = new BaseCell(cellType);
@@ -362,11 +362,11 @@ public abstract class Card extends ComponentLifecycle {
                     cell.setStringType(cellType);
                     return cell;
                 } else {
-                    return null;
+                    return BaseCell.NaN;
                 }
             }
         }
-        return null;
+        return BaseCell.NaN;
     }
 
     protected void parseCell(@NonNull MVHelper resolver, @NonNull JSONObject data, @NonNull final BaseCell cell, boolean appended) {
@@ -1103,6 +1103,14 @@ public abstract class Card extends ComponentLifecycle {
 
             return lhs.position < rhs.position ? mSmall : (lhs.position == rhs.position ? 0 : mLarge);
 
+        }
+    }
+
+    public static final class NaNCard extends Card {
+
+        @Override
+        public boolean isValid() {
+            return false;
         }
     }
 

@@ -24,7 +24,15 @@
 
 package com.tmall.wireless.tangram.structure;
 
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.util.SparseArray;
+import android.view.View;
+import android.widget.ImageView;
 import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
@@ -32,16 +40,15 @@ import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.ComponentLifecycle;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.op.UpdateCellOp;
-import com.tmall.wireless.tangram.support.ExposureSupport;
-import com.tmall.wireless.tangram.support.RxExposureCancellable;
-import com.tmall.wireless.tangram.support.RxClickExposureEvent;
-import com.tmall.wireless.tangram.support.RxTangramSupport;
-import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.CellClickObservable;
 import com.tmall.wireless.tangram.support.CellExposureObservable;
+import com.tmall.wireless.tangram.support.ExposureSupport;
+import com.tmall.wireless.tangram.support.RxClickExposureEvent;
+import com.tmall.wireless.tangram.support.RxExposureCancellable;
+import com.tmall.wireless.tangram.support.RxTangramSupport;
+import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
-
 import io.reactivex.ObservableTransformer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
@@ -49,21 +56,12 @@ import io.reactivex.subjects.PublishSubject;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
-import android.view.View;
-import android.widget.ImageView;
-
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
-
 /**
  * Created by mikeafc on 16/4/25.
  */
 public class BaseCell<V extends View> extends ComponentLifecycle implements View.OnClickListener {
 
-    public static final BaseCell NaN = new BaseCell();
+    public static final BaseCell NaN = new NanBaseCell();
 
     private static AtomicLong sIdGen = new AtomicLong();
 
@@ -521,6 +519,13 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
                 mUpdateCellOpObservable.onNext(new UpdateCellOp(BaseCell.this));
             }
         };
+    }
+
+    public static final class NanBaseCell extends BaseCell {
+        @Override
+        public boolean isValid() {
+            return false;
+        }
     }
 
 }
