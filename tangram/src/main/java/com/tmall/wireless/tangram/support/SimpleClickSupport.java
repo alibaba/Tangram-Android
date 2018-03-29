@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.tmall.wireless.tangram.dataparser.concrete.Cell;
+import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.util.LogUtils;
 import io.reactivex.Observable;
@@ -140,7 +141,7 @@ public abstract class SimpleClickSupport {
      * @param clickEventObservable
      * @param rxEvent
      */
-    public Disposable onRxClick(Observable<RxClickExposureEvent> clickEventObservable, RxClickExposureEvent rxEvent) {
+    public Disposable onRxClick(Observable<ClickExposureCellOp> clickEventObservable, ClickExposureCellOp rxEvent) {
         return clickEventObservable.subscribe(mConsumer);
     }
 
@@ -209,14 +210,14 @@ public abstract class SimpleClickSupport {
         }
     }
 
-    private Consumer<RxClickExposureEvent> mConsumer = new Consumer<RxClickExposureEvent>() {
+    private Consumer<ClickExposureCellOp> mConsumer = new Consumer<ClickExposureCellOp>() {
         @Override
-        public void accept(RxClickExposureEvent rxClickExposureEvent) throws Exception {
-            defaultClick(rxClickExposureEvent.getView(), rxClickExposureEvent.getCell(), rxClickExposureEvent.getEventType());
+        public void accept(ClickExposureCellOp rxClickExposureEvent) throws Exception {
+            defaultClick(rxClickExposureEvent.getArg1(), rxClickExposureEvent.getArg2(), rxClickExposureEvent.getArg3());
         }
     };
 
-    public void setConsumer(Consumer<RxClickExposureEvent> consumer) {
+    public void setConsumer(Consumer<ClickExposureCellOp> consumer) {
         mConsumer = consumer;
     }
 

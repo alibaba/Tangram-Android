@@ -33,7 +33,7 @@ package com.tmall.wireless.tangram.op;
 
 public class TangramOp2<V1, V2> extends TangramOp1<V1> {
 
-    private final V2 arg2;
+    private V2 arg2;
 
     public TangramOp2(V1 arg1, V2 arg2) {
         super(arg1);
@@ -42,5 +42,9 @@ public class TangramOp2<V1, V2> extends TangramOp1<V1> {
 
     public V2 getArg2() {
         return arg2;
+    }
+
+    public void setArg2(V2 arg2) {
+        this.arg2 = arg2;
     }
 }

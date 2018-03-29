@@ -37,8 +37,8 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.View;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
+import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.support.RxClickExposureEvent;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import io.reactivex.functions.Consumer;
 import org.junit.Before;
@@ -100,13 +100,13 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellClicks() {
-        Consumer<RxClickExposureEvent> consumer1 = new Consumer<RxClickExposureEvent>() {
+        Consumer<ClickExposureCellOp> consumer1 = new Consumer<ClickExposureCellOp>() {
             @Override
-            public void accept(RxClickExposureEvent clickEvent) throws Exception {
-                assertEquals(clickEvent.getView(), mView1);
-                assertEquals(clickEvent.getCell(), mBaseCell1);
-                assertEquals(clickEvent.getEventType(), 10);
-                Log.d("RxClickSupportTest", "testOneCellClicks test One cell mEventType " + clickEvent.getEventType());
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertEquals(clickEvent.getArg1(), mView1);
+                assertEquals(clickEvent.getArg2(), mBaseCell1);
+                assertEquals(clickEvent.getArg3().intValue(), 10);
+                Log.d("RxClickSupportTest", "testOneCellClicks test One cell mEventType " + clickEvent.getArg3());
             }
         };
         mSimpleClickSupport.setConsumer(consumer1);
@@ -118,14 +118,14 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testTwoCellClicks() {
-        Consumer<RxClickExposureEvent> consumer1 = new Consumer<RxClickExposureEvent>() {
+        Consumer<ClickExposureCellOp> consumer1 = new Consumer<ClickExposureCellOp>() {
 
             @Override
-            public void accept(RxClickExposureEvent clickEvent) throws Exception {
-                assertEquals(clickEvent.getView(), mView1);
-                assertEquals(clickEvent.getCell(), mBaseCell1);
-                assertEquals(clickEvent.getEventType(), 10);
-                Log.d("RxClickSupportTest", "testTwoCellClicks mEventType " + clickEvent.getEventType());
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertEquals(clickEvent.getArg1(), mView1);
+                assertEquals(clickEvent.getArg2(), mBaseCell1);
+                assertEquals(clickEvent.getArg3().intValue(), 10);
+                Log.d("RxClickSupportTest", "testTwoCellClicks mEventType " + clickEvent.getArg3());
             }
         };
         mSimpleClickSupport.setConsumer(consumer1);
@@ -133,14 +133,14 @@ public class RxClickSupportTest extends AndroidTestCase {
         mBaseCell1.click(mView1);
         mView1.performClick();
 
-        Consumer<RxClickExposureEvent> consumer2 = new Consumer<RxClickExposureEvent>() {
+        Consumer<ClickExposureCellOp> consumer2 = new Consumer<ClickExposureCellOp>() {
 
             @Override
-            public void accept(RxClickExposureEvent clickEvent) throws Exception {
-                assertEquals(clickEvent.getView(), mView2);
-                assertEquals(clickEvent.getCell(), mBaseCell2);
-                assertEquals(clickEvent.getEventType(), 1);
-                Log.d("RxClickSupportTest", "testTwoCellClicks mEventType " + clickEvent.getEventType());
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertEquals(clickEvent.getArg1(), mView2);
+                assertEquals(clickEvent.getArg2(), mBaseCell2);
+                assertEquals(clickEvent.getArg3().intValue(), 1);
+                Log.d("RxClickSupportTest", "testTwoCellClicks mEventType " + clickEvent.getArg3());
             }
         };
         mSimpleClickSupport.setConsumer(consumer2);
@@ -154,13 +154,13 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneConsumerSubscribeTwoCellClicks() {
-        Consumer<RxClickExposureEvent> consumer = new Consumer<RxClickExposureEvent>() {
+        Consumer<ClickExposureCellOp> consumer = new Consumer<ClickExposureCellOp>() {
 
             @Override
-            public void accept(RxClickExposureEvent clickEvent) throws Exception {
-                assertTrue(clickEvent.getView() == mView1 || clickEvent.getView() == mView2);
-                assertTrue(clickEvent.getCell() == mBaseCell1 || clickEvent.getCell() == mBaseCell2);
-                Log.d("RxClickSupportTest", "testOneConsumerSubscribeTwoCellClicks mEventType " + clickEvent.getEventType());
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertTrue(clickEvent.getArg1() == mView1 || clickEvent.getArg1() == mView2);
+                assertTrue(clickEvent.getArg2() == mBaseCell1 || clickEvent.getArg2() == mBaseCell2);
+                Log.d("RxClickSupportTest", "testOneConsumerSubscribeTwoCellClicks mEventType " + clickEvent.getArg3());
             }
         };
         mSimpleClickSupport.setConsumer(consumer);
@@ -177,10 +177,10 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testCellClickDispose() {
-        Consumer<RxClickExposureEvent> consumer = new Consumer<RxClickExposureEvent>() {
+        Consumer<ClickExposureCellOp> consumer = new Consumer<ClickExposureCellOp>() {
 
             @Override
-            public void accept(RxClickExposureEvent clickEvent) throws Exception {
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
                 //should not execute this code
                 assertTrue(false);
             }
@@ -196,14 +196,14 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellWithMultiViewClick() {
-        Consumer<RxClickExposureEvent> consumer = new Consumer<RxClickExposureEvent>() {
+        Consumer<ClickExposureCellOp> consumer = new Consumer<ClickExposureCellOp>() {
 
             @Override
-            public void accept(RxClickExposureEvent clickEvent) throws Exception {
-                assertTrue(clickEvent.getView() == mView1 || clickEvent.getView() == mView2);
-                assertTrue(clickEvent.getCell() == mBaseCell1);
-                Log.d("RxClickSupportTest", "testOneCellWithMultiViewClick mEventType " + clickEvent.getEventType());
-                Log.d("RxClickSupportTest", "testOneCellWithMultiViewClick view " + clickEvent.getView());
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertTrue(clickEvent.getArg1() == mView1 || clickEvent.getArg1() == mView2);
+                assertTrue(clickEvent.getArg2() == mBaseCell1);
+                Log.d("RxClickSupportTest", "testOneCellWithMultiViewClick mEventType " + clickEvent.getArg3());
+                Log.d("RxClickSupportTest", "testOneCellWithMultiViewClick view " + clickEvent.getArg1());
             }
         };
         mSimpleClickSupport.setConsumer(consumer);
@@ -218,14 +218,14 @@ public class RxClickSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellWithMultiViewClickDispose() {
-        Consumer<RxClickExposureEvent> consumer = new Consumer<RxClickExposureEvent>() {
+        Consumer<ClickExposureCellOp> consumer = new Consumer<ClickExposureCellOp>() {
 
             @Override
-            public void accept(RxClickExposureEvent clickEvent) throws Exception {
-                assertTrue(clickEvent.getView() == mView1 || clickEvent.getView() == mView2);
-                assertTrue(clickEvent.getCell() == mBaseCell1);
-                Log.d("RxClickSupportTest", "testOneCellWithMultiViewClickDispose mEventType " + clickEvent.getEventType());
-                Log.d("RxClickSupportTest", "testOneCellWithMultiViewClickDispose view " + clickEvent.getView());
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertTrue(clickEvent.getArg1() == mView1 || clickEvent.getArg1() == mView2);
+                assertTrue(clickEvent.getArg2() == mBaseCell1);
+                Log.d("RxClickSupportTest", "testOneCellWithMultiViewClickDispose mEventType " + clickEvent.getArg3());
+                Log.d("RxClickSupportTest", "testOneCellWithMultiViewClickDispose view " + clickEvent.getArg1());
 
                 //should not execute this code
                 assertTrue(false);

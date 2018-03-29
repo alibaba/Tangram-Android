@@ -37,10 +37,13 @@ public class TangramOp1<V1> {
         this.arg1 = arg1;
     }
 
-    private final V1 arg1;
+    private V1 arg1;
 
     public V1 getArg1() {
         return arg1;
     }
 
+    public void setArg1(V1 arg1) {
+        this.arg1 = arg1;
+    }
 }

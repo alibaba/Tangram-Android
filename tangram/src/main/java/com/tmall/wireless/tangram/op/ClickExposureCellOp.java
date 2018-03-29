@@ -22,47 +22,23 @@
  * SOFTWARE.
  */
 
-package com.tmall.wireless.tangram.support;
+package com.tmall.wireless.tangram.op;
 
 import android.view.View;
 import com.tmall.wireless.tangram.structure.BaseCell;
 
 /**
- * Created by longerian on 2018/3/5.
+ * Created by longerian on 2018/3/29.
  *
  * @author longerian
- * @date 2018/03/05
+ * @date 2018/03/29
  */
 
-public class RxClickExposureEvent {
+public class ClickExposureCellOp extends TangramOp3<View, BaseCell, Integer> {
 
-    private View mView;
-
-    private BaseCell mCell;
-
-    private int mEventType;
-
-    public RxClickExposureEvent(View view, BaseCell cell, int eventType) {
-        mView = view;
-        mCell = cell;
-        mEventType = eventType;
+    public ClickExposureCellOp(View arg1, BaseCell arg2, Integer arg3) {
+        super(arg1, arg2, arg3);
     }
 
-    public void update(View view, BaseCell cell, int eventType) {
-        mView = view;
-        mCell = cell;
-        mEventType = eventType;
-    }
 
-    public View getView() {
-        return mView;
-    }
-
-    public BaseCell getCell() {
-        return mCell;
-    }
-
-    public int getEventType() {
-        return mEventType;
-    }
 }

@@ -24,6 +24,7 @@
 
 package com.tmall.wireless.tangram.support;
 
+import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import io.reactivex.Observer;
 import io.reactivex.android.MainThreadDisposable;
 import android.view.View;
@@ -37,20 +38,20 @@ import android.view.View;
 
 public class RxClickListener extends MainThreadDisposable implements View.OnClickListener {
 
-    private RxClickExposureEvent mRxClickExposureEvent;
+    private ClickExposureCellOp mRxClickExposureEvent;
 
-    private Observer<? super RxClickExposureEvent> mObserver;
+    private Observer<? super ClickExposureCellOp> mObserver;
 
-    public RxClickListener(RxClickExposureEvent rxClickExposureEvent, Observer<? super RxClickExposureEvent> observer) {
+    public RxClickListener(ClickExposureCellOp rxClickExposureEvent, Observer<? super ClickExposureCellOp> observer) {
         this.mRxClickExposureEvent = rxClickExposureEvent;
         this.mObserver = observer;
     }
 
-    public void setRxClickExposureEvent(RxClickExposureEvent rxClickExposureEvent) {
+    public void setRxClickExposureEvent(ClickExposureCellOp rxClickExposureEvent) {
         mRxClickExposureEvent = rxClickExposureEvent;
     }
 
-    public void setObserver(Observer<? super RxClickExposureEvent> observer) {
+    public void setObserver(Observer<? super ClickExposureCellOp> observer) {
         mObserver = observer;
     }
 
@@ -63,7 +64,7 @@ public class RxClickListener extends MainThreadDisposable implements View.OnClic
 
     @Override
     protected void onDispose() {
-        mRxClickExposureEvent.getView().setOnClickListener(null);
+        mRxClickExposureEvent.getArg1().setOnClickListener(null);
     }
 
 }

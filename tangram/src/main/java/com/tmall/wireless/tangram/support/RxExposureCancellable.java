@@ -24,6 +24,7 @@
 
 package com.tmall.wireless.tangram.support;
 
+import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import io.reactivex.functions.Cancellable;
 import io.reactivex.functions.Consumer;
 
@@ -34,7 +35,7 @@ import io.reactivex.functions.Consumer;
  * @date 2018/03/07
  */
 
-public abstract class RxExposureCancellable implements Consumer<RxClickExposureEvent>, Cancellable {
+public abstract class RxExposureCancellable implements Consumer<ClickExposureCellOp>, Cancellable {
 
     public RxExposureCancellable() {
     }

@@ -24,6 +24,7 @@
 
 package com.tmall.wireless.tangram.support;
 
+import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import com.tmall.wireless.tangram.util.Preconditions;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -36,19 +37,19 @@ import io.reactivex.internal.disposables.CancellableDisposable;
  * @date 2018/03/07
  */
 
-public class CellExposureObservable extends Observable<RxClickExposureEvent> {
+public class CellExposureObservable extends Observable<ClickExposureCellOp> {
 
-    private RxClickExposureEvent mRxClickExposureEvent;
+    private ClickExposureCellOp mRxClickExposureEvent;
     private RxExposureCancellable mRxExposureCancellable;
 
-    public CellExposureObservable(RxClickExposureEvent rxClickExposureEvent, RxExposureCancellable rxExposureCancellable) {
+    public CellExposureObservable(ClickExposureCellOp rxClickExposureEvent, RxExposureCancellable rxExposureCancellable) {
         Preconditions.checkNotNull(rxClickExposureEvent);
-        Preconditions.checkNotNull(rxClickExposureEvent.getView());
+        Preconditions.checkNotNull(rxClickExposureEvent.getArg1());
         this.mRxClickExposureEvent = rxClickExposureEvent;
         this.mRxExposureCancellable = rxExposureCancellable;
     }
 
-    public void setRxClickExposureEvent(RxClickExposureEvent rxClickExposureEvent) {
+    public void setRxClickExposureEvent(ClickExposureCellOp rxClickExposureEvent) {
         mRxClickExposureEvent = rxClickExposureEvent;
     }
 
@@ -57,7 +58,7 @@ public class CellExposureObservable extends Observable<RxClickExposureEvent> {
     }
 
     @Override
-    protected void subscribeActual(Observer<? super RxClickExposureEvent> observer) {
+    protected void subscribeActual(Observer<? super ClickExposureCellOp> observer) {
         if (mRxExposureCancellable != null) {
             observer.onSubscribe(new CancellableDisposable(mRxExposureCancellable));
         }

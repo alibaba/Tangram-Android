@@ -24,6 +24,7 @@
 
 package com.tmall.wireless.tangram.support;
 
+import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import com.tmall.wireless.tangram.util.Preconditions;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
@@ -35,24 +36,24 @@ import io.reactivex.Observer;
  * @date 2018/03/07
  */
 
-public class CellClickObservable extends Observable<RxClickExposureEvent> {
+public class CellClickObservable extends Observable<ClickExposureCellOp> {
 
-    private RxClickExposureEvent mRxClickExposureEvent;
+    private ClickExposureCellOp mRxClickExposureEvent;
 
     private RxClickListener mListener;
 
-    public CellClickObservable(RxClickExposureEvent rxClickExposureEvent) {
+    public CellClickObservable(ClickExposureCellOp rxClickExposureEvent) {
         Preconditions.checkNotNull(rxClickExposureEvent);
-        Preconditions.checkNotNull(rxClickExposureEvent.getView());
+        Preconditions.checkNotNull(rxClickExposureEvent.getArg1());
         this.mRxClickExposureEvent = rxClickExposureEvent;
     }
 
-    public void setRxClickExposureEvent(RxClickExposureEvent rxClickExposureEvent) {
+    public void setRxClickExposureEvent(ClickExposureCellOp rxClickExposureEvent) {
         mRxClickExposureEvent = rxClickExposureEvent;
     }
 
     @Override
-    protected void subscribeActual(Observer<? super RxClickExposureEvent> observer) {
+    protected void subscribeActual(Observer<? super ClickExposureCellOp> observer) {
         if (!Preconditions.checkMainThread(observer)) {
             return;
         }
@@ -63,7 +64,7 @@ public class CellClickObservable extends Observable<RxClickExposureEvent> {
             mListener.setObserver(observer);
         }
         observer.onSubscribe(mListener);
-        mRxClickExposureEvent.getView().setOnClickListener(mListener);
+        mRxClickExposureEvent.getArg1().setOnClickListener(mListener);
     }
 
 }

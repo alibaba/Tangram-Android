@@ -25,6 +25,7 @@
 package com.tmall.wireless.tangram.support;
 
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.util.LogUtils;
 
@@ -270,7 +271,7 @@ public abstract class ExposureSupport {
      * @param rxEvent
      * @return exposure handle task by rxEvent
      */
-    public RxExposureCancellable getRxExposureCancellable(RxClickExposureEvent rxEvent) {
+    public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
         return null;
     }
 
@@ -279,7 +280,7 @@ public abstract class ExposureSupport {
      * @param rxEvent
      * @return
      */
-    public ObservableTransformer<RxClickExposureEvent, RxClickExposureEvent> getObservableTransformer(RxClickExposureEvent rxEvent) {
+    public ObservableTransformer<ClickExposureCellOp, ClickExposureCellOp> getObservableTransformer(ClickExposureCellOp rxEvent) {
         return null;
     }
 
