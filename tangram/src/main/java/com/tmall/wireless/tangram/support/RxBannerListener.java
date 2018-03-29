@@ -24,9 +24,6 @@
 
 package com.tmall.wireless.tangram.support;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.tmall.wireless.tangram.ext.BannerListener;
 import io.reactivex.Observer;
 import io.reactivex.android.MainThreadDisposable;
@@ -40,10 +37,10 @@ import io.reactivex.android.MainThreadDisposable;
 
 public abstract class RxBannerListener<T> extends MainThreadDisposable implements BannerListener {
 
-    protected List<Observer<? super T>> mObservers = new ArrayList<>();
+    protected Observer<? super T> mObserver;
 
     public void addObserver(Observer<? super T> observer) {
-        mObservers.add(observer);
+        mObserver = observer;
     }
 
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels, int direction) {
@@ -64,6 +61,6 @@ public abstract class RxBannerListener<T> extends MainThreadDisposable implement
 
     @Override
     protected void onDispose() {
-        mObservers.clear();
+        mObserver = null;
     }
 }

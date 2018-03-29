@@ -38,14 +38,11 @@ import io.reactivex.Observable;
  */
 public class BannerSupport {
 
-    private ArrayMap<String, BannerListener> mSelectedListenerArrayMap = new ArrayMap<>();
-    private ArrayMap<String, BannerSelectedObservable> mSelectedObservableArrayMap = new ArrayMap<>();
+    private ArrayMap<String, List<BannerListener>> mSelectedListenerArrayMap = new ArrayMap<>();
 
-    private ArrayMap<String, BannerListener> mScrolledListenerArrayMap = new ArrayMap<>();
-    private ArrayMap<String, BannerScrolledObservable> mScrolledObservableArrayMap = new ArrayMap<>();
+    private ArrayMap<String, List<BannerListener>> mScrolledListenerArrayMap = new ArrayMap<>();
 
-    private ArrayMap<String, BannerListener> mScrollStateListenerArrayMap = new ArrayMap<>();
-    private ArrayMap<String, BannerScrollStateChangedObservable> mScrollStateObservableArrayMap = new ArrayMap<>();
+    private ArrayMap<String, List<BannerListener>> mScrollStateListenerArrayMap = new ArrayMap<>();
 
     @Deprecated
     private List<BannerListener> listeners = new ArrayList<BannerListener>();
@@ -67,57 +64,51 @@ public class BannerSupport {
         return listeners;
     }
 
-    public BannerListener getSelectedListenerById(String id) {
+    public List<BannerListener> getSelectedListenerById(String id) {
         return mSelectedListenerArrayMap.get(id);
     }
 
-    public BannerListener getScrolledListenerById(String id) {
+    public List<BannerListener> getScrolledListenerById(String id) {
         return mScrolledListenerArrayMap.get(id);
     }
 
-    public BannerListener getScrollStateChangedListenerById(String id) {
+    public List<BannerListener> getScrollStateChangedListenerById(String id) {
         return mScrollStateListenerArrayMap.get(id);
     }
 
     public Observable<Integer> observeSelected(String id) {
-        BannerListener rxBannerSelectedListener = mSelectedListenerArrayMap.get(id);
-        if (rxBannerSelectedListener == null) {
-            rxBannerSelectedListener = new RxBannerSelectedListener();
-            mSelectedListenerArrayMap.put(id, rxBannerSelectedListener);
+        List<BannerListener> list = mSelectedListenerArrayMap.get(id);
+        if (list == null) {
+            list = new ArrayList<>();
+            mSelectedListenerArrayMap.put(id, list);
         }
-        BannerSelectedObservable bannerSupportObservable = mSelectedObservableArrayMap.get(id);
-        if (bannerSupportObservable == null) {
-            bannerSupportObservable = new BannerSelectedObservable((RxBannerSelectedListener)rxBannerSelectedListener);
-            bannerSupportObservable.share();
-        }
+        RxBannerSelectedListener rxBannerSelectedListener = new RxBannerSelectedListener();
+        list.add(rxBannerSelectedListener);
+        BannerSelectedObservable bannerSupportObservable = new BannerSelectedObservable(rxBannerSelectedListener);
         return bannerSupportObservable;
     }
 
     public Observable<ScrollEvent> observeScrolled(String id) {
-        BannerListener rxBannerSelectedListener = mScrolledListenerArrayMap.get(id);
-        if (rxBannerSelectedListener == null) {
-            rxBannerSelectedListener = new RxBannerScrolledListener();
-            mScrolledListenerArrayMap.put(id, rxBannerSelectedListener);
+        List<BannerListener> list = mScrolledListenerArrayMap.get(id);
+        if (list == null) {
+            list = new ArrayList<>();
+            mScrolledListenerArrayMap.put(id, list);
         }
-        BannerScrolledObservable bannerSupportObservable = mScrolledObservableArrayMap.get(id);
-        if (bannerSupportObservable == null) {
-            bannerSupportObservable = new BannerScrolledObservable((RxBannerScrolledListener)rxBannerSelectedListener);
-            bannerSupportObservable.share();
-        }
+        RxBannerScrolledListener rxBannerSelectedListener = new RxBannerScrolledListener();
+        list.add(rxBannerSelectedListener);
+        BannerScrolledObservable bannerSupportObservable = new BannerScrolledObservable(rxBannerSelectedListener);
         return bannerSupportObservable;
     }
 
     public Observable<Integer> observeScrollStateChanged(String id) {
-        BannerListener rxBannerSelectedListener = mScrollStateListenerArrayMap.get(id);
-        if (rxBannerSelectedListener == null) {
-            rxBannerSelectedListener = new RxBannerScrollStateChangedListener();
-            mScrollStateListenerArrayMap.put(id, rxBannerSelectedListener);
+        List<BannerListener> list = mScrollStateListenerArrayMap.get(id);
+        if (list == null) {
+            list = new ArrayList<>();
+            mScrollStateListenerArrayMap.put(id, list);
         }
-        BannerScrollStateChangedObservable bannerSupportObservable = mScrollStateObservableArrayMap.get(id);
-        if (bannerSupportObservable == null) {
-            bannerSupportObservable = new BannerScrollStateChangedObservable((RxBannerScrollStateChangedListener)rxBannerSelectedListener);
-            bannerSupportObservable.share();
-        }
+        RxBannerScrollStateChangedListener rxBannerSelectedListener = new RxBannerScrollStateChangedListener();
+        list.add(rxBannerSelectedListener);
+        BannerScrollStateChangedObservable bannerSupportObservable = new BannerScrollStateChangedObservable(rxBannerSelectedListener);
         return bannerSupportObservable;
     }
 
@@ -129,19 +120,14 @@ public class BannerSupport {
 
     public void destroyBannerSelected() {
         mSelectedListenerArrayMap.clear();
-        mSelectedObservableArrayMap.clear();
-
     }
 
     public void destroyBannerScrolled() {
         mScrolledListenerArrayMap.clear();
-        mScrolledObservableArrayMap.clear();
-
     }
 
     public void destroyBannerScrollStateChanged() {
         mScrollStateListenerArrayMap.clear();
-        mScrollStateObservableArrayMap.clear();
     }
 
 }

@@ -294,7 +294,7 @@ public class RxTangramActivity extends Activity {
             }
         });
         mCompositeDisposable.add(dsp1);
-        Disposable dsp2 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
+        final Disposable dsp2 = bannerSupport.observeSelected("banner1").subscribe(new Consumer<Integer>() {
             @Override
             public void accept(Integer integer) throws Exception {
                 Log.d("TangramActivity", "2 selected " + integer);
@@ -511,6 +511,12 @@ public class RxTangramActivity extends Activity {
             }
         }).subscribe(engine.asUpdateCellConsumer()));
 
+        mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.count)).subscribe(new Consumer<Object>() {
+            @Override
+            public void accept(Object o) throws Exception {
+                dsp2.dispose();
+            }
+        }));
     }
 
     @Override

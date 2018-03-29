@@ -216,9 +216,12 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
             }
         }
         if (bannerSupport != null) {
-            BannerListener listener = bannerSupport.getScrolledListenerById(cell.id);
-            if (listener != null) {
-                listener.onPageScrolled(currentItemPos, positionOffset, positionOffsetPixels, direction);
+            List<BannerListener> listeners = bannerSupport.getScrolledListenerById(cell.id);
+            if (listeners != null) {
+                for (int i = 0; i < listeners.size(); i++) {
+                    BannerListener listener = listeners.get(i);
+                    listener.onPageScrolled(currentItemPos, positionOffset, positionOffsetPixels, direction);
+                }
             }
         }
     }
@@ -253,9 +256,12 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
             }
         }
         if (bannerSupport != null) {
-            BannerListener listener = bannerSupport.getSelectedListenerById(cell.id);
-            if (listener != null) {
-                listener.onPageSelected(currentItemPos);
+            List<BannerListener> listeners = bannerSupport.getSelectedListenerById(cell.id);
+            if (listeners != null) {
+                for (int i = 0; i < listeners.size(); i ++) {
+                    BannerListener listener = listeners.get(i);
+                    listener.onPageSelected(currentItemPos);
+                }
             }
         }
 
@@ -270,9 +276,12 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
             }
         }
         if (bannerSupport != null) {
-            BannerListener listener = bannerSupport.getScrollStateChangedListenerById(cell.id);
-            if (listener != null) {
-                listener.onPageScrollStateChanged(state);
+            List<BannerListener> listeners = bannerSupport.getScrollStateChangedListenerById(cell.id);
+            if (listeners != null) {
+                for (int i = 0; i < listeners.size(); i ++) {
+                    BannerListener listener = listeners.get(i);
+                    listener.onPageScrollStateChanged(state);
+                }
             }
         }
     }
