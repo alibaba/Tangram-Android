@@ -540,6 +540,15 @@ public abstract class Card extends ComponentLifecycle {
         }
     }
 
+    public BaseCell getCellById(String id) {
+        for (int i = 0, size = mCells.size(); i < size; i++) {
+            BaseCell target = mCells.get(i);
+            if (target.id != null && target.id.equals(id)) {
+                return target;
+            }
+        }
+        return null;
+    }
 
     public List<BaseCell> getCells() {
         return Collections.unmodifiableList(mCells);
