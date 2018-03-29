@@ -27,10 +27,6 @@ public class RxTangramSupport {
         mCompositeDisposable.add(observable.subscribe(mTangramEngine.asUpdateCellConsumer()));
     }
 
-    public void observeCard(Observable<ReplaceGroupContentOp> observable) {
-        mCompositeDisposable.add(observable.subscribe(mTangramEngine.asReplaceGroupContentConsumer()));
-    }
-
     public void destroy() {
         if (mCompositeDisposable != null) {
             mCompositeDisposable.dispose();

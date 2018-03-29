@@ -195,6 +195,26 @@ public class RxClickSupportTest extends AndroidTestCase {
     @Test
     @SmallTest
     @UiThreadTest
+    public void testCellClickDisposeAndResubscribe() {
+        Consumer<ClickExposureCellOp> consumer = new Consumer<ClickExposureCellOp>() {
+
+            @Override
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertTrue(clickEvent.getArg1() == mView1);
+                Log.d("RxClickSupportTest", "testCellClickDisposeAndResubscribe mEventType " + clickEvent.getArg3());
+            }
+        };
+        mSimpleClickSupport.setConsumer(consumer);
+
+        mBaseCell1.click(mView1);
+        mBaseCell1.unclick(mView1);
+        mBaseCell1.click(mView1);
+        mView1.performClick();
+    }
+
+    @Test
+    @SmallTest
+    @UiThreadTest
     public void testOneCellWithMultiViewClick() {
         Consumer<ClickExposureCellOp> consumer = new Consumer<ClickExposureCellOp>() {
 

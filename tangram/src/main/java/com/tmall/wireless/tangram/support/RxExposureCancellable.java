@@ -35,9 +35,6 @@ import io.reactivex.functions.Consumer;
  * @date 2018/03/07
  */
 
-public abstract class RxExposureCancellable implements Consumer<ClickExposureCellOp>, Cancellable {
-
-    public RxExposureCancellable() {
-    }
+public abstract class RxExposureCancellable extends CancellableConsumer<ClickExposureCellOp> {
 
 }

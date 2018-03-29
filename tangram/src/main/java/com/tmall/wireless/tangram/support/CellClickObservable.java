@@ -40,8 +40,6 @@ public class CellClickObservable extends Observable<ClickExposureCellOp> {
 
     private ClickExposureCellOp mRxClickExposureEvent;
 
-    private RxClickListener mListener;
-
     public CellClickObservable(ClickExposureCellOp rxClickExposureEvent) {
         Preconditions.checkNotNull(rxClickExposureEvent);
         Preconditions.checkNotNull(rxClickExposureEvent.getArg1());
@@ -57,12 +55,7 @@ public class CellClickObservable extends Observable<ClickExposureCellOp> {
         if (!Preconditions.checkMainThread(observer)) {
             return;
         }
-        if (mListener == null) {
-            mListener = new RxClickListener(mRxClickExposureEvent, observer);
-        } else {
-            mListener.setRxClickExposureEvent(mRxClickExposureEvent);
-            mListener.setObserver(observer);
-        }
+        RxClickListener mListener = new RxClickListener(mRxClickExposureEvent, observer);
         observer.onSubscribe(mListener);
         mRxClickExposureEvent.getArg1().setOnClickListener(mListener);
     }

@@ -115,7 +115,7 @@ public class RxExposureSupportTest extends AndroidTestCase {
             public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
                 RxExposureCancellable cancellable = new RxExposureCancellable() {
                     @Override
-                    public void accept(ClickExposureCellOp tangramEvent) throws Exception {
+                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
                         assertTrue(Looper.myLooper() == Looper.getMainLooper());
                         assertEquals(tangramEvent.getArg1(), mView1);
                         assertEquals(tangramEvent.getArg2(), mBaseCell1);
@@ -123,9 +123,6 @@ public class RxExposureSupportTest extends AndroidTestCase {
                         Log.d("RxExposureSupportTest", "testOneCellExposure test One cell mEventType " + tangramEvent.getArg3());
                     }
 
-                    @Override
-                    public void cancel() throws Exception {
-                    }
                 };
                 return cancellable;
             }
@@ -149,7 +146,7 @@ public class RxExposureSupportTest extends AndroidTestCase {
             public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
                 RxExposureCancellable cancellable = new RxExposureCancellable() {
                     @Override
-                    public void accept(ClickExposureCellOp tangramEvent) throws Exception {
+                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
                         assertTrue(Looper.myLooper() == Looper.getMainLooper());
                         assertTrue(tangramEvent.getArg1() == mView1 || tangramEvent.getArg1() == mView2);
                         assertTrue(tangramEvent.getArg2() == mBaseCell1);
@@ -157,9 +154,6 @@ public class RxExposureSupportTest extends AndroidTestCase {
                         Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure view " + tangramEvent.getArg1());
                     }
 
-                    @Override
-                    public void cancel() throws Exception {
-                    }
                 };
                 return cancellable;
             }
@@ -197,7 +191,7 @@ public class RxExposureSupportTest extends AndroidTestCase {
                 RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
 
                     @Override
-                    public void accept(ClickExposureCellOp tangramEvent) throws Exception {
+                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
                         assertTrue(Looper.myLooper() != Looper.getMainLooper());
                         assertEquals(tangramEvent.getArg1(), mView1);
                         assertEquals(tangramEvent.getArg2(), mBaseCell1);
@@ -208,9 +202,6 @@ public class RxExposureSupportTest extends AndroidTestCase {
                                 .getName());
                     }
 
-                    @Override
-                    public void cancel() throws Exception {
-                    }
                 };
                 return rxExposureCancellable;
             }
@@ -247,28 +238,20 @@ public class RxExposureSupportTest extends AndroidTestCase {
             public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
                 RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
 
-                    boolean cancel = false;
-
                     @Override
-                    public void accept(ClickExposureCellOp tangramEvent) throws Exception {
+                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
                         assertTrue(Looper.myLooper() != Looper.getMainLooper());
                         //should not run here
                         assertTrue(false);
-                        if (!cancel) {
-                            assertEquals(tangramEvent.getArg1(), mView1);
-                            assertEquals(tangramEvent.getArg2(), mBaseCell1);
-                            assertEquals(tangramEvent.getArg3().intValue(), 10);
-                            Log.d("RxExposureSupportTest", "testExposureTaskAsyncThenCancelIt  mEventType " + tangramEvent.getArg3());
-                            Log.d("RxExposureSupportTest",
-                                "testExposureTaskAsyncThenCancelIt  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
-                                    .getName());
-                        }
+                        assertEquals(tangramEvent.getArg1(), mView1);
+                        assertEquals(tangramEvent.getArg2(), mBaseCell1);
+                        assertEquals(tangramEvent.getArg3().intValue(), 10);
+                        Log.d("RxExposureSupportTest", "testExposureTaskAsyncThenCancelIt  mEventType " + tangramEvent.getArg3());
+                        Log.d("RxExposureSupportTest",
+                            "testExposureTaskAsyncThenCancelIt  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
+                                .getName());
                     }
 
-                    @Override
-                    public void cancel() throws Exception {
-                        cancel = true;
-                    }
                 };
                 return rxExposureCancellable;
             }
@@ -278,6 +261,44 @@ public class RxExposureSupportTest extends AndroidTestCase {
 
         mBaseCell1.exposure(mView1);
         mBaseCell1.unexposure(mView1);
+    }
+
+    @Test
+    @SmallTest
+    @UiThreadTest
+    public void testExposureTaskAsyncThenCancelItButResubscribe() {
+        ExposureSupport exposureSupport = new ExposureSupport() {
+
+            @Override
+            public void onExposure(@NonNull Card card, int offset, int position) {
+
+            }
+
+            @Override
+            public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
+                RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
+
+                    @Override
+                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
+                        assertTrue(Looper.myLooper() == Looper.getMainLooper());
+                        assertEquals(tangramEvent.getArg1(), mView1);
+                        assertEquals(tangramEvent.getArg2(), mBaseCell1);
+                        assertEquals(tangramEvent.getArg3().intValue(), 10);
+                        Log.d("RxExposureSupportTest", "testExposureTaskAsyncThenCancelItButResubscribe  mEventType " + tangramEvent.getArg3());
+                        Log.d("RxExposureSupportTest",
+                            "testExposureTaskAsyncThenCancelItButResubscribe  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
+                                .getName());
+                    }
+
+                };
+                return rxExposureCancellable;
+            }
+
+        };
+        mServiceManager.register(ExposureSupport.class, exposureSupport);
+        mBaseCell1.exposure(mView1);
+        mBaseCell1.unexposure(mView1);
+        mBaseCell1.exposure(mView1);
     }
 
 }
