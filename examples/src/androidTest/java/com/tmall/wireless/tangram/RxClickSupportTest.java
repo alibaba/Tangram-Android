@@ -188,7 +188,7 @@ public class RxClickSupportTest extends AndroidTestCase {
         mSimpleClickSupport.setConsumer(consumer);
 
         mBaseCell1.click(mView1);
-        mBaseCell1.unclick(mView1);
+        mSimpleClickSupport.destroy();
         mView1.performClick();
     }
 
@@ -207,7 +207,6 @@ public class RxClickSupportTest extends AndroidTestCase {
         mSimpleClickSupport.setConsumer(consumer);
 
         mBaseCell1.click(mView1);
-        mBaseCell1.unclick(mView1);
         mBaseCell1.click(mView1);
         mView1.performClick();
     }
@@ -256,8 +255,7 @@ public class RxClickSupportTest extends AndroidTestCase {
         mBaseCell1.click(mView1);
         mBaseCell1.click(mView2);
 
-        mBaseCell1.unclick(mView1);
-        mBaseCell1.unclick(mView2);
+        mSimpleClickSupport.destroy();
 
         mView1.performClick();
         mView2.performClick();

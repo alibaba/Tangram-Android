@@ -457,7 +457,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     private ArrayMap<View, ClickExposureCellOp> mRxClickEvents = new ArrayMap<>();
 
-    private ArrayMap<View, Disposable> mClickDisposables = new ArrayMap<>();
+    //private ArrayMap<View, Disposable> mClickDisposables = new ArrayMap<>();
 
     private ArrayMap<View, CellClickObservable> mViewClickObservables = new ArrayMap<>();
 
@@ -477,8 +477,8 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         if (serviceManager != null) {
             final SimpleClickSupport service = serviceManager.getService(SimpleClickSupport.class);
             if (service != null) {
-                Disposable clickDisposable = service.onRxClick(cellClickObservable, rxClickExposureEvent);
-                mClickDisposables.put(view, clickDisposable);
+                /*Disposable clickDisposable = */service.onRxClick(cellClickObservable, rxClickExposureEvent);
+                //mClickDisposables.put(view, clickDisposable);
             }
         }
     }
@@ -498,17 +498,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
             rxClickEvent.setArg3(this.pos);
         }
         click(view, rxClickEvent);
-    }
-
-    /**
-     * @param view
-     * @since 3.0.0
-     */
-    public void unclick(View view) {
-        Disposable clickDisposable = mClickDisposables.get(view);
-        if (clickDisposable != null) {
-            clickDisposable.dispose();
-        }
     }
 
     /**

@@ -33,6 +33,7 @@ import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.util.LogUtils;
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
@@ -135,16 +136,6 @@ public abstract class SimpleClickSupport {
         }
     }
 
-    /**
-     * Handler click event on item in reactive way
-     *
-     * @param clickEventObservable
-     * @param rxEvent
-     */
-    public Disposable onRxClick(Observable<ClickExposureCellOp> clickEventObservable, ClickExposureCellOp rxEvent) {
-        return clickEventObservable.subscribe(mConsumer);
-    }
-
     public void onClick(View targetView, Cell cell, int eventType) {
         onClick(targetView, cell, eventType, null);
     }
@@ -210,6 +201,18 @@ public abstract class SimpleClickSupport {
         }
     }
 
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+
+    /**
+     * Handler click event on item in reactive way
+     *
+     * @param clickEventObservable
+     * @param rxEvent
+     */
+    public void onRxClick(Observable<ClickExposureCellOp> clickEventObservable, ClickExposureCellOp rxEvent) {
+        mCompositeDisposable.add(clickEventObservable.subscribe(mConsumer));
+    }
+
     private Consumer<ClickExposureCellOp> mConsumer = new Consumer<ClickExposureCellOp>() {
         @Override
         public void accept(ClickExposureCellOp rxClickExposureEvent) throws Exception {
@@ -219,6 +222,10 @@ public abstract class SimpleClickSupport {
 
     public void setConsumer(Consumer<ClickExposureCellOp> consumer) {
         mConsumer = consumer;
+    }
+
+    public void destroy() {
+        mCompositeDisposable.dispose();
     }
 
 }
