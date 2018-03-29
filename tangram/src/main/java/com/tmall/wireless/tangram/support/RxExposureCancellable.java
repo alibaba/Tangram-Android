@@ -25,8 +25,7 @@
 package com.tmall.wireless.tangram.support;
 
 import com.tmall.wireless.tangram.op.ClickExposureCellOp;
-import io.reactivex.functions.Cancellable;
-import io.reactivex.functions.Consumer;
+import com.tmall.wireless.tangram.reactive.CancellableConsumer;
 
 /**
  * Created by longerian on 2018/3/7.
