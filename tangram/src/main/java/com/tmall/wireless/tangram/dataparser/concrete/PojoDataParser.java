@@ -171,7 +171,7 @@ public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card
                     cellCard.parseWith(data, cellResolver);
                     cellCard.setStringType(TangramBuilder.TYPE_CONTAINER_1C_FLOW);
                     if (cellCard.isValid()) {
-                        return card;
+                        return cellCard;
                     }
                 }
             }
