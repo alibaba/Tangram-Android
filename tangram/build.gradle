@@ -30,6 +30,7 @@ buildscript {
         maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
         mavenCentral()
         jcenter()
+        maven { url 'https://maven.google.com' }
     }
 
     dependencies {
@@ -42,6 +43,7 @@ repositories {
     maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
     jcenter()
     mavenLocal()
+    maven { url 'https://maven.google.com' }
 }
 
 ext {
@@ -138,18 +140,18 @@ dependencies {
         println 'compile with virtualview source code'
         compile(project(':virtualview')) {
 
+            exclude group: 'com.android.support', module: 'appcompat'
             exclude group: 'com.android.support', module: 'appcompat-v7'
-            exclude group: 'com.tmall.android', module: 'tmallandroid_mui'
-            exclude group: 'com.google.android', module: 'support-v7-recyclerview'
+            exclude group: 'com.android.support', module: 'support-v7-recyclerview'
             exclude group: 'com.android.support', module: 'support-v4'
             exclude group: 'com.android.support', module: 'support-annotations'
         }
     } else {
         compile('com.alibaba.android:virtualview:1.1.1@aar') {
             transitive true
+            exclude group: 'com.android.support', module: 'appcompat'
             exclude group: 'com.android.support', module: 'appcompat-v7'
-            exclude group: 'com.tmall.android', module: 'tmallandroid_mui'
-            exclude group: 'com.google.android', module: 'support-v7-recyclerview'
+            exclude group: 'com.android.support', module: 'support-v7-recyclerview'
             exclude group: 'com.android.support', module: 'support-v4'
             exclude group: 'com.android.support', module: 'support-annotations'
         }
