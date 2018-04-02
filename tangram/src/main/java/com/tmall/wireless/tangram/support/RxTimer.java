@@ -96,16 +96,14 @@ public class RxTimer implements ITimer {
             }).observeOn(
             AndroidSchedulers.mainThread()).subscribe(new Consumer<Long>() {
 
-                private int count = 0;
-
                 @Override
-                public void accept(Long aLong) throws Exception {
-                    if (count == 0) {
+                public void accept(Long count) throws Exception {
+                    Log.d("RxTimerSupportTest", "accept " + " value " + count);
+                    if (count % interval == 0) {
                         if (onTickListener != null) {
                             onTickListener.onTick();
                         }
                     }
-                    count = (count + 1) % interval;
                 }
         });
         tickCache.put(onTickListener, disposable);
