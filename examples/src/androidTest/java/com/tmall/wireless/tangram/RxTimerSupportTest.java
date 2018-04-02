@@ -146,6 +146,35 @@ public class RxTimerSupportTest extends AndroidTestCase {
     @Test
     @SmallTest
     @UiThreadTest
+    public void testRegisterAndUnregister() {
+        assertEquals(mTimerSupport.getStatus(), TimerStatus.Waiting);
+        OnTickListener onTickListener = new OnTickListener() {
+
+            long start = System.currentTimeMillis();
+
+            @Override
+            public void onTick() {
+                assertEquals(Looper.myLooper(), Looper.getMainLooper());
+                assertEquals(mTimerSupport.getStatus(), TimerStatus.Running);
+                long end = System.currentTimeMillis();
+                long time = (end - start);
+                Log.d("RxTimerSupportTest", "testTimerIntermediateArg " + time);
+                //assertTrue(Math.abs(time) < 50 || Math.abs(time - 1 * 1000) < 50);
+                start = end;
+            }
+        };
+        mTimerSupport.register(1, onTickListener, true);
+        mTimerSupport.unregister(onTickListener);
+        mTimerSupport.register(1, onTickListener, true);
+        mTimerSupport.unregister(onTickListener);
+        mTimerSupport.register(1, onTickListener, true);
+        mTimerSupport.unregister(onTickListener);
+        mTimerSupport.register(1, onTickListener, true);
+    }
+
+    @Test
+    @SmallTest
+    @UiThreadTest
     public void testIntervalLargerThan1() {
         assertEquals(mTimerSupport.getStatus(), TimerStatus.Waiting);
         mTimerSupport.register(3, new OnTickListener() {

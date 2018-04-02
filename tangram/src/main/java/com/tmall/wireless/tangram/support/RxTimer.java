@@ -47,7 +47,9 @@ import io.reactivex.functions.Predicate;
 public class RxTimer implements ITimer {
 
     private long mInterval;
+
     private TimerStatus mStatus;
+
     private boolean pause;
 
     private Observable<Long> mIntervalObservable;
@@ -135,7 +137,6 @@ public class RxTimer implements ITimer {
     public void pause() {
         pause = true;
         mStatus = TimerStatus.Paused;
-        //TODO manage status in reactive
     }
 
     @Override

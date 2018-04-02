@@ -183,7 +183,7 @@ abstract public class PageDetectorSupport {
         if (!isDetectingPageAppear) {
             TimerSupport timerSupport = mTangramEngine.getService(TimerSupport.class);
             int tickInterval = idleInterval / 1000;
-            if (tickInterval != 0) {
+            if (tickInterval != 0 && timerSupport.isRegistered(mOnTickListener)) {
                 timerSupport.register(idleInterval / 1000, mOnTickListener);
             }
             isDetectingPageAppear = true;

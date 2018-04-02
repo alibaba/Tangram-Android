@@ -121,8 +121,8 @@ dependencies {
             changing = true
         }
     }
-    provided 'io.reactivex.rxjava2:rxjava:2.0.1'
-    provided 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    provided 'io.reactivex.rxjava2:rxjava:2.1.12'
+    provided 'io.reactivex.rxjava2:rxandroid:2.0.2'
     compile 'com.android.support:recyclerview-v7:23.1.1@aar'
     compile 'com.android.support:support-v4:23.1.1@aar'
     compile 'com.android.support:support-annotations:23.1.1'
