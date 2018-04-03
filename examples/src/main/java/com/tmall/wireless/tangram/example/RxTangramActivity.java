@@ -365,7 +365,7 @@ public class RxTangramActivity extends Activity {
         //            Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
         //        }
         //    })
-        //    .subscribe(engine.asOriginalDataConsume());
+        //    .subscribe(engine.asOriginalDataConsumer());
 
         // method 2, use transformer api
         //Observable.fromCallable(new Callable<byte[]>() {
@@ -396,7 +396,7 @@ public class RxTangramActivity extends Activity {
         //            Log.d("TangramActivity", "do subscribe in thread " + Thread.currentThread().getName());
         //        }
         //    })
-        //    .subscribe(engine.asParsedDataConsume());
+        //    .subscribe(engine.asParsedDataConsumer());
         // method 3, emit json array and flat map to jsonobject
         Disposable dsp8 = Observable.create(new ObservableOnSubscribe<JSONArray>() {
             @Override
