@@ -174,8 +174,11 @@ abstract public class PageDetectorSupport {
 
     public void startDetectFastScroll() {
         if (mOnScrollListener != null) {
-            mTangramEngine.getContentView().removeOnScrollListener(mOnScrollListener);
-            mTangramEngine.getContentView().setOnScrollListener(mOnScrollListener);
+            RecyclerView recyclerView = mTangramEngine.getContentView();
+            if (recyclerView != null) {
+                recyclerView.removeOnScrollListener(mOnScrollListener);
+                recyclerView.setOnScrollListener(mOnScrollListener);
+            }
         }
     }
 

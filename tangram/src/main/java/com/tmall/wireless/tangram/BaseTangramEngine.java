@@ -129,18 +129,10 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
-     * @return Return the recyclerView binded to Tangram, do not call this method after {@link #destroy()}, since it
-     * will recreate a recyclerView instance. Also it is suggested to call {@link #bindView(RecyclerView)} first
-     * before call this method, since the recyclerView created in this method is a default one and may not meet up to
-     * your case.
+     * @return Return the recyclerView binded to Tangram. It is suggested to call {@link #bindView(RecyclerView)} first
+     * before call this method.
      */
     public RecyclerView getContentView() {
-        if (mContentView == null) {
-            RecyclerView recyclerView = new RecyclerView(mContext);
-            bindView(recyclerView);
-            Preconditions.checkState(mContentView != null, "mContentView is still null after call bindView()");
-        }
-
         return mContentView;
     }
 

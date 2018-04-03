@@ -160,6 +160,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
         if (contentView != null && mSwipeItemTouchListener != null) {
             contentView.removeOnItemTouchListener(mSwipeItemTouchListener);
             mSwipeItemTouchListener = null;
+            contentView.removeCallbacks(updateRunnable);
         }
         super.unbindView();
     }
@@ -414,7 +415,10 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
             BaseCell cell = cells.get(0);
             int pos = mGroupBasicAdapter.getComponents().indexOf(cell);
             if (pos > 0) {
-                this.getContentView().scrollToPosition(pos);
+                RecyclerView recyclerView = getContentView();
+                if (recyclerView != null) {
+                    recyclerView.scrollToPosition(pos);
+                }
             }
         }
     }
@@ -427,7 +431,10 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
         if (cell != null) {
             int pos = mGroupBasicAdapter.getComponents().indexOf(cell);
             if (pos > 0) {
-                this.getContentView().scrollToPosition(pos);
+                RecyclerView recyclerView = getContentView();
+                if (recyclerView != null) {
+                    recyclerView.scrollToPosition(pos);
+                }
             }
         }
     }
@@ -446,9 +453,16 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
                 View view = lm.findViewByPosition(pos);
                 if (view != null) {
                     int top = lm.getDecoratedTop(view);
-                    this.getContentView().scrollBy(0, top);
-                } else
-                    this.getContentView().scrollToPosition(pos);
+                    RecyclerView recyclerView = getContentView();
+                    if (recyclerView != null) {
+                        recyclerView.scrollBy(0, top);
+                    }
+                } else {
+                    RecyclerView recyclerView = getContentView();
+                    if (recyclerView != null) {
+                        recyclerView.scrollToPosition(pos);
+                    }
+                }
             }
         }
     }
@@ -465,9 +479,15 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
                 View view = lm.findViewByPosition(pos);
                 if (view != null) {
                     int top = lm.getDecoratedTop(view);
-                    this.getContentView().scrollBy(0, top);
+                    RecyclerView recyclerView = getContentView();
+                    if (recyclerView != null) {
+                        recyclerView.scrollBy(0, top);
+                    }
                 } else {
-                    this.getContentView().scrollToPosition(pos);
+                    RecyclerView recyclerView = getContentView();
+                    if (recyclerView != null) {
+                        recyclerView.scrollToPosition(pos);
+                    }
                 }
             }
         }
@@ -487,14 +507,19 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     public void setSwipeCardActionEdge(int actionEdge) {
         if (actionEdge == NO_SWIPE) {
-            if (mSwipeItemTouchListener != null)
-                getContentView().removeOnItemTouchListener(mSwipeItemTouchListener);
+            if (mSwipeItemTouchListener != null) {
+                RecyclerView contentView = getContentView();
+                if (contentView != null) {
+                    contentView.removeOnItemTouchListener(mSwipeItemTouchListener);
+                }
+            }
         } else {
             mSwipeCardActionEdge = actionEdge;
-            if (mSwipeItemTouchListener != null) {
-                getContentView().removeOnItemTouchListener(mSwipeItemTouchListener);
+            RecyclerView contentView = getContentView();
+            if (mSwipeItemTouchListener != null && contentView != null) {
+                contentView.removeOnItemTouchListener(mSwipeItemTouchListener);
                 mSwipeItemTouchListener.setActionEdge(actionEdge);
-                getContentView().addOnItemTouchListener(mSwipeItemTouchListener);
+                contentView.addOnItemTouchListener(mSwipeItemTouchListener);
             }
         }
     }
