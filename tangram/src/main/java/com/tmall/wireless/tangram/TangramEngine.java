@@ -272,11 +272,14 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
      * Loading data for card whose's position in within 0 to {{@link #mPreLoadNumber}}.
      */
     public void loadFirstPageCard() {
-        if (!mEnableLoadFirstPageCard)
+        if (!mEnableLoadFirstPageCard) {
             return;
+        }
 
         final CardLoadSupport loadSupport = getService(CardLoadSupport.class);
-        if (loadSupport == null) return;
+        if (loadSupport == null) {
+            return;
+        }
 
         boolean loadedMore = false;
 
@@ -317,7 +320,9 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     public void loadMoreCard() {
         CardLoadSupport loadSupport = getService(CardLoadSupport.class);
-        if (loadSupport == null) return;
+        if (loadSupport == null) {
+            return;
+        }
 
         List<Card> groups = findGroups(new Predicate<Card>() {
             @Override
@@ -339,10 +344,28 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
      */
     public Card findCardById(String id) {
         MVHelper mvHelper = getService(MVHelper.class);
-        if (mvHelper == null)
+        if (mvHelper == null) {
             return null;
-
+        }
         return mvHelper.resolver().findCardById(id);
+    }
+
+    /**
+     *
+     * @param id Target cell's id. Can not be null
+     * @return
+     * @since 3.0.0
+     */
+    public BaseCell findCellById(String id) {
+        if (mGroupBasicAdapter != null && id != null) {
+            List<BaseCell> cells = mGroupBasicAdapter.getComponents();
+            for (int i = 0, size = cells.size(); i < size; i++) {
+                if (id.equals(cells.get(i).id)) {
+                    return cells.get(i);
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -352,7 +375,9 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
     public void refresh(final boolean layoutUpdated) {
         final RecyclerView contentView = getContentView();
 
-        if (contentView == null) return;
+        if (contentView == null) {
+            return;
+        }
 
         if (contentView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE) {
             // contentView.stopScroll();
