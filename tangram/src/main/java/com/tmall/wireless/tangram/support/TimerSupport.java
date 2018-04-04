@@ -25,6 +25,7 @@
 package com.tmall.wireless.tangram.support;
 
 import android.support.annotation.NonNull;
+import com.tmall.wireless.tangram.support.HandlerTimer.TimerStatus;
 import io.reactivex.Observable;
 
 import java.util.concurrent.TimeUnit;
@@ -64,7 +65,7 @@ public class TimerSupport {
     /**
      * @return current timer status
      */
-    public HandlerTimer.TimerStatus getStatus() {
+    public TimerStatus getStatus() {
         return mDefaultTimer.getStatus();
     }
 

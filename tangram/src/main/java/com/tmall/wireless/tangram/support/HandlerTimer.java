@@ -71,6 +71,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * start timer immediately
      */
+    @Override
     public void start() {
         start(false);
     }
@@ -78,6 +79,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * @param bySecond true, start timer with interval alignment; false, start timer immediately
      */
+    @Override
     public void start(boolean bySecond) {
         if (this.mStatus != TimerStatus.Running) {
             this.mStartTS = bySecond ? 0 : System.currentTimeMillis();
@@ -92,6 +94,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * pause timer
      */
+    @Override
     public void pause() {
         this.mStatus = TimerStatus.Paused;
         mHandler.removeCallbacks(this);
@@ -100,6 +103,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * resume timer
      */
+    @Override
     public void restart() {
         mHandler.removeCallbacks(this);
         this.mStatus = TimerStatus.Running;
@@ -109,6 +113,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * stop timer
      */
+    @Override
     public void stop() {
         mStatus = TimerStatus.Stopped;
         mHandler.removeCallbacks(this);
@@ -117,6 +122,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * cancel timer
      */
+    @Override
     public void cancel() {
         mStatus = TimerStatus.Stopped;
         mHandler.removeCallbacks(this);
@@ -125,9 +131,44 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * @return current status
      */
+    @Override
     public TimerStatus getStatus() {
         return mStatus;
     }
 
+    /**
+     * Timer status
+     */
+    public enum TimerStatus {
+
+        Waiting(0, "Wating"),
+        Running(1, "Running"),
+        Paused(-1, "Paused"),
+        Stopped(-2, "Stopped");
+
+        private int code;
+        private String desc;
+
+        private TimerStatus(int code, String desc) {
+            this.code = code;
+            this.desc = desc;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
+
+        public void setDesc(String desc) {
+            this.desc = desc;
+        }
+    }
 
 }
