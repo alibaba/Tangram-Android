@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.tmall.wireless.tangram.reactive;
+package com.alibaba.android.rx;
 
 import android.os.Looper;
 import android.view.View;
