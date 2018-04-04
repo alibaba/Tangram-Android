@@ -26,7 +26,7 @@ package com.tmall.wireless.tangram.support;
 
 import android.os.Handler;
 import android.os.Looper;
-
+import android.support.annotation.Keep;
 
 public class HandlerTimer implements Runnable, ITimer {
     private Handler mHandler;
@@ -139,17 +139,30 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * Timer status
      */
+    @Keep
     public enum TimerStatus {
 
-        Waiting(0, "Wating"),
+        /**
+         * Waiting
+         */
+        Waiting(0, "Waiting"),
+        /**
+         * Running
+         */
         Running(1, "Running"),
+        /**
+         * Paused
+         */
         Paused(-1, "Paused"),
+        /**
+         * Stopped
+         */
         Stopped(-2, "Stopped");
 
         private int code;
         private String desc;
 
-        private TimerStatus(int code, String desc) {
+        TimerStatus(int code, String desc) {
             this.code = code;
             this.desc = desc;
         }
