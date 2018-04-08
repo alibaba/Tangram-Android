@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -68,6 +69,9 @@ import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
 import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.alibaba.android.rx.JSONArrayObservable;
 import com.alibaba.android.rx.ViewClickObservable;
+import com.alibaba.android.rx.lifecycle.ActivityLFEvent;
+import com.alibaba.android.rx.lifecycle.LifeCycleProviderImpl;
+
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
 import com.tmall.wireless.tangram.support.BannerSupport;
@@ -110,6 +114,8 @@ public class RxTangramActivity extends Activity {
     private TangramBuilder.InnerBuilder builder;
     private RecyclerView recyclerView;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+    private LifeCycleProviderImpl<ActivityLFEvent> mActivityLFEventLifeCycleProvider = new LifeCycleProviderImpl<>(
+        ActivityLFEvent.ACTIVITY_LIFECYCLE);
 
     private static class ImageTarget implements Target {
 
@@ -152,6 +158,7 @@ public class RxTangramActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mActivityLFEventLifeCycleProvider.emitNext(ActivityLFEvent.CREATE);
         setContentView(R.layout.main_activity);
         recyclerView = (RecyclerView) findViewById(R.id.main_view);
 
@@ -516,8 +523,47 @@ public class RxTangramActivity extends Activity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mActivityLFEventLifeCycleProvider.emitNext(ActivityLFEvent.START);
+        Observable.interval(1, TimeUnit.SECONDS)
+            .doOnDispose(new Action() {
+                @Override
+                public void run() throws Exception {
+                    Log.i(TAG, "Unsubscribing subscription from onStart()");
+                }
+            })
+            .compose(mActivityLFEventLifeCycleProvider.<Long>bindUntil(ActivityLFEvent.DESTROY))
+            .subscribe(new Consumer<Long>() {
+                @Override
+                public void accept(Long num) throws Exception {
+                    Log.i(TAG, "Started in onStart(), running until in onDestroy(): " + num);
+                }
+            });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mActivityLFEventLifeCycleProvider.emitNext(ActivityLFEvent.RESUME);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mActivityLFEventLifeCycleProvider.emitNext(ActivityLFEvent.PAUSE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mActivityLFEventLifeCycleProvider.emitNext(ActivityLFEvent.STOP);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        mActivityLFEventLifeCycleProvider.emitNext(ActivityLFEvent.DESTROY);
         if (engine != null) {
             engine.destroy();
         }
