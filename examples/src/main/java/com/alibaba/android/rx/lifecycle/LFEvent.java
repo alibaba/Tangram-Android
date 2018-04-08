@@ -31,5 +31,18 @@ package com.alibaba.android.rx.lifecycle;
  * @date 2018/04/04
  */
 
-abstract public class Event {
+abstract public class LFEvent {
+
+    final protected String name;
+
+    protected LFEvent(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "LFEvent{" +
+            "name='" + name + '\'' +
+            '}';
+    }
 }

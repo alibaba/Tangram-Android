@@ -34,7 +34,7 @@ import io.reactivex.subjects.BehaviorSubject;
  * @date 2018/04/08
  */
 
-public class LifeCycleProviderImpl<E extends Event> implements LifeCycleProvider<E> {
+public class LifeCycleProviderImpl<E extends LFEvent> implements LifeCycleProvider<E> {
 
     private final BehaviorSubject<E> lifecycleSubject = BehaviorSubject.create();
 

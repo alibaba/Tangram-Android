@@ -33,19 +33,19 @@ import io.reactivex.functions.Function;
  * @date 2018/04/08
  */
 
-public class ActivityEvent extends Event {
+public class ActivityLFEvent extends LFEvent {
 
-    public static final ActivityEvent CREATE = new ActivityEvent();
-    public static final ActivityEvent START = new ActivityEvent();
-    public static final ActivityEvent RESUME = new ActivityEvent();
-    public static final ActivityEvent PAUSE = new ActivityEvent();
-    public static final ActivityEvent STOP = new ActivityEvent();
-    public static final ActivityEvent DESTROY = new ActivityEvent();
+    public static final ActivityLFEvent CREATE = new ActivityLFEvent("onCreate");
+    public static final ActivityLFEvent START = new ActivityLFEvent("onStart");
+    public static final ActivityLFEvent RESUME = new ActivityLFEvent("onResume");
+    public static final ActivityLFEvent PAUSE = new ActivityLFEvent("onPause");
+    public static final ActivityLFEvent STOP = new ActivityLFEvent("onStop");
+    public static final ActivityLFEvent DESTROY = new ActivityLFEvent("onDestroy");
 
-    public static final Function<ActivityEvent, ActivityEvent> ACTIVITY_LIFECYCLE =
-        new Function<ActivityEvent, ActivityEvent>() {
+    public static final Function<ActivityLFEvent, ActivityLFEvent> ACTIVITY_LIFECYCLE =
+        new Function<ActivityLFEvent, ActivityLFEvent>() {
             @Override
-            public ActivityEvent apply(ActivityEvent lastEvent) throws Exception {
+            public ActivityLFEvent apply(ActivityLFEvent lastEvent) throws Exception {
                 if (lastEvent.equals(CREATE)) {
                     return DESTROY;
                 }
@@ -65,5 +65,14 @@ public class ActivityEvent extends Event {
             }
         };
 
+    private ActivityLFEvent(String name) {
+        super(name);
+    }
 
+    @Override
+    public String toString() {
+        return "ActivityLFEvent{" +
+            "name='" + name + '\'' +
+            '}';
+    }
 }

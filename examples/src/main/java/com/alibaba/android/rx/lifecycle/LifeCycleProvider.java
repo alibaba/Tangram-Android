@@ -31,7 +31,7 @@ package com.alibaba.android.rx.lifecycle;
  * @date 2018/04/04
  */
 
-public interface LifeCycleProvider<E extends Event> {
+public interface LifeCycleProvider<E extends LFEvent> {
 
     void emitNext(E event);
 
