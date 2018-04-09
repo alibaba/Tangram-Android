@@ -189,6 +189,7 @@ public class RxTangramActivity extends Activity {
         builder.registerVirtualView("vvtest");
         //Step 4: new engine
         engine = builder.build();
+        engine.setSupportRx(true);
         engine.setVirtualViewTemplate(VVTEST.BIN);
         engine.getService(VafContext.class).setImageLoaderAdapter(new IImageLoaderAdapter() {
 

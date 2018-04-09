@@ -86,6 +86,10 @@ public class RxTimerSupportTest extends AndroidTestCase {
             }
             return type.cast(service);
         }
+        @Override
+        public boolean supportRx() {
+            return true;
+        }
     };
 
     @Before

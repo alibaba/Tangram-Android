@@ -99,6 +99,10 @@ public class RxExposureSupportTest extends AndroidTestCase {
             }
             return type.cast(service);
         }
+        @Override
+        public boolean supportRx() {
+            return true;
+        }
     };
 
     @Before

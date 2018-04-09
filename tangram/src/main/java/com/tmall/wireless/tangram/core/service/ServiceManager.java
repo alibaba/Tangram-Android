@@ -43,4 +43,10 @@ public interface ServiceManager {
      * @return The registered service object.
      */
     <T> T getService(Class<T> type);
+
+    /**
+     * Do not call this outside, this method maybe deleted after official release.
+     * @return true, enable rx features, false, do not enable
+     */
+    boolean supportRx();
 }

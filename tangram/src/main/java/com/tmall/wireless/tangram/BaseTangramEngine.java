@@ -105,6 +105,8 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     private final IAdapterBuilder<C, L> mAdapterBuilder;
 
+    private boolean isSupportRx;
+
     public BaseTangramEngine(@NonNull final Context context,
         @NonNull final DataParser<O, T, C, L> dataParser,
         @NonNull final IAdapterBuilder<C, L> adapterBuilder) {
@@ -631,6 +633,15 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
             return null;
         }
         return type.cast(service);
+    }
+
+    public void setSupportRx(boolean supportRx) {
+        isSupportRx = supportRx;
+    }
+
+    @Override
+    public boolean supportRx() {
+        return isSupportRx;
     }
 
     @SuppressWarnings("unchecked")

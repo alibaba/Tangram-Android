@@ -75,6 +75,11 @@ public class RxBannerSupportTest {
             }
             return type.cast(service);
         }
+
+        @Override
+        public boolean supportRx() {
+            return true;
+        }
     };
 
     @Before
