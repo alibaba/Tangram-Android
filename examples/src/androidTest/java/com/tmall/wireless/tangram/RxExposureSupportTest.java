@@ -25,6 +25,7 @@
 package com.tmall.wireless.tangram;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.os.Looper;
@@ -43,10 +44,12 @@ import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.support.ExposureSupport;
-import com.tmall.wireless.tangram.support.RxExposureCancellable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.internal.operators.maybe.MaybeCallbackObserver;
 import io.reactivex.schedulers.Schedulers;
 import org.junit.Before;
 import org.junit.Rule;
@@ -71,6 +74,13 @@ public class RxExposureSupportTest extends AndroidTestCase {
     private final View mView2 = new View(context);
     private final BaseCell mBaseCell1 = new BaseCell();
     private final BaseCell mBaseCell2 = new BaseCell();
+    private final ExposureSupport mExposureSupport = new ExposureSupport() {
+
+        @Override
+        public void onExposure(@NonNull Card card, int offset, int position) {
+
+        }
+    };
 
 
     private final ServiceManager mServiceManager = new ServiceManager() {
@@ -93,6 +103,8 @@ public class RxExposureSupportTest extends AndroidTestCase {
 
     @Before
     public void setUp() throws Exception {
+        mServiceManager.register(ExposureSupport.class, mExposureSupport);
+
         mBaseCell1.pos = 10;
         mBaseCell1.serviceManager = mServiceManager;
 
@@ -104,30 +116,16 @@ public class RxExposureSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellExposure() {
-        ExposureSupport exposureSupport = new ExposureSupport() {
-
+        Consumer<ClickExposureCellOp> consumer1 = new Consumer<ClickExposureCellOp>() {
             @Override
-            public void onExposure(@NonNull Card card, int offset, int position) {
-
-            }
-
-            @Override
-            public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
-                RxExposureCancellable cancellable = new RxExposureCancellable() {
-                    @Override
-                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
-                        assertTrue(Looper.myLooper() == Looper.getMainLooper());
-                        assertEquals(tangramEvent.getArg1(), mView1);
-                        assertEquals(tangramEvent.getArg2(), mBaseCell1);
-                        assertEquals(tangramEvent.getArg3().intValue(), 10);
-                        Log.d("RxExposureSupportTest", "testOneCellExposure test One cell mEventType " + tangramEvent.getArg3());
-                    }
-
-                };
-                return cancellable;
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertEquals(clickEvent.getArg1(), mView1);
+                assertEquals(clickEvent.getArg2(), mBaseCell1);
+                assertEquals(clickEvent.getArg3().intValue(), 10);
+                Log.d("RxExposureSupportTest", "testOneCellExposure test One cell mEventType " + clickEvent.getArg3());
             }
         };
-        mServiceManager.register(ExposureSupport.class, exposureSupport);
+        mExposureSupport.setConsumer(consumer1);
         mBaseCell1.exposure(mView1);
     }
 
@@ -135,30 +133,17 @@ public class RxExposureSupportTest extends AndroidTestCase {
     @SmallTest
     @UiThreadTest
     public void testOneCellWithMultiViewExposure() {
-        ExposureSupport exposureSupport = new ExposureSupport() {
-
+        Consumer<ClickExposureCellOp> consumer1 = new Consumer<ClickExposureCellOp>() {
             @Override
-            public void onExposure(@NonNull Card card, int offset, int position) {
-
-            }
-
-            @Override
-            public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
-                RxExposureCancellable cancellable = new RxExposureCancellable() {
-                    @Override
-                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
-                        assertTrue(Looper.myLooper() == Looper.getMainLooper());
-                        assertTrue(tangramEvent.getArg1() == mView1 || tangramEvent.getArg1() == mView2);
-                        assertTrue(tangramEvent.getArg2() == mBaseCell1);
-                        Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure mEventType " + tangramEvent.getArg3());
-                        Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure view " + tangramEvent.getArg1());
-                    }
-
-                };
-                return cancellable;
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertTrue(Looper.myLooper() == Looper.getMainLooper());
+                assertTrue(clickEvent.getArg1() == mView1 || clickEvent.getArg1() == mView2);
+                assertTrue(clickEvent.getArg2() == mBaseCell1);
+                Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure mEventType " + clickEvent.getArg3());
+                Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure view " + clickEvent.getArg1());
             }
         };
-        mServiceManager.register(ExposureSupport.class, exposureSupport);
+        mExposureSupport.setConsumer(consumer1);
 
         mBaseCell1.exposure(mView1);
         mBaseCell1.exposure(mView2);
@@ -167,56 +152,47 @@ public class RxExposureSupportTest extends AndroidTestCase {
     @Test
     @SmallTest
     @UiThreadTest
-    public void testExpsoureTaskAsync() {
-        ExposureSupport exposureSupport = new ExposureSupport() {
+    public void testOneConsumerSubscribeTwoCellExposure() {
+        Consumer<ClickExposureCellOp> consumer = new Consumer<ClickExposureCellOp>() {
 
             @Override
-            public void onExposure(@NonNull Card card, int offset, int position) {
-
+            public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                assertTrue(clickEvent.getArg1() == mView1 || clickEvent.getArg1() == mView2);
+                assertTrue(clickEvent.getArg2() == mBaseCell1 || clickEvent.getArg2() == mBaseCell2);
+                Log.d("RxExposureSupportTest", "testOneConsumerSubscribeTwoCellExposure mEventType " + clickEvent.getArg3());
             }
-
-            @Override
-            public ObservableTransformer<ClickExposureCellOp, ClickExposureCellOp> getObservableTransformer(
-                ClickExposureCellOp rxEvent) {
-                return new ObservableTransformer<ClickExposureCellOp, ClickExposureCellOp>() {
-                    @Override
-                    public ObservableSource<ClickExposureCellOp> apply(Observable<ClickExposureCellOp> upstream) {
-                        return upstream.subscribeOn(Schedulers.newThread());
-                    }
-                };
-            }
-
-            @Override
-            public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
-                RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
-
-                    @Override
-                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
-                        assertTrue(Looper.myLooper() != Looper.getMainLooper());
-                        assertEquals(tangramEvent.getArg1(), mView1);
-                        assertEquals(tangramEvent.getArg2(), mBaseCell1);
-                        assertEquals(tangramEvent.getArg3().intValue(), 10);
-                        Log.d("RxExposureSupportTest", "testExpsoureTaskAsync  mEventType " + tangramEvent.getArg3());
-                        Log.d("RxExposureSupportTest",
-                            "testExpsoureTaskAsync  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
-                                .getName());
-                    }
-
-                };
-                return rxExposureCancellable;
-            }
-
         };
-        mServiceManager.register(ExposureSupport.class, exposureSupport);
-
+        mExposureSupport.setConsumer(consumer);
         mBaseCell1.exposure(mView1);
+        mBaseCell2.exposure(mView2);
     }
+
 
     @Test
     @SmallTest
     @UiThreadTest
-    public void testExposureTaskAsyncThenCancelIt() {
+    public void testDestroyExposure() {
         ExposureSupport exposureSupport = new ExposureSupport() {
+
+            private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+
+            Consumer<ClickExposureCellOp> consumer = new Consumer<ClickExposureCellOp>() {
+
+                @Override
+                public void accept(ClickExposureCellOp clickEvent) throws Exception {
+                    //should not execute here
+                    assertTrue(false);
+                    assertTrue(Looper.myLooper() == Looper.getMainLooper());
+                    assertEquals(clickEvent.getArg1(), mView1);
+                    assertEquals(clickEvent.getArg2(), mBaseCell1);
+                    assertEquals(clickEvent.getArg3().intValue(), 10);
+                    Log.d("RxExposureSupportTest", "testExposureTaskAsyncThenCancelItButResubscribe  mEventType " + clickEvent.getArg3());
+                    Log.d("RxExposureSupportTest",
+                        "testDestroyExposure  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
+                            .getName());
+                }
+            };
+
 
             @Override
             public void onExposure(@NonNull Card card, int offset, int position) {
@@ -224,81 +200,23 @@ public class RxExposureSupportTest extends AndroidTestCase {
             }
 
             @Override
-            public ObservableTransformer<ClickExposureCellOp, ClickExposureCellOp> getObservableTransformer(
+            public void onRxExposure(Observable<ClickExposureCellOp> exposureCellOpObservable,
                 ClickExposureCellOp rxEvent) {
-                return new ObservableTransformer<ClickExposureCellOp, ClickExposureCellOp>() {
-                    @Override
-                    public ObservableSource<ClickExposureCellOp> apply(Observable<ClickExposureCellOp> upstream) {
-                        return upstream.subscribeOn(Schedulers.newThread());
-                    }
-                };
+                mCompositeDisposable.add(
+                    exposureCellOpObservable.delaySubscription(1, TimeUnit.MINUTES).subscribe(consumer));
             }
 
             @Override
-            public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
-                RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
-
-                    @Override
-                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
-                        assertTrue(Looper.myLooper() != Looper.getMainLooper());
-                        //should not run here
-                        assertTrue(false);
-                        assertEquals(tangramEvent.getArg1(), mView1);
-                        assertEquals(tangramEvent.getArg2(), mBaseCell1);
-                        assertEquals(tangramEvent.getArg3().intValue(), 10);
-                        Log.d("RxExposureSupportTest", "testExposureTaskAsyncThenCancelIt  mEventType " + tangramEvent.getArg3());
-                        Log.d("RxExposureSupportTest",
-                            "testExposureTaskAsyncThenCancelIt  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
-                                .getName());
-                    }
-
-                };
-                return rxExposureCancellable;
+            public void destroy() {
+                super.destroy();
+                mCompositeDisposable.clear();
             }
-
-        };
-        mServiceManager.register(ExposureSupport.class, exposureSupport);
-
-        mBaseCell1.exposure(mView1);
-        mBaseCell1.unexposure(mView1);
-    }
-
-    @Test
-    @SmallTest
-    @UiThreadTest
-    public void testExposureTaskAsyncThenCancelItButResubscribe() {
-        ExposureSupport exposureSupport = new ExposureSupport() {
-
-            @Override
-            public void onExposure(@NonNull Card card, int offset, int position) {
-
-            }
-
-            @Override
-            public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
-                RxExposureCancellable rxExposureCancellable = new RxExposureCancellable() {
-
-                    @Override
-                    public void onAccept(ClickExposureCellOp tangramEvent) throws Exception {
-                        assertTrue(Looper.myLooper() == Looper.getMainLooper());
-                        assertEquals(tangramEvent.getArg1(), mView1);
-                        assertEquals(tangramEvent.getArg2(), mBaseCell1);
-                        assertEquals(tangramEvent.getArg3().intValue(), 10);
-                        Log.d("RxExposureSupportTest", "testExposureTaskAsyncThenCancelItButResubscribe  mEventType " + tangramEvent.getArg3());
-                        Log.d("RxExposureSupportTest",
-                            "testExposureTaskAsyncThenCancelItButResubscribe  thread " + Thread.currentThread().getId() + ": " + Thread.currentThread()
-                                .getName());
-                    }
-
-                };
-                return rxExposureCancellable;
-            }
-
         };
         mServiceManager.register(ExposureSupport.class, exposureSupport);
         mBaseCell1.exposure(mView1);
-        mBaseCell1.unexposure(mView1);
         mBaseCell1.exposure(mView1);
+        exposureSupport.destroy();
+
     }
 
 }

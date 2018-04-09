@@ -24,10 +24,13 @@
 
 package com.tmall.wireless.tangram.support;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import com.tmall.wireless.tangram.util.Preconditions;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.internal.disposables.CancellableDisposable;
 
 /**
@@ -40,29 +43,44 @@ import io.reactivex.internal.disposables.CancellableDisposable;
 public class CellExposureObservable extends Observable<ClickExposureCellOp> {
 
     private ClickExposureCellOp mRxClickExposureEvent;
-    private RxExposureCancellable mRxExposureCancellable;
 
-    public CellExposureObservable(ClickExposureCellOp rxClickExposureEvent, RxExposureCancellable rxExposureCancellable) {
+    private ExposureDispose mExposureDispose;
+
+    public CellExposureObservable(ClickExposureCellOp rxClickExposureEvent) {
         Preconditions.checkNotNull(rxClickExposureEvent);
         Preconditions.checkNotNull(rxClickExposureEvent.getArg1());
         this.mRxClickExposureEvent = rxClickExposureEvent;
-        this.mRxExposureCancellable = rxExposureCancellable;
     }
 
     public void setRxClickExposureEvent(ClickExposureCellOp rxClickExposureEvent) {
         mRxClickExposureEvent = rxClickExposureEvent;
     }
 
-    public void setRxExposureCancellable(RxExposureCancellable rxExposureCancellable) {
-        mRxExposureCancellable = rxExposureCancellable;
-    }
-
     @Override
     protected void subscribeActual(Observer<? super ClickExposureCellOp> observer) {
-        if (mRxExposureCancellable != null) {
-            observer.onSubscribe(new CancellableDisposable(mRxExposureCancellable));
+        if (mExposureDispose == null) {
+            mExposureDispose = new ExposureDispose();
         }
-        observer.onNext(mRxClickExposureEvent);
+        observer.onSubscribe(mExposureDispose);
+        if (!mExposureDispose.isDisposed()) {
+            observer.onNext(mRxClickExposureEvent);
+        }
     }
+
+    private static class ExposureDispose implements Disposable {
+
+        private final AtomicBoolean unsubscribed = new AtomicBoolean();
+
+        @Override
+        public void dispose() {
+            unsubscribed.compareAndSet(false, true);
+        }
+
+        @Override
+        public boolean isDisposed() {
+            return unsubscribed.get();
+        }
+    }
+
 
 }

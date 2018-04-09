@@ -58,7 +58,9 @@ import com.tmall.wireless.tangram.op.TangramOp3;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.support.BannerSupport;
+import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.RxTangramSupport;
+import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
@@ -267,6 +269,14 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
         TimerSupport timerSupport = getService(TimerSupport.class);
         if (timerSupport != null) {
             timerSupport.clear();
+        }
+        SimpleClickSupport simpleClickSupport = getService(SimpleClickSupport.class);
+        if (simpleClickSupport != null) {
+            simpleClickSupport.destroy();
+        }
+        ExposureSupport exposureSupport = getService(ExposureSupport.class);
+        if (exposureSupport != null) {
+            exposureSupport.destroy();
         }
         BusSupport busSupport = getService(BusSupport.class);
         if (busSupport != null) {

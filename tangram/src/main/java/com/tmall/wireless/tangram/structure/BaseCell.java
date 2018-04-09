@@ -44,13 +44,10 @@ import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.tmall.wireless.tangram.support.CellClickObservable;
 import com.tmall.wireless.tangram.support.CellExposureObservable;
 import com.tmall.wireless.tangram.support.ExposureSupport;
-import com.tmall.wireless.tangram.support.RxExposureCancellable;
 import com.tmall.wireless.tangram.support.RxTangramSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
-import io.reactivex.ObservableTransformer;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.PublishSubject;
 import org.json.JSONArray;
@@ -390,8 +387,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     private ArrayMap<View, ClickExposureCellOp> mRxExposureEvents = new ArrayMap<>();
 
-    private ArrayMap<View, Disposable> mExposureDisposables = new ArrayMap<>();
-
     private ArrayMap<View, CellExposureObservable> mViewExposureObservables = new ArrayMap<>();
 
     /**
@@ -401,29 +396,15 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
      */
     public void exposure(View targetView, ClickExposureCellOp rxClickExposureEvent) {
         final ExposureSupport exposureSupport = serviceManager.getService(ExposureSupport.class);
-        RxExposureCancellable exposureCancellable = null;
-        if (exposureSupport != null) {
-            exposureCancellable = exposureSupport.getRxExposureCancellable(rxClickExposureEvent);
-        }
         CellExposureObservable cellExposureObservable = mViewExposureObservables.get(targetView);
         if (cellExposureObservable == null) {
-            cellExposureObservable = new CellExposureObservable(rxClickExposureEvent, exposureCancellable);
+            cellExposureObservable = new CellExposureObservable(rxClickExposureEvent);
             mViewExposureObservables.put(targetView, cellExposureObservable);
         } else {
             cellExposureObservable.setRxClickExposureEvent(rxClickExposureEvent);
-            cellExposureObservable.setRxExposureCancellable(exposureCancellable);
         }
-        if (exposureSupport != null && exposureCancellable != null) {
-            ObservableTransformer<ClickExposureCellOp, ClickExposureCellOp> transformer = exposureSupport.getObservableTransformer(
-
-                rxClickExposureEvent);
-            Disposable exposureDisposable;
-            if (transformer != null) {
-                exposureDisposable = cellExposureObservable.compose(transformer).subscribe(exposureCancellable);
-            } else {
-                exposureDisposable = cellExposureObservable.subscribe(exposureCancellable);
-            }
-            mExposureDisposables.put(targetView, exposureDisposable);
+        if (exposureSupport != null) {
+            exposureSupport.onRxExposure(cellExposureObservable, rxClickExposureEvent);
         }
     }
 
@@ -444,20 +425,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         exposure(targetView, rxExposureEvent);
     }
 
-    /**
-     * @param view
-     * @since 3.0.0
-     */
-    public void unexposure(View view) {
-        Disposable exposureDisposable = mExposureDisposables.get(view);
-        if (exposureDisposable != null) {
-            exposureDisposable.dispose();
-        }
-    }
-
     private ArrayMap<View, ClickExposureCellOp> mRxClickEvents = new ArrayMap<>();
-
-    //private ArrayMap<View, Disposable> mClickDisposables = new ArrayMap<>();
 
     private ArrayMap<View, CellClickObservable> mViewClickObservables = new ArrayMap<>();
 
@@ -477,8 +445,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         if (serviceManager != null) {
             final SimpleClickSupport service = serviceManager.getService(SimpleClickSupport.class);
             if (service != null) {
-                /*Disposable clickDisposable = */service.onRxClick(cellClickObservable, rxClickExposureEvent);
-                //mClickDisposables.put(view, clickDisposable);
+                service.onRxClick(cellClickObservable, rxClickExposureEvent);
             }
         }
     }

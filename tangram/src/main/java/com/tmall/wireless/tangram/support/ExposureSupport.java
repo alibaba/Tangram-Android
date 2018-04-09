@@ -33,7 +33,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
+import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Consumer;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -266,22 +269,25 @@ public abstract class ExposureSupport {
 
     }
 
-    /**
-     *
-     * @param rxEvent
-     * @return exposure handle task by rxEvent
-     */
-    public RxExposureCancellable getRxExposureCancellable(ClickExposureCellOp rxEvent) {
-        return null;
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
+
+    public void onRxExposure(Observable<ClickExposureCellOp> exposureCellOpObservable, ClickExposureCellOp rxEvent) {
+        mCompositeDisposable.add(exposureCellOpObservable.subscribe(mConsumer));
     }
 
-    /**
-     * By default,
-     * @param rxEvent
-     * @return
-     */
-    public ObservableTransformer<ClickExposureCellOp, ClickExposureCellOp> getObservableTransformer(ClickExposureCellOp rxEvent) {
-        return null;
+    private Consumer<ClickExposureCellOp> mConsumer = new Consumer<ClickExposureCellOp>() {
+        @Override
+        public void accept(ClickExposureCellOp rxClickExposureEvent) throws Exception {
+            attachUtInfoToView(rxClickExposureEvent.getArg1(), rxClickExposureEvent.getArg2());
+        }
+    };
+
+    public void setConsumer(Consumer<ClickExposureCellOp> consumer) {
+        mConsumer = consumer;
+    }
+
+    public void destroy() {
+        mCompositeDisposable.clear();
     }
 
 }

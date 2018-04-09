@@ -225,7 +225,7 @@ public abstract class SimpleClickSupport {
     }
 
     public void destroy() {
-        mCompositeDisposable.dispose();
+        mCompositeDisposable.clear();
     }
 
 }
