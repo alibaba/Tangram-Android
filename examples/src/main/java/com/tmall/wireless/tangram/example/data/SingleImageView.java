@@ -102,7 +102,7 @@ public class SingleImageView extends LinearLayout implements ITangramViewLifeCyc
 
     @Override
     public void postBindView(BaseCell cell) {
-        if (cell.serviceManager.supportRx()) {
+        if (cell.serviceManager != null && cell.serviceManager.supportRx()) {
             LifeCycleProviderImpl<BDE> lifeCycleProvider = cell.getLifeCycleProvider();
             Observable.just(cell).map(new Function<BaseCell, String>() {
                 @Override
