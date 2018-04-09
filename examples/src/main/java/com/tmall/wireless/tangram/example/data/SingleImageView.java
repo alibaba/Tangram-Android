@@ -36,8 +36,14 @@ import android.widget.Space;
 import android.widget.TextView;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.structure.BaseCell.BDE;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
 import com.tmall.wireless.tangram.util.ImageUtils;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 public class SingleImageView extends LinearLayout implements ITangramViewLifeCycle {
 
@@ -109,23 +115,64 @@ public class SingleImageView extends LinearLayout implements ITangramViewLifeCyc
 //            int color = parseColor(titleColor, "#555555");
 //            titleTextView.setTextColor(color);
 //        }
+        if (cell.serviceManager.supportRx()) {
+            Observable.just(cell).map(new Function<BaseCell, String>() {
+                @Override
+                public String apply(BaseCell cell) throws Exception {
+                    Thread.sleep(500L);
+                    int pos = cell.pos;
+                    return cell.id + " pos: " + pos + " " + cell.parent.getClass().getSimpleName() + " " + cell
+                        .optStringParam("title");
+                }
+            }).subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+                .compose(cell.<String>bindUntil(BDE.UNBIND))
+            .subscribe(new Consumer<String>() {
+                @Override
+                public void accept(String s) throws Exception {
+                    titleTextView.setText(s);
+                }
+            });
 
-        int pos = cell.pos;
-        titleTextView.setText(
-                cell.id + " pos: " + pos + " " + cell.parent.getClass().getSimpleName() + " " + cell
-                        .optStringParam("title"));
-
-        if (pos > 57) {
-            icon.setBackgroundColor(0x66cccf00 + (pos - 50) * 128);
-        } else if (pos % 2 == 0) {
-            icon.setBackgroundColor(0xaaaaff55);
+            Observable.just(cell).map(new Function<BaseCell, Integer>() {
+                @Override
+                public Integer apply(BaseCell cell) throws Exception {
+                    Thread.sleep(500L);
+                    int pos = cell.pos;
+                    if (pos > 57) {
+                        return 0x66cccf00 + (pos - 50) * 128;
+                    } else if (pos % 2 == 0) {
+                         return 0xaaaaff55;
+                    } else {
+                        return 0xcceeeeee;
+                    }
+                }
+            }).subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(cell.<Integer>bindUntil(BDE.UNBIND))
+                .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer s) throws Exception {
+                        icon.setBackgroundColor(s);
+                    }
+                });
         } else {
-            icon.setBackgroundColor(0xcceeeeee);
+            int pos = cell.pos;
+            titleTextView.setText(cell.id + " pos: " + pos + " " + cell.parent.getClass().getSimpleName() + " " + cell
+                .optStringParam("title"));
+            if (pos > 57) {
+                icon.setBackgroundColor(0x66cccf00 + (pos - 50) * 128);
+            } else if (pos % 2 == 0) {
+                icon.setBackgroundColor(0xaaaaff55);
+            } else {
+                icon.setBackgroundColor(0xcceeeeee);
+            }
         }
     }
 
     @Override
     public void postUnBindView(BaseCell cell) {
+
     }
 
     public static int parseColor(String colorStr, String defaultColor) {

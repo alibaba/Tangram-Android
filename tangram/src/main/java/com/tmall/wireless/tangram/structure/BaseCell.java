@@ -48,7 +48,22 @@ import com.tmall.wireless.tangram.support.RxTangramSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
+import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
+import io.reactivex.CompletableTransformer;
+import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
+import io.reactivex.MaybeTransformer;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.SingleTransformer;
 import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -485,6 +500,78 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         @Override
         public boolean isValid() {
             return false;
+        }
+    }
+
+    private BehaviorSubject<BDE> lifecycleSubject;
+
+
+    public void emitNext(BDE event) {
+        if (lifecycleSubject == null) {
+            lifecycleSubject = BehaviorSubject.create();
+        }
+        lifecycleSubject.onNext(event);
+    }
+
+    public <T> LifecycleTransformer<T> bindUntil(final BDE target) {
+        return new LifecycleTransformer<>(lifecycleSubject.filter(new Predicate<BDE>() {
+            @Override
+            public boolean test(BDE e) throws Exception {
+                return e.equals(target);
+            }
+        }));
+    }
+
+    public static class LifecycleTransformer<T> implements ObservableTransformer<T, T>,
+        SingleTransformer<T, T>, MaybeTransformer<T, T>, CompletableTransformer {
+
+        final Observable<?> mObservable;
+
+        public LifecycleTransformer(Observable<?> observable) {
+            mObservable = observable;
+        }
+
+        @Override
+        public ObservableSource<T> apply(Observable<T> upstream) {
+            return upstream.takeUntil(mObservable);
+        }
+
+        @Override
+        public MaybeSource<T> apply(Maybe<T> upstream) {
+            return upstream.takeUntil(mObservable.firstElement());
+        }
+
+        @Override
+        public SingleSource<T> apply(Single<T> upstream) {
+            return upstream.takeUntil(mObservable.firstOrError());
+        }
+
+        @Override
+        public CompletableSource apply(Completable upstream) {
+            return Completable.ambArray(upstream, mObservable.flatMapCompletable(
+                new Function<Object, CompletableSource>() {
+                    @Override
+                    public CompletableSource apply(Object t) throws Exception {
+                        return Completable.complete();
+                    }
+                }));
+        }
+    }
+
+    public static class BDE {
+
+        public static final BDE BIND = new BDE("bind");
+        public static final BDE UNBIND = new BDE("unbind");
+
+        final protected String name;
+
+        public BDE(String name) {this.name = name;}
+
+        @Override
+        public String toString() {
+            return "BDE{" +
+                "name='" + name + '\'' +
+                '}';
         }
     }
 

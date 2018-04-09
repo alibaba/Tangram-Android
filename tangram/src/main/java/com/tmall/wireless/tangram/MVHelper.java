@@ -36,6 +36,7 @@ import android.view.ViewGroup;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.structure.BaseCell.BDE;
 import com.tmall.wireless.tangram.structure.CellRender;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
 import com.tmall.wireless.tangram.support.CellSupport;
@@ -116,6 +117,9 @@ public class MVHelper {
         try {
             mvResolver.register(getCellUniqueId(cell), cell, view);
             if (cell.serviceManager != null) {
+                if (cell.serviceManager.supportRx()) {
+                    cell.emitNext(BDE.BIND);
+                }
                 CellSupport cellSupport = cell.serviceManager.getService(CellSupport.class);
                 if (cellSupport != null) {
                     cellSupport.bindView(cell, view);
@@ -160,10 +164,7 @@ public class MVHelper {
     public String getCellUniqueId(BaseCell cell) {
         String flareId = cellFlareIdMap.get(cell);
         if (flareId == null) {
-            String parentId = "";
-            if (cell.parent instanceof Card) {
-                parentId = ((Card) cell.parent).id;
-            }
+            String parentId = cell.parent.id;
             flareId = String.format("%s_%s", cell.parent == null ? "null" : parentId, cell.pos);
             cellFlareIdMap.put(cell, flareId);
         }
@@ -174,6 +175,11 @@ public class MVHelper {
         if (view instanceof IContainer) {
             ViewBase vb = ((IContainer)view).getVirtualView();
             vb.reset();
+        }
+        if (cell.serviceManager != null) {
+            if (cell.serviceManager.supportRx()) {
+                cell.emitNext(BDE.UNBIND);
+            }
         }
         postUnMountView(cell, view);
         if (cell.serviceManager != null) {

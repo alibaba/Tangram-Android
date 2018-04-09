@@ -78,6 +78,7 @@ import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.support.RxBannerScrolledListener.ScrollEvent;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
+import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
@@ -163,7 +164,7 @@ public class RxTangramActivity extends Activity {
         recyclerView = (RecyclerView) findViewById(R.id.main_view);
 
         //Step 1: init tangram
-        TangramBuilder.init(this, new IInnerImageSetter() {
+        TangramBuilder.init(this.getApplicationContext(), new IInnerImageSetter() {
             @Override
             public <IMAGE extends ImageView> void doLoadImageUrl(@NonNull IMAGE view,
                 @Nullable String url) {
@@ -569,6 +570,7 @@ public class RxTangramActivity extends Activity {
             engine.destroy();
         }
         mCompositeDisposable.dispose();
+        ImageUtils.setImageSetter(null);
     }
 
     public static byte[] getAssertsFile(Context context, String fileName) {
