@@ -36,9 +36,9 @@ import android.widget.Space;
 import android.widget.TextView;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.structure.BaseCell.BDE;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
-import com.tmall.wireless.tangram.util.ImageUtils;
+import com.tmall.wireless.tangram.util.BDE;
+import com.tmall.wireless.tangram.util.LifeCycleProviderImpl;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -102,20 +102,8 @@ public class SingleImageView extends LinearLayout implements ITangramViewLifeCyc
 
     @Override
     public void postBindView(BaseCell cell) {
-//        String title = cell.optStringParam("title");
-//        if(!isEmpty(title)) {
-//            titleTextView.setText(title);
-//        }
-//        String imgUrl = cell.optStringParam("imgUrl");
-//        if (!isEmpty(imgUrl)) {
-//            ImageUtils.doLoadImageUrl(this.icon, imgUrl);
-//        }
-//        String titleColor = cell.optStringParam("titleColor");
-//        if (!isEmpty(titleColor)) {
-//            int color = parseColor(titleColor, "#555555");
-//            titleTextView.setTextColor(color);
-//        }
         if (cell.serviceManager.supportRx()) {
+            LifeCycleProviderImpl<BDE> lifeCycleProvider = cell.getLifeCycleProvider();
             Observable.just(cell).map(new Function<BaseCell, String>() {
                 @Override
                 public String apply(BaseCell cell) throws Exception {
@@ -126,7 +114,7 @@ public class SingleImageView extends LinearLayout implements ITangramViewLifeCyc
                 }
             }).subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
-                .compose(cell.<String>bindUntil(BDE.UNBIND))
+            .compose(lifeCycleProvider.<String>bindUntil(BDE.UNBIND))
             .subscribe(new Consumer<String>() {
                 @Override
                 public void accept(String s) throws Exception {
@@ -149,7 +137,7 @@ public class SingleImageView extends LinearLayout implements ITangramViewLifeCyc
                 }
             }).subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .compose(cell.<Integer>bindUntil(BDE.UNBIND))
+                .compose(lifeCycleProvider.<Integer>bindUntil(BDE.UNBIND))
                 .subscribe(new Consumer<Integer>() {
                     @Override
                     public void accept(Integer s) throws Exception {
