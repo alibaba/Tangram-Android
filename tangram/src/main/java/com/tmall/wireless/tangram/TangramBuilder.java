@@ -58,7 +58,6 @@ import com.tmall.wireless.tangram.structure.card.StickyEndCard;
 import com.tmall.wireless.tangram.structure.card.TripleColumnCard;
 import com.tmall.wireless.tangram.structure.view.SimpleEmptyView;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
-import com.tmall.wireless.tangram.support.RxTangramSupport;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -509,7 +508,6 @@ public class TangramBuilder {
             // add other features service
             tangramEngine.register(TimerSupport.class, new TimerSupport());
             tangramEngine.register(BusSupport.class, new BusSupport());
-            tangramEngine.register(RxTangramSupport.class, new RxTangramSupport(tangramEngine));
 
             // add virtual view context
             VafContext mVafContext = new VafContext(mContext.getApplicationContext());

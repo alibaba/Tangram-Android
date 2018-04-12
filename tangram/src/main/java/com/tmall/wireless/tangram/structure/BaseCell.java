@@ -44,7 +44,6 @@ import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.tmall.wireless.tangram.support.CellClickObservable;
 import com.tmall.wireless.tangram.support.CellExposureObservable;
 import com.tmall.wireless.tangram.support.ExposureSupport;
-import com.tmall.wireless.tangram.support.RxTangramSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.util.BDE;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
@@ -389,20 +388,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         return null;
     }
 
-    @Override
-    public void onAdded() {
-        super.onAdded();
-        if (serviceManager != null) {
-            RxTangramSupport rxTangramSupport = serviceManager.getService(RxTangramSupport.class);
-            rxTangramSupport.observeCell(mUpdateCellOpObservable);
-        }
-    }
-
-    @Override
-    public void onRemoved() {
-        super.onRemoved();
-    }
-
     private ArrayMap<View, ClickExposureCellOp> mRxExposureEvents = new ArrayMap<>();
 
     private ArrayMap<View, CellExposureObservable> mViewExposureObservables = new ArrayMap<>();
@@ -483,20 +468,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
             rxClickEvent.setArg3(this.pos);
         }
         click(view, rxClickEvent);
-    }
-
-    /**
-     * Response data change
-     * @since 3.0.0
-     */
-    public Consumer<JSONObject> asUpdateConsumer() {
-        return new Consumer<JSONObject>() {
-            @Override
-            public void accept(JSONObject jsonObject) throws Exception {
-                extras = jsonObject;
-                mUpdateCellOpObservable.onNext(new UpdateCellOp(BaseCell.this));
-            }
-        };
     }
 
     public static final class NanBaseCell extends BaseCell {

@@ -440,22 +440,6 @@ public class RxTangramActivity extends Activity {
             }
         }).subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
-            .doOnComplete(new Action() {
-                @Override
-                public void run() throws Exception {
-                    final BaseCell cell = (BaseCell)engine.getGroupBasicAdapter().getComponents().get(1);
-                    mCompositeDisposable.add(ViewClickObservable.from(findViewById(R.id.last)).map(
-                        new Function<Object, JSONObject>() {
-                            @Override
-                            public JSONObject apply(Object o) throws Exception {
-                                cell.extras.put("title", "Rx标题2");
-                                JSONObject jsonObject = cell.extras;
-                                return jsonObject;
-                            }
-                        }).subscribe(cell.asUpdateConsumer()));
-
-                }
-            })
         .subscribe(engine.asAppendGroupConsumer(), new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
