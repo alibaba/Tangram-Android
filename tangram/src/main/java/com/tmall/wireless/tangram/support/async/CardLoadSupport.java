@@ -106,7 +106,7 @@ public class CardLoadSupport {
                 @Override
                 public void finish(List<BaseCell> cells) {
                     finish();
-                    card.setCells(cells);
+                    card.addCells(cells);
                     card.notifyDataChange();
                 }
 
