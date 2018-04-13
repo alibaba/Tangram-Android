@@ -643,7 +643,9 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                     }
                 }
                 mImageViews[currentItemPos].setTag(R.id.TANGRAM_BANNER_INDICATOR_POS, currentItemPos);
-                ImageUtils.doLoadImageUrl(mImageViews[currentItemPos], focusUrl);
+                if (style == STYLE_IMG) {
+                    ImageUtils.doLoadImageUrl(mImageViews[currentItemPos], focusUrl);
+                }
             }
         }
 
