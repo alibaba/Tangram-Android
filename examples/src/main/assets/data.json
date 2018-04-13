@@ -570,6 +570,12 @@
   {
     "type": "9",
     "load": "com.tmall.request.test",
+    "header": {
+      "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "title": "标题1",
+      "type": "vvtest"
+    },
     "style": {
       "autoExpand": true
     },

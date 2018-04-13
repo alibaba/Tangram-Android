@@ -64,4 +64,6 @@ Tangram is available under the MIT license.
 
 # WeChatGroup
 
-Search `longerian` to be invited in WeChat.
+![](https://img.alicdn.com/tfs/TB11_2_kbSYBuNjSspiXXXNzpXa-167-167.png)
+
+Search `tangram_` or scan the QR code above to be invited in WeChat.
