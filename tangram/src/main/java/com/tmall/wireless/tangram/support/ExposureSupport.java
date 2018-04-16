@@ -24,26 +24,20 @@
 
 package com.tmall.wireless.tangram.support;
 
-import com.tmall.wireless.tangram.dataparser.concrete.Card;
-import com.tmall.wireless.tangram.op.ClickExposureCellOp;
-import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.util.LogUtils;
-
-import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
-import android.util.Log;
-import android.view.View;
-import io.reactivex.Observable;
-import io.reactivex.ObservableTransformer;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.functions.Consumer;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
+import android.util.Log;
+import android.view.View;
+import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.util.LogUtils;
 
 /**
  *
@@ -269,25 +263,7 @@ public abstract class ExposureSupport {
 
     }
 
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
-
-    public void onRxExposure(Observable<ClickExposureCellOp> exposureCellOpObservable, ClickExposureCellOp rxEvent) {
-        mCompositeDisposable.add(exposureCellOpObservable.subscribe(mConsumer));
-    }
-
-    private Consumer<ClickExposureCellOp> mConsumer = new Consumer<ClickExposureCellOp>() {
-        @Override
-        public void accept(ClickExposureCellOp rxClickExposureEvent) throws Exception {
-            attachUtInfoToView(rxClickExposureEvent.getArg1(), rxClickExposureEvent.getArg2());
-        }
-    };
-
-    public void setConsumer(Consumer<ClickExposureCellOp> consumer) {
-        mConsumer = consumer;
-    }
-
     public void destroy() {
-        mCompositeDisposable.clear();
     }
 
 }

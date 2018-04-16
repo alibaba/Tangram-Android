@@ -113,7 +113,7 @@ public class RxClickSupportTest extends AndroidTestCase {
                 Log.d("RxClickSupportTest", "testOneCellClicks test One cell mEventType " + clickEvent.getArg3());
             }
         };
-        mSimpleClickSupport.setConsumer(consumer1);
+        //mSimpleClickSupport.setConsumer(consumer1);
         mBaseCell1.click(mView1);
         mView1.performClick();
     }
@@ -132,7 +132,7 @@ public class RxClickSupportTest extends AndroidTestCase {
                 Log.d("RxClickSupportTest", "testTwoCellClicks mEventType " + clickEvent.getArg3());
             }
         };
-        mSimpleClickSupport.setConsumer(consumer1);
+        //mSimpleClickSupport.setConsumer(consumer1);
 
         mBaseCell1.click(mView1);
         mView1.performClick();
@@ -147,7 +147,7 @@ public class RxClickSupportTest extends AndroidTestCase {
                 Log.d("RxClickSupportTest", "testTwoCellClicks mEventType " + clickEvent.getArg3());
             }
         };
-        mSimpleClickSupport.setConsumer(consumer2);
+        //mSimpleClickSupport.setConsumer(consumer2);
 
         mBaseCell2.click(mView2);
         mView2.performClick();
@@ -167,7 +167,7 @@ public class RxClickSupportTest extends AndroidTestCase {
                 Log.d("RxClickSupportTest", "testOneConsumerSubscribeTwoCellClicks mEventType " + clickEvent.getArg3());
             }
         };
-        mSimpleClickSupport.setConsumer(consumer);
+        //mSimpleClickSupport.setConsumer(consumer);
 
         mBaseCell1.click(mView1);
         mView1.performClick();
@@ -189,10 +189,10 @@ public class RxClickSupportTest extends AndroidTestCase {
                 assertTrue(false);
             }
         };
-        mSimpleClickSupport.setConsumer(consumer);
+        //mSimpleClickSupport.setConsumer(consumer);
 
         mBaseCell1.click(mView1);
-        mSimpleClickSupport.destroy();
+        //mSimpleClickSupport.destroy();
         mView1.performClick();
     }
 
@@ -208,7 +208,7 @@ public class RxClickSupportTest extends AndroidTestCase {
                 Log.d("RxClickSupportTest", "testCellClickDisposeAndResubscribe mEventType " + clickEvent.getArg3());
             }
         };
-        mSimpleClickSupport.setConsumer(consumer);
+        //mSimpleClickSupport.setConsumer(consumer);
 
         mBaseCell1.click(mView1);
         mBaseCell1.click(mView1);
@@ -229,7 +229,7 @@ public class RxClickSupportTest extends AndroidTestCase {
                 Log.d("RxClickSupportTest", "testOneCellWithMultiViewClick view " + clickEvent.getArg1());
             }
         };
-        mSimpleClickSupport.setConsumer(consumer);
+        //mSimpleClickSupport.setConsumer(consumer);
 
         mBaseCell1.click(mView1);
         mBaseCell1.click(mView2);
@@ -254,12 +254,12 @@ public class RxClickSupportTest extends AndroidTestCase {
                 assertTrue(false);
             }
         };
-        mSimpleClickSupport.setConsumer(consumer);
+        //mSimpleClickSupport.setConsumer(consumer);
 
         mBaseCell1.click(mView1);
         mBaseCell1.click(mView2);
 
-        mSimpleClickSupport.destroy();
+        //mSimpleClickSupport.destroy();
 
         mView1.performClick();
         mView2.performClick();

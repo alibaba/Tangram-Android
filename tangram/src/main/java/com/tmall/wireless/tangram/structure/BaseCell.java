@@ -43,29 +43,11 @@ import com.tmall.wireless.tangram.op.ClickExposureCellOp;
 import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.tmall.wireless.tangram.support.CellClickObservable;
 import com.tmall.wireless.tangram.support.CellExposureObservable;
-import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.util.BDE;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
-import com.tmall.wireless.tangram.util.LifeCycleHelper;
 import com.tmall.wireless.tangram.util.LifeCycleProviderImpl;
-import io.reactivex.Completable;
-import io.reactivex.CompletableSource;
-import io.reactivex.CompletableTransformer;
-import io.reactivex.Maybe;
-import io.reactivex.MaybeSource;
-import io.reactivex.MaybeTransformer;
-import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.ObservableTransformer;
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
-import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -397,8 +379,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
      * @param rxClickExposureEvent
      * @since 3.0.0
      */
-    public void exposure(View targetView, ClickExposureCellOp rxClickExposureEvent) {
-        final ExposureSupport exposureSupport = serviceManager.getService(ExposureSupport.class);
+    public CellExposureObservable exposure(View targetView, ClickExposureCellOp rxClickExposureEvent) {
         CellExposureObservable cellExposureObservable = mViewExposureObservables.get(targetView);
         if (cellExposureObservable == null) {
             cellExposureObservable = new CellExposureObservable(rxClickExposureEvent);
@@ -406,16 +387,14 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         } else {
             cellExposureObservable.setRxClickExposureEvent(rxClickExposureEvent);
         }
-        if (exposureSupport != null) {
-            exposureSupport.onRxExposure(cellExposureObservable, rxClickExposureEvent);
-        }
+        return cellExposureObservable;
     }
 
     /**
      * @param targetView
      * @since 3.0.0
      */
-    public void exposure(View targetView) {
+    public CellExposureObservable exposure(View targetView) {
         ClickExposureCellOp rxExposureEvent = mRxExposureEvents.get(targetView);
         if (rxExposureEvent == null) {
             rxExposureEvent = new ClickExposureCellOp(targetView, this, this.pos);
@@ -425,7 +404,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
             rxExposureEvent.setArg2(this);
             rxExposureEvent.setArg3(this.pos);
         }
-        exposure(targetView, rxExposureEvent);
+        return exposure(targetView, rxExposureEvent);
     }
 
     private ArrayMap<View, ClickExposureCellOp> mRxClickEvents = new ArrayMap<>();
@@ -437,7 +416,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
      * @param rxClickExposureEvent
      * @since 3.0.0
      */
-    public void click(View view, ClickExposureCellOp rxClickExposureEvent) {
+    public CellClickObservable click(View view, ClickExposureCellOp rxClickExposureEvent) {
         CellClickObservable cellClickObservable = mViewClickObservables.get(view);
         if (cellClickObservable == null) {
             cellClickObservable = new CellClickObservable(rxClickExposureEvent);
@@ -445,19 +424,14 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         } else {
             cellClickObservable.setRxClickExposureEvent(rxClickExposureEvent);
         }
-        if (serviceManager != null) {
-            final SimpleClickSupport service = serviceManager.getService(SimpleClickSupport.class);
-            if (service != null) {
-                service.onRxClick(cellClickObservable, rxClickExposureEvent);
-            }
-        }
+        return cellClickObservable;
     }
 
     /**
      * @param view
      * @since 3.0.0
      */
-    public void click(View view) {
+    public CellClickObservable click(View view) {
         ClickExposureCellOp rxClickEvent = mRxClickEvents.get(view);
         if (rxClickEvent == null) {
             rxClickEvent = new ClickExposureCellOp(view, this, this.pos);
@@ -467,7 +441,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
             rxClickEvent.setArg2(this);
             rxClickEvent.setArg3(this.pos);
         }
-        click(view, rxClickEvent);
+        return click(view, rxClickEvent);
     }
 
     public static final class NanBaseCell extends BaseCell {

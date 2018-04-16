@@ -129,7 +129,7 @@ public class RxExposureSupportTest extends AndroidTestCase {
                 Log.d("RxExposureSupportTest", "testOneCellExposure test One cell mEventType " + clickEvent.getArg3());
             }
         };
-        mExposureSupport.setConsumer(consumer1);
+        //mExposureSupport.setConsumer(consumer1);
         mBaseCell1.exposure(mView1);
     }
 
@@ -147,7 +147,7 @@ public class RxExposureSupportTest extends AndroidTestCase {
                 Log.d("RxExposureSupportTest", "testOneCellWithMultiViewExposure view " + clickEvent.getArg1());
             }
         };
-        mExposureSupport.setConsumer(consumer1);
+        //mExposureSupport.setConsumer(consumer1);
 
         mBaseCell1.exposure(mView1);
         mBaseCell1.exposure(mView2);
@@ -166,7 +166,7 @@ public class RxExposureSupportTest extends AndroidTestCase {
                 Log.d("RxExposureSupportTest", "testOneConsumerSubscribeTwoCellExposure mEventType " + clickEvent.getArg3());
             }
         };
-        mExposureSupport.setConsumer(consumer);
+        //mExposureSupport.setConsumer(consumer);
         mBaseCell1.exposure(mView1);
         mBaseCell2.exposure(mView2);
     }
@@ -203,18 +203,18 @@ public class RxExposureSupportTest extends AndroidTestCase {
 
             }
 
-            @Override
-            public void onRxExposure(Observable<ClickExposureCellOp> exposureCellOpObservable,
-                ClickExposureCellOp rxEvent) {
-                mCompositeDisposable.add(
-                    exposureCellOpObservable.delaySubscription(1, TimeUnit.MINUTES).subscribe(consumer));
-            }
+            //@Override
+            //public void onRxExposure(Observable<ClickExposureCellOp> exposureCellOpObservable,
+            //    ClickExposureCellOp rxEvent) {
+            //    mCompositeDisposable.add(
+            //        exposureCellOpObservable.delaySubscription(1, TimeUnit.MINUTES).subscribe(consumer));
+            //}
 
-            @Override
-            public void destroy() {
-                super.destroy();
-                mCompositeDisposable.clear();
-            }
+            //@Override
+            //public void destroy() {
+            //    super.destroy();
+            //    mCompositeDisposable.clear();
+            //}
         };
         mServiceManager.register(ExposureSupport.class, exposureSupport);
         mBaseCell1.exposure(mView1);
