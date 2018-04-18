@@ -128,7 +128,7 @@ dependencies {
         println 'compile with ultraViewPager source code'
         compile project(':ultraviewpager')
     } else {
-        compile 'com.alibaba.android:ultraviewpager:1.0.6.9@aar'
+        compile 'com.alibaba.android:ultraviewpager:1.0.7.1@aar'
     }
     compile('me.everything:overscroll-decor-android:1.0.1@aar') {
         transitive true
