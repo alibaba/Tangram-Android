@@ -5,6 +5,10 @@ Find the lastest version from [release notes](https://github.com/alibaba/Tangram
 ```
 // gradle
 compile 'com.alibaba.android:tangram:2.0.5@aar'
+
+// we added rxjava in latest version, so need compile rxjava
+compile 'io.reactivex.rxjava2:rxjava:2.1.12'
+compile 'io.reactivex.rxjava2:rxandroid:2.0.2'
 ```
 
 or
@@ -15,6 +19,18 @@ or
   <groupId>com.alibaba.android</groupId>
   <artifactId>tangram</artifactId>
   <version>2.0.5</version>
+  <type>aar</type>
+</dependency>
+<dependency>
+  <groupId>io.reactivex.rxjava2</groupId>
+  <artifactId>rxjava</artifactId>
+  <version>2.1.12</version>
+  <type>aar</type>
+</dependency>
+<dependency>
+  <groupId>io.reactivex.rxjava2</groupId>
+  <artifactId>rxandroid</artifactId>
+  <version>2.0.2</version>
   <type>aar</type>
 </dependency>
 ```
