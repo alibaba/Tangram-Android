@@ -38,7 +38,19 @@ public class TimerSupport {
 
     private static final int MILLISECOND = 1000;
 
-    private RxTimer mDefaultTimer = new RxTimer(MILLISECOND);
+    private ITimer mDefaultTimer = new HandlerTimer(MILLISECOND);
+
+    public void setSupportRx(boolean supportRx) {
+        if (supportRx) {
+            if (!(mDefaultTimer instanceof RxTimer)) {
+                mDefaultTimer = new RxTimer(MILLISECOND);
+            }
+        } else {
+            if (!(mDefaultTimer instanceof HandlerTimer)) {
+                mDefaultTimer = new HandlerTimer(MILLISECOND);
+            }
+        }
+    }
 
     public void register(int interval, @NonNull OnTickListener onTickListener) {
         register(interval, onTickListener, false);
@@ -90,6 +102,7 @@ public class TimerSupport {
      */
     public void clear() {
         mDefaultTimer.stop();
+        mDefaultTimer.clear();
     }
 
     public boolean isRegistered(@NonNull OnTickListener onTickListener) {
