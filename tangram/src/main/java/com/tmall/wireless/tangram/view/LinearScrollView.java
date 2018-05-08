@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -274,7 +274,6 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         }
 
         totalDistance = 0;
-        totalDistanceOfIndicator = 0;
 
         if (lSCell.hasIndicator) {
             indicator.setTranslationX(0);
@@ -328,7 +327,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
     }
 
     private void bindHeaderView(BaseCell cell) {
-        if (cell != null) {
+        if (cell.isValid()) {
             View header = getViewFromRecycler(cell);
             if (header != null) {
                 header.setId(R.id.TANGRAM_BANNER_HEADER_ID);
@@ -345,7 +344,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
     }
 
     private void bindFooterView(BaseCell cell) {
-        if (cell != null) {
+        if (cell.isValid()) {
             View footer = getViewFromRecycler(cell);
             if (footer != null) {
                 footer.setId(R.id.TANGRAM_BANNER_FOOTER_ID);

@@ -1,5 +1,30 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Alibaba Group
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package com.tmall.wireless.tangram.example.dataparser;
 
+import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -12,11 +37,16 @@ import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
+import com.tmall.wireless.tangram.op.ParseComponentsOp;
+import com.tmall.wireless.tangram.op.ParseGroupsOp;
+import com.tmall.wireless.tangram.op.ParseSingleComponentOp;
+import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.BannerCard;
 import com.tmall.wireless.tangram.structure.card.GridCard;
 import com.tmall.wireless.tangram.util.Preconditions;
 
+import io.reactivex.ObservableTransformer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,7 +63,7 @@ import java.util.List;
  * Created by liupeng on 13/12/2017.
  */
 
-public class SampleDataParser extends DataParser<JSONArray, Card, BaseCell> {
+public class SampleDataParser extends DataParser<JSONObject, JSONArray, Card, BaseCell> {
 
     @Nullable
     @Override
@@ -52,7 +82,6 @@ public class SampleDataParser extends DataParser<JSONArray, Card, BaseCell> {
                 if (!TextUtils.isEmpty(cardType)) {
                     final Card card = cardResolver.create(cardType);
                     if (card != null) {
-                        card.rowId = i;
                         card.serviceManager = serviceManager;
                         //add card style
                         addCardStyle(cardData, card);
@@ -116,6 +145,48 @@ public class SampleDataParser extends DataParser<JSONArray, Card, BaseCell> {
     @Nullable
     @Override
     public List<BaseCell> parseComponent(@Nullable JSONArray data, ServiceManager serviceManager) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public List<BaseCell> parseComponent(@Nullable JSONArray data, Card parent, ServiceManager serviceManager) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public Card parseSingleGroup(@Nullable JSONObject data, ServiceManager serviceManager) {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public BaseCell parseSingleComponent(@Nullable JSONObject data, Card parent, ServiceManager serviceManager) {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public ObservableTransformer<ParseGroupsOp, List<Card>> getGroupTransformer() {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public ObservableTransformer<ParseComponentsOp, List<BaseCell>> getComponentTransformer() {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public ObservableTransformer<ParseSingleGroupOp, Card> getSingleGroupTransformer() {
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public ObservableTransformer<ParseSingleComponentOp, BaseCell> getSingleComponentTransformer() {
         return null;
     }
 }

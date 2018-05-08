@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -88,7 +88,7 @@ public class LinearScrollCell extends BaseCell {
     public boolean retainScrollState = true;
 
     @Override
-    protected void onAdded() {
+    public void onAdded() {
         super.onAdded();
         adapter = new Adapter(getAdapter());
     }

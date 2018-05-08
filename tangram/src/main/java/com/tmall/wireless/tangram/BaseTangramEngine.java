@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ChildDrawingOrderCallback;
-import android.util.Pair;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -50,14 +49,30 @@ import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
+import com.tmall.wireless.tangram.op.ParseComponentsOp;
+import com.tmall.wireless.tangram.op.ParseGroupsOp;
+import com.tmall.wireless.tangram.op.ParseSingleComponentOp;
+import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
+import com.tmall.wireless.tangram.op.TangramOp2;
+import com.tmall.wireless.tangram.op.TangramOp3;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.VVCard;
+import com.tmall.wireless.tangram.support.BannerSupport;
+import com.tmall.wireless.tangram.support.ExposureSupport;
+import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
 import com.tmall.wireless.tangram.util.Predicate;
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.framework.ViewManager;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -65,13 +80,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link T} is the type of data, {@link C} is the class of Group, {@link L} is the class of Component
+ * {@link O} is the type of data, {@link T} is the array type of data, {@link C} is the class of Group, {@link L} is the class of Component
  *
  * @author kellen
  * @author villadora
  * @since 1.0.0
  */
-public class BaseTangramEngine<T, C, L> implements ServiceManager {
+public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
 
     private Map<Class<?>, Object> mServices = new ArrayMap<>();
@@ -85,12 +100,14 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
 
     protected GroupBasicAdapter<C, L> mGroupBasicAdapter;
 
-    private final DataParser<T, C, L> mDataParser;
+    private final DataParser<O, T, C, L> mDataParser;
 
     private final IAdapterBuilder<C, L> mAdapterBuilder;
 
+    private boolean isSupportRx;
+
     public BaseTangramEngine(@NonNull final Context context,
-        @NonNull final DataParser<T, C, L> dataParser,
+        @NonNull final DataParser<O, T, C, L> dataParser,
         @NonNull final IAdapterBuilder<C, L> adapterBuilder) {
         //noinspection ConstantConditions
         Preconditions.checkArgument(context != null, "context is null");
@@ -115,18 +132,10 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
-     * @return Return the recyclerView binded to Tangram, do not call this method after {@link #destroy()}, since it
-     * will recreate a recyclerView instance. Also it is suggested to call {@link #bindView(RecyclerView)} first
-     * before call this method, since the recyclerView created in this method is a default one and may not meet up to
-     * your case.
+     * @return Return the recyclerView binded to Tangram. It is suggested to call {@link #bindView(RecyclerView)} first
+     * before call this method.
      */
     public RecyclerView getContentView() {
-        if (mContentView == null) {
-            RecyclerView recyclerView = new RecyclerView(mContext);
-            bindView(recyclerView);
-            Preconditions.checkState(mContentView != null, "mContentView is still null after call bindView()");
-        }
-
         return mContentView;
     }
 
@@ -262,30 +271,26 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
         if (timerSupport != null) {
             timerSupport.clear();
         }
+        SimpleClickSupport simpleClickSupport = getService(SimpleClickSupport.class);
+        if (simpleClickSupport != null) {
+            simpleClickSupport.destroy();
+        }
+        ExposureSupport exposureSupport = getService(ExposureSupport.class);
+        if (exposureSupport != null) {
+            exposureSupport.destroy();
+        }
         BusSupport busSupport = getService(BusSupport.class);
         if (busSupport != null) {
             busSupport.shutdown();
+        }
+        BannerSupport bannerSupport = getService(BannerSupport.class);
+        if (bannerSupport != null) {
+            bannerSupport.destroy();
         }
         VafContext vafContext = getService(VafContext.class);
         if (vafContext != null) {
             vafContext.onDestroy();
         }
-    }
-
-    /**
-     * Set original data list with type {@link T} in Tangram.
-     * @param data Original data with type {@link T}.
-     */
-    public void setData(@Nullable T data) {
-        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
-
-        List<C> cards = mDataParser.parseGroup(data, this);
-        this.setData(cards);
-    }
-
-    public boolean isFullScreen() {
-        mLayoutManager.findLastVisibleItemPosition();
-        return false;
     }
 
     /**
@@ -324,6 +329,17 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
+     * Set original data list with type {@link T} in Tangram.
+     * @param data Original data with type {@link T}.
+     */
+    public void setData(@Nullable T data) {
+        Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
+
+        List<C> cards = mDataParser.parseGroup(data, this);
+        this.setData(cards);
+    }
+
+    /**
      * Set parsed data list with type {@link C} in Tangram
      * @param data Parsed data list.
      */
@@ -333,6 +349,52 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
         if (mvHelper != null)
             mvHelper.reset();
         this.mGroupBasicAdapter.setData(data);
+    }
+
+    /**
+     * @return An ObservableTransformer help to transformer original data to parsed data.
+     * @since 3.0.0
+     */
+    public ObservableTransformer<T, List<C>> getDataTransformer() {
+        return new ObservableTransformer<T, List<C>>() {
+            @Override
+            public ObservableSource<List<C>> apply(Observable<T> upstream) {
+                return upstream.observeOn(Schedulers.computation()).map(new Function<T, List<C>>() {
+                    @Override
+                    public List<C> apply(T t) throws Exception {
+                        return mDataParser.parseGroup(t, BaseTangramEngine.this);
+                    }
+                }).observeOn(AndroidSchedulers.mainThread());
+            }
+        };
+    }
+
+    /**
+     * Make engine as a consumer to accept origin data from user
+     * @return A consumer will call {@link BaseTangramEngine#setData(Object)}
+     * @since 3.0.0
+     */
+    public Consumer<T> asOriginalDataConsumer() {
+        return new Consumer<T>() {
+            @Override
+            public void accept(T t) throws Exception {
+                setData(t);
+            }
+        };
+    }
+
+    /**
+     * Make engine as a consumer to accept parsed data from user
+     * @return A consumer will call {@link BaseTangramEngine#setData(List)}
+     * @since 3.0.0
+     */
+    public Consumer<List<C>> asParsedDataConsumer() {
+        return new Consumer<List<C>>() {
+            @Override
+            public void accept(List<C> cs) throws Exception {
+                setData(cs);
+            }
+        };
     }
 
     /**
@@ -476,12 +538,83 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
     }
 
     /**
+     * Parse original data with type {@link T} into model data list with type {@link L}
+     * @param data Original data.
+     * @param parent the parent group to hold the parsed list.
+     * @return Parsed data list.
+     * @since 3.0.0
+     */
+    public List<L> parseComponent(@Nullable C parent, @Nullable T data) {
+        return mDataParser.parseComponent(data, parent, this);
+    }
+
+    /**
+     * Parse original data with type {@link O} into model data with type {@link C}
+     * @param data Original data.
+     * @return Parsed data.
+     * @since 3.0.0
+     */
+    public C parseSingleData(@Nullable O data) {
+        return mDataParser.parseSingleGroup(data, this);
+    }
+
+    /**
+     * Parse original data with type {@link O} into model data with type {@link L}
+     * @param parent the parent group to hold parsed object.
+     * @param data Original data.
+     * @return Parsed data.
+     * @since 3.0.0
+     */
+    public L parseSingleComponent(@Nullable C parent, @Nullable O data) {
+        return mDataParser.parseSingleComponent(data, parent, this);
+    }
+
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
+    @NonNull
+    public ObservableTransformer<ParseGroupsOp, List<C>> getGroupTransformer() {
+        return mDataParser.getGroupTransformer();
+    }
+
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
+    @NonNull
+    public ObservableTransformer<ParseComponentsOp, List<L>> getComponentTransformer() {
+        return mDataParser.getComponentTransformer();
+    }
+
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
+    @NonNull
+    public ObservableTransformer<ParseSingleGroupOp, C> getSingleGroupTransformer() {
+        return mDataParser.getSingleGroupTransformer();
+    }
+
+    /**
+     *
+     * @return
+     * @since 3.0.0
+     */
+    @NonNull
+    public ObservableTransformer<ParseSingleComponentOp, L> getSingleComponentTransformer() {
+        return mDataParser.getSingleComponentTransformer();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public <S> void register(@NonNull Class<S> type, @NonNull S service) {
         Preconditions.checkArgument(type != null, "type is null");
-
         mServices.put(type, type.cast(service));
     }
 
@@ -495,6 +628,19 @@ public class BaseTangramEngine<T, C, L> implements ServiceManager {
             return null;
         }
         return type.cast(service);
+    }
+
+    public void setSupportRx(boolean supportRx) {
+        isSupportRx = supportRx;
+        TimerSupport timerSupport = getService(TimerSupport.class);
+        if (timerSupport != null) {
+            timerSupport.setSupportRx(supportRx);
+        }
+    }
+
+    @Override
+    public boolean supportRx() {
+        return isSupportRx;
     }
 
     @SuppressWarnings("unchecked")

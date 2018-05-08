@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -121,6 +121,8 @@ dependencies {
             changing = true
         }
     }
+    provided 'io.reactivex.rxjava2:rxjava:2.1.12'
+    provided 'io.reactivex.rxjava2:rxandroid:2.0.2'
     compile 'com.android.support:recyclerview-v7:23.1.1@aar'
     compile 'com.android.support:support-v4:23.1.1@aar'
     compile 'com.android.support:support-annotations:23.1.1'
@@ -145,7 +147,7 @@ dependencies {
             exclude group: 'com.android.support', module: 'support-annotations'
         }
     } else {
-        compile('com.alibaba.android:virtualview:1.0.6@aar') {
+        compile('com.alibaba.android:virtualview:1.1.1@aar') {
             transitive true
             exclude group: 'com.android.support', module: 'appcompat'
             exclude group: 'com.android.support', module: 'appcompat-v7'

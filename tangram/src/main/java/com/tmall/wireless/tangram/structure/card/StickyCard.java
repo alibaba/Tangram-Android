@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,7 @@ public class StickyCard extends OneItemCard {
             }
 
         if (style instanceof StickyStyle) {
+            helper.setOffset(((StickyStyle) style).offset);
             helper.setStickyStart(((StickyStyle) style).stickyStart);
             helper.setMargin(style.margin[Style.MARGIN_LEFT_INDEX], style.margin[Style.MARGIN_TOP_INDEX],
                     style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
@@ -83,6 +84,7 @@ public class StickyCard extends OneItemCard {
         public static final String STICKY_END = "end";
 
         public boolean stickyStart = true;
+        public int offset = 0;
 
 
         public StickyStyle(boolean defaultSticky) {
@@ -95,6 +97,7 @@ public class StickyCard extends OneItemCard {
             if (data != null) {
                 String sticky = data.optString(KEY_STICKY, stickyStart ? STICKY_START : STICKY_END);
                 this.stickyStart = STICKY_START.equalsIgnoreCase(sticky);
+                this.offset = Style.parseSize(data.optString("offset"), 0);
             }
         }
     }

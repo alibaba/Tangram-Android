@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -215,8 +215,10 @@ public class FusionCard extends Card implements IDelegateCard {
                             engine.scrollToPosition(headerCard);
                             engine.replaceCard(currentCard, indexCache.card);
                             currentCard = indexCache.card;
-                            if (!currentCard.loaded)
+                            if (!currentCard.loaded) {
                                 loadSupport.loadMore(currentCard);
+                                loadSupport.reactiveDoLoadMore(currentCard);
+                            }
                         }
 
                         currentIndex = index;

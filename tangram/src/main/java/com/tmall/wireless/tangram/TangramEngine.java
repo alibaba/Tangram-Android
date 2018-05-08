@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,40 +44,48 @@ import android.view.View;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
-import com.tmall.wireless.tangram.expression.ITangramExprParser;
-import com.tmall.wireless.tangram.expression.TangramExpr;
-import com.tmall.wireless.tangram.expression.TangramExprSupport;
 import com.tmall.wireless.tangram.ext.PullFromEndListener;
 import com.tmall.wireless.tangram.ext.SwipeItemTouchListener;
+import com.tmall.wireless.tangram.op.AppendGroupOp;
+import com.tmall.wireless.tangram.op.AppendGroupsOp;
+import com.tmall.wireless.tangram.op.InsertCellOp;
+import com.tmall.wireless.tangram.op.InsertCellsOp;
+import com.tmall.wireless.tangram.op.InsertGroupOp;
+import com.tmall.wireless.tangram.op.InsertGroupsOp;
+import com.tmall.wireless.tangram.op.RemoveCellOp;
+import com.tmall.wireless.tangram.op.RemoveCellPositionOp;
+import com.tmall.wireless.tangram.op.RemoveGroupIdxOp;
+import com.tmall.wireless.tangram.op.RemoveGroupOp;
+import com.tmall.wireless.tangram.op.ReplaceCellOp;
+import com.tmall.wireless.tangram.op.ReplaceGroupContentOp;
+import com.tmall.wireless.tangram.op.ReplaceGroupOp;
+import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.Predicate;
+import com.tmall.wireless.vaf.virtualview.core.ViewCache;
+import io.reactivex.functions.Consumer;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by villadora on 15/8/24.
  *
  * The core of Tangram used to access data, bind view, register service.
  */
-public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> implements Engine,
-    ITangramExprParser {
+public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card, BaseCell> implements Engine {
 
     private static final int NO_SWIPE = -1;
 
     public TangramEngine(@NonNull Context context,
-        @NonNull DataParser<JSONArray, Card, BaseCell> dataParser,
+        @NonNull DataParser<JSONObject, JSONArray, Card, BaseCell> dataParser,
         @NonNull IAdapterBuilder<Card, BaseCell> adapterBuilder) {
         super(context, dataParser, adapterBuilder);
         this.register(DataParser.class, dataParser);
-        mTangramExprSupport = new TangramExprSupport();
-        mTangramExprSupport.registerExprParser(TangramExprSupport.TANGRAM, this);
-        this.register(TangramExprSupport.class, mTangramExprSupport);
-
     }
-
-    private TangramExprSupport mTangramExprSupport;
 
     private Runnable updateRunnable;
 
@@ -152,6 +160,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         if (contentView != null && mSwipeItemTouchListener != null) {
             contentView.removeOnItemTouchListener(mSwipeItemTouchListener);
             mSwipeItemTouchListener = null;
+            contentView.removeCallbacks(updateRunnable);
         }
         super.unbindView();
     }
@@ -200,6 +209,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 // page load
                 if (current.loadMore) {
                     loadSupport.loadMore(current);
+                    loadSupport.reactiveDoLoadMore(current);
                 }
                 return;
             }
@@ -216,9 +226,11 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 if (c.loadMore && !loadedMore) {
                     // only load one load more card
                     loadSupport.loadMore(c);
+                    loadSupport.reactiveDoLoadMore(c);
                     loadedMore = true;
                 } else {
                     loadSupport.doLoad(c);
+                    loadSupport.reactiveDoLoad(c);
                 }
                 c.loaded = true;
             }
@@ -260,11 +272,14 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      * Loading data for card whose's position in within 0 to {{@link #mPreLoadNumber}}.
      */
     public void loadFirstPageCard() {
-        if (!mEnableLoadFirstPageCard)
+        if (!mEnableLoadFirstPageCard) {
             return;
+        }
 
         final CardLoadSupport loadSupport = getService(CardLoadSupport.class);
-        if (loadSupport == null) return;
+        if (loadSupport == null) {
+            return;
+        }
 
         boolean loadedMore = false;
 
@@ -278,9 +293,11 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 if (card.loadMore && !loadedMore) {
                     // only load one load more card
                     loadSupport.loadMore(card);
+                    loadSupport.reactiveDoLoadMore(card);
                     loadedMore = true;
                 } else {
                     loadSupport.doLoad(card);
+                    loadSupport.reactiveDoLoad(card);
                 }
                 card.loaded = true;
             }
@@ -303,7 +320,9 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
     public void loadMoreCard() {
         CardLoadSupport loadSupport = getService(CardLoadSupport.class);
-        if (loadSupport == null) return;
+        if (loadSupport == null) {
+            return;
+        }
 
         List<Card> groups = findGroups(new Predicate<Card>() {
             @Override
@@ -315,6 +334,7 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
         if (groups.size() != 0) {
             loadSupport.loadMore(groups.get(groups.size() - 1));
+            loadSupport.reactiveDoLoadMore(groups.get(groups.size() - 1));
         }
     }
 
@@ -324,10 +344,28 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
      */
     public Card findCardById(String id) {
         MVHelper mvHelper = getService(MVHelper.class);
-        if (mvHelper == null)
+        if (mvHelper == null) {
             return null;
-
+        }
         return mvHelper.resolver().findCardById(id);
+    }
+
+    /**
+     *
+     * @param id Target cell's id. Can not be null
+     * @return
+     * @since 3.0.0
+     */
+    public BaseCell findCellById(String id) {
+        if (mGroupBasicAdapter != null && id != null) {
+            List<BaseCell> cells = mGroupBasicAdapter.getComponents();
+            for (int i = 0, size = cells.size(); i < size; i++) {
+                if (id.equals(cells.get(i).id)) {
+                    return cells.get(i);
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -337,7 +375,9 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     public void refresh(final boolean layoutUpdated) {
         final RecyclerView contentView = getContentView();
 
-        if (contentView == null) return;
+        if (contentView == null) {
+            return;
+        }
 
         if (contentView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE) {
             // contentView.stopScroll();
@@ -400,7 +440,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
             BaseCell cell = cells.get(0);
             int pos = mGroupBasicAdapter.getComponents().indexOf(cell);
             if (pos > 0) {
-                this.getContentView().scrollToPosition(pos);
+                RecyclerView recyclerView = getContentView();
+                if (recyclerView != null) {
+                    recyclerView.scrollToPosition(pos);
+                }
             }
         }
     }
@@ -413,7 +456,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         if (cell != null) {
             int pos = mGroupBasicAdapter.getComponents().indexOf(cell);
             if (pos > 0) {
-                this.getContentView().scrollToPosition(pos);
+                RecyclerView recyclerView = getContentView();
+                if (recyclerView != null) {
+                    recyclerView.scrollToPosition(pos);
+                }
             }
         }
     }
@@ -432,9 +478,16 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 View view = lm.findViewByPosition(pos);
                 if (view != null) {
                     int top = lm.getDecoratedTop(view);
-                    this.getContentView().scrollBy(0, top);
-                } else
-                    this.getContentView().scrollToPosition(pos);
+                    RecyclerView recyclerView = getContentView();
+                    if (recyclerView != null) {
+                        recyclerView.scrollBy(0, top);
+                    }
+                } else {
+                    RecyclerView recyclerView = getContentView();
+                    if (recyclerView != null) {
+                        recyclerView.scrollToPosition(pos);
+                    }
+                }
             }
         }
     }
@@ -451,9 +504,15 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
                 View view = lm.findViewByPosition(pos);
                 if (view != null) {
                     int top = lm.getDecoratedTop(view);
-                    this.getContentView().scrollBy(0, top);
+                    RecyclerView recyclerView = getContentView();
+                    if (recyclerView != null) {
+                        recyclerView.scrollBy(0, top);
+                    }
                 } else {
-                    this.getContentView().scrollToPosition(pos);
+                    RecyclerView recyclerView = getContentView();
+                    if (recyclerView != null) {
+                        recyclerView.scrollToPosition(pos);
+                    }
                 }
             }
         }
@@ -473,38 +532,28 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
     public void setSwipeCardActionEdge(int actionEdge) {
         if (actionEdge == NO_SWIPE) {
-            if (mSwipeItemTouchListener != null)
-                getContentView().removeOnItemTouchListener(mSwipeItemTouchListener);
-        } else {
-            mSwipeCardActionEdge = actionEdge;
             if (mSwipeItemTouchListener != null) {
-                getContentView().removeOnItemTouchListener(mSwipeItemTouchListener);
-                mSwipeItemTouchListener.setActionEdge(actionEdge);
-                getContentView().addOnItemTouchListener(mSwipeItemTouchListener);
-            }
-        }
-    }
-
-    @Override
-    public Object getValueBy(TangramExpr var) {
-        if (var.hasNextFragment()) {
-            String next = var.nextFragment();
-            List<Card> cards = getGroupBasicAdapter().getGroups();
-            for (int i = 0, size = cards.size(); i < size; i++) {
-                Card card = cards.get(i);
-                if (card.id.equals(next)) {
-                    return card.getValueBy(var);
+                RecyclerView contentView = getContentView();
+                if (contentView != null) {
+                    contentView.removeOnItemTouchListener(mSwipeItemTouchListener);
                 }
             }
+        } else {
+            mSwipeCardActionEdge = actionEdge;
+            RecyclerView contentView = getContentView();
+            if (mSwipeItemTouchListener != null && contentView != null) {
+                contentView.removeOnItemTouchListener(mSwipeItemTouchListener);
+                mSwipeItemTouchListener.setActionEdge(actionEdge);
+                contentView.addOnItemTouchListener(mSwipeItemTouchListener);
+            }
         }
-        return null;
     }
 
     /**
-     * NOTE new API
      * A high performance method to insert cells. TODO handle nested card
      * @param insertPosition the position to be inserted.
      * @param data new cell data
+     * @since 2.1.0
      */
     public void insertWith(int insertPosition, BaseCell data) {
         insertWith(insertPosition, Arrays.asList(data));
@@ -512,10 +561,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
 
 
     /**
-     * NOTE new API
-     * A high performance method to insert cells. TODO handle nested card
+     * A high performance method to insert cells. Do not allowed to insert to an empty Tangram. TODO handle nested card
      * @param insertPosition the position to be inserted
      * @param list new cell data list
+     * @since 2.1.0
      */
     public void insertWith(int insertPosition, List<BaseCell> list) {
         int newItemSize = list != null ? list.size() : 0;
@@ -548,14 +597,19 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
-     * NOTE new API
      * @param insertIdx the index to be inserted
      * @param group a group of data
+     * @since 2.1.0
      */
     public void insertBatchWith(int insertIdx, Card group) {
         insertBatchWith(insertIdx, Arrays.asList(group));
     }
 
+    /**
+     * @param insertIdx the index to be inserted
+     * @param groups a group list
+     * @since 2.1.0
+     */
     public void insertBatchWith(int insertIdx, List<Card> groups) {
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (groups != null && groups.size() > 0 && mGroupBasicAdapter != null && layoutManager != null) {
@@ -576,8 +630,17 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
+     * @param group new group to be append at tail.
+     * @since 3.0.0
+     */
+    public void appendWith(Card group) {
+        appendBatchWith(Arrays.asList(group));
+    }
+
+    /**
      * NOTE new API, use this to replace {@link BaseTangramEngine#appendData(List)} and {@link BaseTangramEngine#appendData(Object)}
-     * @param groups new group to be append at tail.
+     * @param groups new groups to be append at tail.
+     * @since 2.1.0
      */
     public void appendBatchWith(List<Card> groups) {
         if (mGroupBasicAdapter != null) {
@@ -586,9 +649,9 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
-     * NOTE new API
      * Remove cell at target position. TODO handle nested card
      * @param position
+     * @since 2.1.0
      */
     protected void removeBy(int position) {
         if (mGroupBasicAdapter != null) {
@@ -600,9 +663,9 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
-     * NOTE new API
      * Remove target cell. TODO handle nested card, cell in staggered, cell in onePlusN
      * @param data
+     * @since 2.1.0
      */
     protected void removeBy(BaseCell data) {
         VirtualLayoutManager layoutManager = getLayoutManager();
@@ -645,9 +708,9 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
-     * NOTE new API
      * Remove all cells in a card with target index
      * @param removeIdx target card's index
+     * @since 2.1.0
      */
     protected void removeBatchBy(int removeIdx) {
         if (mGroupBasicAdapter != null) {
@@ -659,9 +722,9 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
-     * NOTE new API
      * Remove all cells in a card.
      * @param group
+     * @since 2.1.0
      */
     protected void removeBatchBy(Card group) {
         VirtualLayoutManager layoutManager = getLayoutManager();
@@ -695,10 +758,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
-     * NOTE new API
      * Replace cell one by one.
      * @param oldOne
      * @param newOne
+     * @since 2.1.0
      */
     public void replace(BaseCell oldOne, BaseCell newOne) {
         VirtualLayoutManager layoutManager = getLayoutManager();
@@ -714,10 +777,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
-     * NOTE new API
      * Replace parent card's children. Cells' size should be equal with parent's children size.
      * @param parent
      * @param cells
+     * @since 2.1.0
      */
     public void replace(Card parent, List<BaseCell> cells) {
         VirtualLayoutManager layoutManager = getLayoutManager();
@@ -754,10 +817,10 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
     }
 
     /**
-     * NOTE new API
      * Replace card one by one. New one's children size should be equal with old one's children size.
      * @param oldOne
      * @param newOne
+     * @since 2.1.0
      */
     public void replace(Card oldOne, Card newOne) {
         VirtualLayoutManager layoutManager = getLayoutManager();
@@ -779,5 +842,198 @@ public class TangramEngine extends BaseTangramEngine<JSONArray, Card, BaseCell> 
         }
     }
 
+    /**
+     * Update a view's UI by its cell's data, you should change cell's data first.
+     * @param cell
+     * @since 3.0.0
+     */
+    public void update(BaseCell cell) {
+        if (cell != null && mGroupBasicAdapter != null) {
+            int position = mGroupBasicAdapter.getPositionByItem(cell);
+            if (position >= 0) {
+                try {
+                    cell.extras.put(ViewCache.Item.FLAG_INVALIDATE, true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                mGroupBasicAdapter.notifyItemChanged(position);
+            }
+        }
+
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<InsertCellOp> asInsertCellConsumer() {
+        return new Consumer<InsertCellOp>() {
+            @Override
+            public void accept(InsertCellOp op) throws Exception {
+                insertWith(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<InsertCellsOp> asInsertCellsConsumer() {
+        return new Consumer<InsertCellsOp>() {
+            @Override
+            public void accept(InsertCellsOp op) throws Exception {
+                insertWith(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<InsertGroupOp> asInsertGroupConsumer() {
+        return new Consumer<InsertGroupOp>() {
+            @Override
+            public void accept(InsertGroupOp op) throws Exception {
+                insertBatchWith(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<InsertGroupsOp> asInsertGroupsConsumer() {
+        return new Consumer<InsertGroupsOp>() {
+            @Override
+            public void accept(InsertGroupsOp op) throws Exception {
+                insertBatchWith(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * Make engine as a consumer to accept data to append at the end of list
+     * @return
+     * @since 3.0.0
+     */
+    public Consumer<AppendGroupOp> asAppendGroupConsumer() {
+        return new Consumer<AppendGroupOp>() {
+            @Override
+            public void accept(AppendGroupOp op) throws Exception {
+                appendWith(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * Make engine as a consumer to accept data to append at the end of list
+     * @return
+     * @since 3.0.0
+     */
+    public Consumer<AppendGroupsOp> asAppendGroupsConsumer() {
+        return new Consumer<AppendGroupsOp>() {
+            @Override
+            public void accept(AppendGroupsOp op) throws Exception {
+                appendBatchWith(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected Consumer<RemoveCellPositionOp> asRemoveCellPositionConsumer() {
+        return new Consumer<RemoveCellPositionOp>() {
+            @Override
+            public void accept(RemoveCellPositionOp op) throws Exception {
+                removeBy(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected Consumer<RemoveCellOp> asRemoveCellConsumer() {
+        return new Consumer<RemoveCellOp>() {
+            @Override
+            public void accept(RemoveCellOp op) throws Exception {
+                removeBy(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected Consumer<RemoveGroupIdxOp> asRemoveGroupIdxConsumer() {
+        return new Consumer<RemoveGroupIdxOp>() {
+            @Override
+            public void accept(RemoveGroupIdxOp op) throws Exception {
+                removeBatchBy(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected Consumer<RemoveGroupOp> asRemoveGroupConsumer() {
+        return new Consumer<RemoveGroupOp>() {
+            @Override
+            public void accept(RemoveGroupOp op) throws Exception {
+                removeBatchBy(op.getArg1());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<ReplaceCellOp> asReplaceCellConsumer() {
+        return new Consumer<ReplaceCellOp>() {
+            @Override
+            public void accept(ReplaceCellOp op) throws Exception {
+                replace(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<ReplaceGroupContentOp> asReplaceGroupContentConsumer() {
+        return new Consumer<ReplaceGroupContentOp>() {
+            @Override
+            public void accept(ReplaceGroupContentOp op) throws Exception {
+                replace(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public Consumer<ReplaceGroupOp> asReplaceGroupConsumer() {
+        return new Consumer<ReplaceGroupOp>() {
+            @Override
+            public void accept(ReplaceGroupOp op) throws Exception {
+                replace(op.getArg1(), op.getArg2());
+            }
+        };
+    }
+
+    /**
+     * Make engine as a consumer to accept cell'data change
+     * @return
+     * @since 3.0.0
+     */
+    public Consumer<UpdateCellOp> asUpdateCellConsumer() {
+        return new Consumer<UpdateCellOp>() {
+            @Override
+            public void accept(UpdateCellOp op) throws Exception {
+                update(op.getArg1());
+            }
+        };
+    }
 
 }

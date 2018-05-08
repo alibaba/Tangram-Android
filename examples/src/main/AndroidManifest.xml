@@ -1,7 +1,7 @@
 <!--
   ~ MIT License
   ~
-  ~ Copyright (c) 2017 Alibaba Group
+  ~ Copyright (c) 2018 Alibaba Group
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy
   ~ of this software and associated documentation files (the "Software"), to deal
@@ -29,23 +29,26 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+            android:name="com.tmall.wireless.tangram.example.TangramApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
-        <activity android:name="com.tmall.wireless.tangram.example.TangramActivity">
+        <activity android:name="com.tmall.wireless.tangram.example.DemoListActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                 <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--<activity android:name="com.tmall.wireless.tangram.example.TangramDataParserActivity">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN"/>-->
-                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
+
+        <activity android:name="com.tmall.wireless.tangram.example.TangramActivity">
+        </activity>
+        <activity android:name="com.tmall.wireless.tangram.example.RxTangramActivity">
+        </activity>
+        <activity android:name="com.tmall.wireless.tangram.example.TangramDataParserActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -73,6 +73,7 @@ public class MVResolver {
 
     private ArrayMap<View, BaseCell> vmMap = new ArrayMap<>(128);
 
+    @Deprecated
     private ArrayMap<String, View> idViewMap = new ArrayMap<>(128);
 
     private ServiceManager mServiceManager;
@@ -126,6 +127,7 @@ public class MVResolver {
         return mvMap.get(cell);
     }
 
+    @Deprecated
     public View getView(String uniqueId) {
         return idViewMap.get(uniqueId);
     }

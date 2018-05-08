@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@ package com.tmall.wireless.tangram.dataparser.concrete;
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+
+import android.util.Log;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
@@ -415,6 +417,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                         newCards.add(newPair);
                     }
                 }
+                component.removed();
                 mCards.clear();
                 mCards.addAll(newCards);
                 mData.remove(component);
@@ -447,6 +450,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                     newCards.add(newPair);
                 }
             }
+            group.removed();
             mCards.clear();
             mCards.addAll(newCards);
             mData.removeAll(group.getCells());
@@ -458,7 +462,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
     @Override
     public void insertComponents(int pos, List<BaseCell> components) {
-        if (mData != null && components != null && !components.isEmpty() && pos >= 0) {
+        if (mData != null && mData.size() > 0 && components != null && !components.isEmpty() && pos >= 0) {
             int newItemSize = components.size();
             if (mCards != null) {
                 List<Pair<Range<Integer>, Card>> newCards = new ArrayList<>();
@@ -479,6 +483,12 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 }
                 mCards.clear();
                 mCards.addAll(newCards);
+            }
+            for (int i = 0, size = components.size(); i < size; i++) {
+                BaseCell cell = components.get(i);
+                if (cell != null) {
+                    cell.added();
+                }
             }
             for (int i = 0; i < newItemSize; i++) {
                 if ((pos + i) < mData.size()) {
@@ -532,7 +542,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 }
             } else {
                 newCards.addAll(mCards);
-                lastEnd = mCards.get(mCards.size() - 1).first.getUpper();
+                lastEnd = mCards.size() > 0 ? mCards.get(mCards.size() - 1).first.getUpper() : 0;
                 insertPosition = lastEnd;
                 for (int j = 0, gs = group.size(); j < gs; j++) {
                     Card newGroup = group.get(j);
@@ -542,6 +552,12 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                     newCards.add(insertPair);
                     newData.addAll(newGroup.getCells());
                     lastEnd = lastEnd + childrenSize;
+                }
+            }
+            for (int i = 0, size = group.size(); i < size; i++) {
+                Card card = group.get(i);
+                if (card != null) {
+                    card.added();
                 }
             }
             mCards.clear();
@@ -577,6 +593,18 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                     }
                     mCards.clear();
                     mCards.addAll(newCards);
+                }
+                for (int i = 0, size = oldComponent.size(); i < size; i++) {
+                    BaseCell cell = oldComponent.get(i);
+                    if (cell != null) {
+                        cell.removed();
+                    }
+                }
+                for (int i = 0, size = newComponent.size(); i < size; i++) {
+                    BaseCell cell = newComponent.get(i);
+                    if (cell != null) {
+                        cell.added();
+                    }
                 }
                 mData.removeAll(oldComponent);
                 mData.addAll(index, newComponent);
@@ -616,6 +644,8 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                     mCards.clear();
                     mCards.addAll(newCards);
                 }
+                oldGroup.removed();
+                newGroup.added();
                 mData.removeAll(oldComponent);
                 mData.addAll(index, newComponent);
                 int oldSize = oldComponent.size();

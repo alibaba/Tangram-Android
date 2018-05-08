@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -73,8 +73,6 @@ public class TestView extends FrameLayout implements ITangramViewLifeCycle {
         String parent = "";
         if (cell.parent != null) {
             parent = cell.parent.getClass().getSimpleName();
-        } else if (cell.nestedParent != null) {
-            parent = cell.nestedParent.getClass().getSimpleName();
         }
         textView.setText(
                 cell.id + " pos: " + pos + " " + parent + " " + cell

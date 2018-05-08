@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,22 +24,20 @@
 
 package com.tmall.wireless.tangram.support;
 
-import com.tmall.wireless.tangram.dataparser.concrete.Card;
-import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.util.LogUtils;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.util.LogUtils;
 
 /**
  *
@@ -49,7 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * <pre>
  *     ExposureSupport support = serviceManager.getService(ExposureSupport.class)
- *     support.onExposure(targetView, thisCell, eventType);
+ *     support.onExposure(targetView, thisCell, mEventType);
  * </pre>
  * <p>
  * Which make all the click handlers registered in one place, and decouple the business logic from ComponentViews
@@ -93,10 +91,7 @@ public abstract class ExposureSupport {
     private void findTraceMethods(Method[] methods) {
         for (Method method : methods) {
             String methodName = method.getName();
-            if (!methodName.equals(ON_TRACE_METHOD_NAME) && methodName.startsWith(
-                    ON_TRACE_METHOD_NAME) ||
-                    (methodName.startsWith(ON_TRACE_METHOD_PREFIX) && methodName.endsWith(
-                            ON_TRACE_METHOD_POSTFIX))) {
+            if (isValidTraceMethodName(methodName)) {
                 int modifiers = method.getModifiers();
                 if ((modifiers & Modifier.PUBLIC) != 0 && (modifiers & MODIFIERS_IGNORE) == 0) {
                     Class<?>[] parameterTypes = method.getParameterTypes();
@@ -116,13 +111,15 @@ public abstract class ExposureSupport {
         }
     }
 
+    private boolean isValidTraceMethodName(String methodName) {
+        return !methodName.equals(ON_TRACE_METHOD_NAME) && methodName.startsWith(ON_TRACE_METHOD_NAME) ||
+            (methodName.startsWith(ON_TRACE_METHOD_PREFIX) && methodName.endsWith(ON_TRACE_METHOD_POSTFIX));
+    }
+
     private void findExposureMethods(Method[] methods) {
         for (Method method : methods) {
             String methodName = method.getName();
-            if (!methodName.equals(ON_EXPOSURE_METHOD_NAME) && methodName.startsWith(
-                    ON_EXPOSURE_METHOD_NAME) ||
-                    (methodName.startsWith(ON_EXPOSURE_METHOD_PREFIX) && methodName.endsWith(
-                            ON_EXPOSURE_METHOD_POSTFIX))) {
+            if (isValidExposureMethodName(methodName)) {
                 int modifiers = method.getModifiers();
                 if ((modifiers & Modifier.PUBLIC) != 0 && (modifiers & MODIFIERS_IGNORE) == 0) {
                     Class<?>[] parameterTypes = method.getParameterTypes();
@@ -140,6 +137,11 @@ public abstract class ExposureSupport {
                 }
             }
         }
+    }
+
+    private boolean isValidExposureMethodName(String methodName) {
+        return !methodName.equals(ON_EXPOSURE_METHOD_NAME) && methodName.startsWith(ON_EXPOSURE_METHOD_NAME) ||
+            (methodName.startsWith(ON_EXPOSURE_METHOD_PREFIX) && methodName.endsWith(ON_EXPOSURE_METHOD_POSTFIX));
     }
 
     /**
@@ -257,20 +259,11 @@ public abstract class ExposureSupport {
 
     public abstract void onExposure(@NonNull Card card, int offset, int position);
 
-    public void onExposureReaptly(@NonNull Card card, int offset, int position) {
-
-    }
-
-    public void attachTrackInfoToView(View targetView, BaseCell baseCell, int spmD) {
-
-    }
-
-    public void attachTrackInfoToView(View targetView, BaseCell baseCell, int spmD,
-            HashMap<String, Object> extras) {
-
-    }
-
     public void attachUtInfoToView(View targetView, BaseCell baseCell) {
 
     }
+
+    public void destroy() {
+    }
+
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -58,18 +58,18 @@ public class OnePlusNCard extends Card {
 
     @Override
     protected void parseHeaderCell(@NonNull MVHelper resolver, @Nullable JSONObject header) {
-        BaseCell mHeader = createCell(resolver, header, true);
+        BaseCell mHeader = createCell(this, resolver, header, serviceManager, true);
         ensureBlock(mHeader);
     }
 
     @Override
     protected void parseFooterCell(@NonNull MVHelper resolver, @Nullable JSONObject footer) {
-        BaseCell mFooter = createCell(resolver, footer, true);
+        BaseCell mFooter = createCell(this, resolver, footer, serviceManager, true);
         ensureBlock(mFooter);
     }
 
     private void ensureBlock(BaseCell cell) {
-        if (cell != null) {
+        if (cell.isValid()) {
             if (cell.style.extras == null) {
                 cell.style.extras = new JSONObject();
             }

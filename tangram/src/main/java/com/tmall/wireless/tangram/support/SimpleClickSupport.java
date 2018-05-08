@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,19 @@
 
 package com.tmall.wireless.tangram.support;
 
-import android.support.v4.util.ArrayMap;
-import android.util.Log;
-import android.view.View;
-
-import com.tmall.wireless.tangram.dataparser.concrete.Cell;
-import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.util.LogUtils;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import android.support.v4.util.ArrayMap;
+import android.util.Log;
+import android.view.View;
+import com.tmall.wireless.tangram.dataparser.concrete.Cell;
+import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.util.LogUtils;
 
 
 /**
@@ -48,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * <pre>
  *     SimpleClickSupport support = serviceManager.getService(SimpleClickSupport.class)
- *     support.onClick(targetView, thisCell, eventType, [params]);
+ *     support.onClick(targetView, thisCell, mEventType, [params]);
  * </pre>
  * <p>
  * Which make all the click handlers registered in one place, and decouple the business logic from ComponentViews
@@ -86,8 +84,7 @@ public abstract class SimpleClickSupport {
     private void findClickMethods(Method[] methods) {
         for (Method method : methods) {
             String methodName = method.getName();
-            if (!methodName.equals(ON_CLICK_METHOD_NAME) && methodName.startsWith(ON_CLICK_METHOD_NAME) ||
-                    (methodName.startsWith(ON_CLICK_METHOD_PREFIX) && methodName.endsWith(ON_CLICK_METHOD_POSTFIX))) {
+            if (isValidMethodName(methodName)) {
                 int modifiers = method.getModifiers();
                 if ((modifiers & Modifier.PUBLIC) != 0 && (modifiers & MODIFIERS_IGNORE) == 0) {
                     Class<?>[] parameterTypes = method.getParameterTypes();
@@ -111,6 +108,11 @@ public abstract class SimpleClickSupport {
                 }
             }
         }
+    }
+
+    private boolean isValidMethodName(String methodName) {
+        return !methodName.equals(ON_CLICK_METHOD_NAME) && methodName.startsWith(ON_CLICK_METHOD_NAME) ||
+            (methodName.startsWith(ON_CLICK_METHOD_PREFIX) && methodName.endsWith(ON_CLICK_METHOD_POSTFIX));
     }
 
     /**
@@ -191,6 +193,9 @@ public abstract class SimpleClickSupport {
             this.paramLength = paramLength;
             this.method = method;
         }
+    }
+
+    public void destroy() {
     }
 
 }

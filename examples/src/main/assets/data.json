@@ -29,6 +29,47 @@
     ]
   },
   {
+    "type": "container-oneColumn",
+    "items": [
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "暴走大事件第五季暴走大事件第五季暴走大事件第五季",
+        "play": "23343454",
+        "danmu": "13234",
+        "test": "分区1",
+        "type": "Debug"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "说说你在B站的故事",
+        "play": "5445667",
+        "danmu": "2134",
+        "test": "分区2",
+        "type": "Debug"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "切格瓦拉东京偷车切格瓦拉东京偷车切格瓦拉东京偷车",
+        "play": "496",
+        "danmu": "23",
+        "test": "分区3",
+        "type": "Debug"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "Five to Go 大学生短片",
+        "play": "369",
+        "danmu": "5",
+        "test": "分区4",
+        "type": "Debug"
+      }
+    ]
+  },
+  {
     "id": "banner1",
     "type": 1,
     "style": {
@@ -48,7 +89,6 @@
     ]
   },
   {
-    "type": "container-scroll",
     "style": {
       "pageWidth": 200,
       "pageHeight": 100,
@@ -61,7 +101,6 @@
       "indicatorHeight": "1.5",
       "itemRatio": "2.654",
       "scrollMarginRight": "10",
-      "autoScroll": "5000",
       "indicatorGravity": "center",
       "hGap": "20"
     },
@@ -108,6 +147,7 @@
     "type": "container-oneColumn",
     "items": [
       {
+        "id": "banner1",
         "type": "container-banner",
         "style": {
           "indicatorMargin": "5",
@@ -119,7 +159,6 @@
           "indicatorHeight": "1.5",
           "itemRatio": "2.654",
           "scrollMarginRight": "10",
-          "autoScroll": "5000",
           "indicatorGravity": "center",
           "hGap": "20",
           "height": 200
@@ -182,7 +221,6 @@
           "indicatorHeight": "1.5",
           "itemRatio": "2.654",
           "scrollMarginRight": "10",
-          "autoScroll": "5000",
           "indicatorGravity": "center",
           "hGap": "20"
         },
@@ -302,7 +340,8 @@
     ]
   },
   {
-    "type": "10",
+    "type": "container-banner",
+    "id": "banner2",
     "style": {
       "indicatorImg1": "https://gw.alicdn.com/tps/TB16RaxLpXXXXbIXFXXXXXXXXXX-14-14.png",
       "indicatorImg2": "https://gw.alicdn.com/tps/TB1m79uLpXXXXXUXVXXXXXXXXXX-18-16.png",
@@ -630,7 +669,6 @@
     ]
   },
   {
-    "type": 7,
     "style": {
       "align": "bottom_left",
       "x": 200,

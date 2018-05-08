@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,42 +24,47 @@
 
 package com.tmall.wireless.tangram.structure;
 
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.util.SparseArray;
+import android.view.View;
+import android.widget.ImageView;
 import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.ComponentLifecycle;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
-import com.tmall.wireless.tangram.expression.ITangramExprParser;
-import com.tmall.wireless.tangram.expression.TangramExpr;
+import com.tmall.wireless.tangram.op.ClickExposureCellOp;
+import com.tmall.wireless.tangram.op.UpdateCellOp;
+import com.tmall.wireless.tangram.support.CellClickObservable;
+import com.tmall.wireless.tangram.support.CellExposureObservable;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
+import com.tmall.wireless.tangram.util.BDE;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
-
+import com.tmall.wireless.tangram.util.LifeCycleProviderImpl;
+import io.reactivex.subjects.PublishSubject;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
-import android.view.View;
-import android.widget.ImageView;
-
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by mikeafc on 16/4/25.
  */
-public class BaseCell<V extends View> extends ComponentLifecycle implements View.OnClickListener,
-    ITangramExprParser {
+public class BaseCell<V extends View> extends ComponentLifecycle implements View.OnClickListener {
+
+    public static final BaseCell NaN = new NanBaseCell();
+
     private static AtomicLong sIdGen = new AtomicLong();
 
     public static boolean sIsGenIds = false;
 
     /**
-     * cell's type
+     * cell's type, use {@link #stringType} instead
      */
     @Deprecated
     public int type;
@@ -68,11 +73,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
      * cell's type
      */
     public String stringType;
-
-    /**
-     * indicate whether this cell is a cellized card
-     */
-    public boolean inlineCard;
 
     /**
      * parent's id
@@ -86,74 +86,15 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public Card parent;
 
     /**
-     * the parent of a cellized card
-     */
-    public ComponentLifecycle nestedParent;
-
-    /**
      * id of a cell
      */
     @Nullable
     public String id;
 
     /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String action;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String pageParam;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String scm;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String spm;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String syncIds;
-
-    /**
      * the natural position this cell in its parent
      */
     public int pos;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String title;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String subTitle;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public int titleColor = -1;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public int subTitleColor = -1;
 
     /**
      * position that assigned from server side
@@ -186,18 +127,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     private ArrayMap<String, Object> bizParaMap = new ArrayMap<>(32);
 
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public String imgUrl;
-
-    /**
-     * do not use it, would be removed in future
-     */
-    //@Deprecated
-    //public float urlRatio = Float.NaN;
-
     private ArrayMap<Integer, Integer> innerClickMap = new ArrayMap<>();
 
     @Nullable
@@ -207,10 +136,16 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     private SparseArray<Object> mTag;
 
+    private PublishSubject<UpdateCellOp> mUpdateCellOpObservable = PublishSubject.create();
+
     public BaseCell() {
         objectId = sIsGenIds ? sIdGen.getAndIncrement() : 0;
     }
 
+    /**
+     * Use {@link #BaseCell(String)} instead
+     * @param type
+     */
     @Deprecated
     public BaseCell(int type) {
         this.type = type;
@@ -263,6 +198,10 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         innerClickMap.remove(view.hashCode());
     }
 
+    /**
+     * Do not call this method as its poor performance.
+     */
+    @Deprecated
     public final void notifyDataChange() {
         if (serviceManager instanceof Engine) {
             ((Engine) serviceManager).refresh(false);
@@ -407,16 +346,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         return true;
     }
 
-    @Override
-    public Object getValueBy(TangramExpr var) {
-        if (var.hasNextFragment()) {
-            String next = var.nextFragment();
-            return optParam(next);
-        } else {
-            return extras;
-        }
-    }
-
     /**
      * bind a tag to baseCell
      * @param key
@@ -440,4 +369,102 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         }
         return null;
     }
+
+    private ArrayMap<View, ClickExposureCellOp> mRxExposureEvents = new ArrayMap<>();
+
+    private ArrayMap<View, CellExposureObservable> mViewExposureObservables = new ArrayMap<>();
+
+    /**
+     * @param targetView
+     * @param rxClickExposureEvent
+     * @since 3.0.0
+     */
+    public CellExposureObservable exposure(View targetView, ClickExposureCellOp rxClickExposureEvent) {
+        CellExposureObservable cellExposureObservable = mViewExposureObservables.get(targetView);
+        if (cellExposureObservable == null) {
+            cellExposureObservable = new CellExposureObservable(rxClickExposureEvent);
+            mViewExposureObservables.put(targetView, cellExposureObservable);
+        } else {
+            cellExposureObservable.setRxClickExposureEvent(rxClickExposureEvent);
+        }
+        return cellExposureObservable;
+    }
+
+    /**
+     * @param targetView
+     * @since 3.0.0
+     */
+    public CellExposureObservable exposure(View targetView) {
+        ClickExposureCellOp rxExposureEvent = mRxExposureEvents.get(targetView);
+        if (rxExposureEvent == null) {
+            rxExposureEvent = new ClickExposureCellOp(targetView, this, this.pos);
+            mRxExposureEvents.put(targetView, rxExposureEvent);
+        } else {
+            rxExposureEvent.setArg1(targetView);
+            rxExposureEvent.setArg2(this);
+            rxExposureEvent.setArg3(this.pos);
+        }
+        return exposure(targetView, rxExposureEvent);
+    }
+
+    private ArrayMap<View, ClickExposureCellOp> mRxClickEvents = new ArrayMap<>();
+
+    private ArrayMap<View, CellClickObservable> mViewClickObservables = new ArrayMap<>();
+
+    /**
+     * @param view
+     * @param rxClickExposureEvent
+     * @since 3.0.0
+     */
+    public CellClickObservable click(View view, ClickExposureCellOp rxClickExposureEvent) {
+        CellClickObservable cellClickObservable = mViewClickObservables.get(view);
+        if (cellClickObservable == null) {
+            cellClickObservable = new CellClickObservable(rxClickExposureEvent);
+            mViewClickObservables.put(view, cellClickObservable);
+        } else {
+            cellClickObservable.setRxClickExposureEvent(rxClickExposureEvent);
+        }
+        return cellClickObservable;
+    }
+
+    /**
+     * @param view
+     * @since 3.0.0
+     */
+    public CellClickObservable click(View view) {
+        ClickExposureCellOp rxClickEvent = mRxClickEvents.get(view);
+        if (rxClickEvent == null) {
+            rxClickEvent = new ClickExposureCellOp(view, this, this.pos);
+            mRxClickEvents.put(view, rxClickEvent);
+        } else {
+            rxClickEvent.setArg1(view);
+            rxClickEvent.setArg2(this);
+            rxClickEvent.setArg3(this.pos);
+        }
+        return click(view, rxClickEvent);
+    }
+
+    public static final class NanBaseCell extends BaseCell {
+        @Override
+        public boolean isValid() {
+            return false;
+        }
+    }
+
+    private LifeCycleProviderImpl<BDE> mLifeCycleProvider;
+
+
+    public void emitNext(BDE event) {
+        if (mLifeCycleProvider == null) {
+            mLifeCycleProvider = new LifeCycleProviderImpl<>();
+        }
+        mLifeCycleProvider.emitNext(event);
+    }
+
+    public LifeCycleProviderImpl<BDE> getLifeCycleProvider() {
+        return mLifeCycleProvider;
+    }
+
+
+
 }

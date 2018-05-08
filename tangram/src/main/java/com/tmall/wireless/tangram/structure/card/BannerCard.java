@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +81,7 @@ public class BannerCard extends Card {
             obj.put("type", TangramBuilder.TYPE_CAROUSEL_CELL);
             obj.put("bizId", id);
 
-            resolver.parseCell(resolver, cell, obj);
+            resolver.parseCell(cell, obj);
 
             if (!super.getCells().isEmpty()) {
                 cell.mCells.addAll(super.getCells());
@@ -102,8 +102,8 @@ public class BannerCard extends Card {
 
     @Override
     protected void parseHeaderCell(@NonNull MVHelper resolver, @Nullable JSONObject header) {
-        cell.mHeader = createCell(resolver, header, false);
-        if (cell.mHeader != null) {
+        cell.mHeader = createCell(this, resolver, header, serviceManager, false);
+        if (cell.mHeader.isValid()) {
             cell.mHeader.parent = this;
             cell.mHeader.parentId = id;
             cell.mHeader.pos = 0;
@@ -116,11 +116,11 @@ public class BannerCard extends Card {
 
     @Override
     protected void parseFooterCell(@NonNull MVHelper resolver, @Nullable JSONObject footer) {
-        cell.mFooter = createCell(resolver, footer, false);
-        if (cell.mFooter != null) {
+        cell.mFooter = createCell(this, resolver, footer, serviceManager, false);
+        if (cell.mFooter.isValid()) {
             cell.mFooter.parent = this;
             cell.mFooter.parentId = id;
-            cell.mFooter.pos = cell.mHeader != null ? getCells().size() + 1: getCells().size();
+            cell.mFooter.pos = cell.mHeader.isValid() ? getCells().size() + 1: getCells().size();
             try {
                 cell.mFooter.extras.put(MVResolver.KEY_INDEX, cell.mFooter.pos);
             } catch (JSONException e) {

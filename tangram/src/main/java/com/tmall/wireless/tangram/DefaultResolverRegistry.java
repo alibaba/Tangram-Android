@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -93,7 +93,7 @@ public class DefaultResolverRegistry {
         if (viewHolderMap.get(type) == null) {
             mDefaultCellBinderResolver.register(type, new BaseCellBinder<>(viewClz, mMVHelper));
         } else {
-            mDefaultCellBinderResolver.register(type, new BaseCellBinder<>(viewHolderMap.get(type),
+            mDefaultCellBinderResolver.register(type, new BaseCellBinder<ViewHolderCreator.ViewHolder, V>(viewHolderMap.get(type),
                 mMVHelper));
         }
         mMVHelper.resolver().register(type, viewClz);

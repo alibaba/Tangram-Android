@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,20 @@
  * SOFTWARE.
  */
 
-package com.tmall.wireless.tangram.expression;
+package com.tmall.wireless.tangram.op;
+
+import com.tmall.wireless.tangram.core.service.ServiceManager;
+import org.json.JSONObject;
 
 /**
- * Created by longerian on 16/8/23.
+ * Created by longerian on 2018/3/28.
+ *
+ * @author longerian
+ * @date 2018/03/28
  */
 
-public interface ITangramExprParser {
-
-    Object getValueBy(TangramExpr var);
-
+public class ParseSingleGroupOp extends TangramOp2<JSONObject, ServiceManager> {
+    public ParseSingleGroupOp(JSONObject arg1, ServiceManager arg2) {
+        super(arg1, arg2);
+    }
 }

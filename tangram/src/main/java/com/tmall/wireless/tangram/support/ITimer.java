@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@
  */
 
 package com.tmall.wireless.tangram.support;
+
+import com.tmall.wireless.tangram.support.HandlerTimer.TimerStatus;
+import com.tmall.wireless.tangram.support.TimerSupport.OnTickListener;
 
 /**
  * Created by villadora on 15/8/31.
@@ -55,8 +58,23 @@ public interface ITimer {
     void stop();
 
     /**
+     * clear listeners
+     */
+    void clear();
+
+    /**
      * cancel timer
      */
     void cancel();
 
+    /**
+     * @return timer status
+     */
+    TimerStatus getStatus();
+
+    void register(int interval, OnTickListener onTickListener, boolean immediate);
+
+    void unregister(OnTickListener onTickListener);
+
+    boolean isRegistered(OnTickListener onTickListener);
 }

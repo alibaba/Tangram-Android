@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -91,7 +91,7 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      * Post an event to the bus, called by event sender
-     * @param event Event object
+     * @param event TangramOp1 object
      * @return Return true if the event is successfully enqueued into the event queue.
      */
     public boolean post(@NonNull Event event) {
@@ -100,7 +100,7 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      * Post a list of events to the bus, called by event sender
-     * @param eventList Event object list
+     * @param eventList TangramOp1 object list
      * @return Return true if the events are successfully enqueued into the event queue.
      */
     public boolean post(@NonNull List<Event> eventList) {
@@ -109,7 +109,7 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      * Dispatch event to a subscriber, you should not call this method directly.
-     * @param event Event object
+     * @param event TangramOp1 object
      */
     @Override
     public synchronized void dispatch(@NonNull Event event) {
@@ -138,12 +138,12 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      *
-     * @param type Event type to identify an event.
-     * @param sourceId Event sender's unique id. If sourceId is empty, the event would be dispatched to any
+     * @param type TangramOp1 type to identify an event.
+     * @param sourceId TangramOp1 sender's unique id. If sourceId is empty, the event would be dispatched to any
      *                 subscribers which is registered to receive events with 'type'. Otherwise, the event would be
      *                 dispatched to any subscribers which is registered to receive events with 'type' and this 'sourceId'.
-     * @param args Event args, may be null.
-     * @param eventContext Event context, see {@link EventContext}, may by null.
+     * @param args TangramOp1 args, may be null.
+     * @param eventContext TangramOp1 context, see {@link EventContext}, may by null.
      * @return An event object from recycler pool. It is suggested to use this method to obtain an event object. The
      * returned object's field is filled provided params.
      */
@@ -162,7 +162,7 @@ public class BusSupport implements IDispatcherDelegate {
      * @param type The event type subcriber is interested.
      * @param producer The event source id subscriber is interested.
      * @param subscriber Original subscriber object.
-     * @param action The name of callback method with parameter 'Event'. If empty, the subscribe must provide a handler method named 'execute'. See {@link ReflectedActionFinder}
+     * @param action The name of callback method with parameter 'TangramOp1'. If empty, the subscribe must provide a handler method named 'execute'. See {@link ReflectedActionFinder}
      * @return An EventHandlerWrapper wrapping a subscriber and used to registered into event bus.
      */
     public static EventHandlerWrapper wrapEventHandler(@NonNull String type, String producer, @NonNull Object subscriber,

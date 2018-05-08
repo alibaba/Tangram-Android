@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -89,8 +89,6 @@ public class BaseCellBinder<T extends ViewHolderCreator.ViewHolder, V extends Vi
 
     @Override
     public void mountView(@NonNull BaseCell data, @NonNull V view) {
-        // TODO: generate mounter like properties setter
-        // delegate to cell
         mMvHelper.mountView(data, view);
     }
 

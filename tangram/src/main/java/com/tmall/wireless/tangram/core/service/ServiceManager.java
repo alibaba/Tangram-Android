@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,4 +43,10 @@ public interface ServiceManager {
      * @return The registered service object.
      */
     <T> T getService(Class<T> type);
+
+    /**
+     * Do not call this outside, this method maybe deleted after official release.
+     * @return true, enable rx features, false, do not enable
+     */
+    boolean supportRx();
 }

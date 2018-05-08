@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,11 +35,9 @@ import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
-import com.tmall.wireless.tangram.expression.ITangramExprParser;
-import com.tmall.wireless.tangram.expression.TangramExpr;
 import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.structure.entitycard.BannerEntityCard;
-import com.tmall.wireless.tangram.structure.entitycard.LinearScrollEntityCard;
+import com.tmall.wireless.tangram.structure.card.BannerCard;
+import com.tmall.wireless.tangram.structure.card.LinearScrollCard;
 import com.tmall.wireless.tangram.support.CardSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -73,7 +71,9 @@ import java.util.Map;
  * Basic Card, which will represent LayoutHelpers
  * <p/>
  */
-public abstract class Card extends ComponentLifecycle implements ITangramExprParser {
+public abstract class Card extends ComponentLifecycle {
+
+    public static final Card NaN = new NaNCard();
 
     private static final String TAG = "Card";
 
@@ -114,13 +114,11 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
     @Nullable
     public String id;
 
-    protected
     @Nullable
-    BaseCell mHeader;
+    protected BaseCell mHeader;
 
-    protected
     @Nullable
-    BaseCell mFooter;
+    protected BaseCell mFooter;
 
     @NonNull
     protected ArrayMap<Range<Integer>, Card> mChildren = new ArrayMap<>();
@@ -172,6 +170,10 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
      */
     public boolean hasMore = false;
 
+    /**
+     * Not used
+     */
+    @Deprecated
     public int rowId;
 
     /**
@@ -185,8 +187,6 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
     @Nullable
     public ServiceManager serviceManager;
 
-
-    // TODO: back store refactor
     @Nullable
     private Map<String, Object> mParams;
 
@@ -255,7 +255,7 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
             final int cellLength = Math.min(componentArray.length(), maxChildren);
             for (int i = 0; i < cellLength; i++) {
                 final JSONObject cellData = componentArray.optJSONObject(i);
-                createCell(resolver, cellData, true);
+                createCell(this, resolver, cellData, serviceManager, true);
             }
         }
         // parsing footer
@@ -270,21 +270,23 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
 
     }
 
-    protected BaseCell createCell(@NonNull MVHelper resolver, @Nullable JSONObject cellData, boolean appended) {
+    public static BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,
+        @NonNull ServiceManager serviceManager, boolean appended) {
         if (cellData != null) {
             BaseCell cell = null;
             String cellType = cellData.optString(Card.KEY_TYPE);
-            if ((getMVHelper() != null && getMVHelper().resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
+            if ((resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
                 if (resolver.resolver().isCompatibleType(cellType)) {
                     cell = Utils.newInstance(resolver.resolver().getCellClass(cellType));
 
                     //do not display when newInstance failed
-                    if (cell == null)
-                        return null;
+                    if (cell == null) {
+                        return BaseCell.NaN;
+                    }
 
                     cell.serviceManager = serviceManager; // ensure service manager
                 } else {
-                    if (Utils.isCard(cellData)) {
+                    if (Utils.isCard(cellData) && parent != null) {
                         switch (cellType) {
                             case TangramBuilder.TYPE_CONTAINER_FLOW:
                             case TangramBuilder.TYPE_CONTAINER_1C_FLOW:
@@ -296,30 +298,50 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
                                 Card gridCard = cardResolver.create(cellType);
                                 gridCard.serviceManager = serviceManager;
                                 gridCard.parseWith(cellData, resolver);
-                                addChildCard(gridCard);
+                                parent.addChildCard(gridCard);
                                 break;
                             case TangramBuilder.TYPE_CONTAINER_BANNER:
-                                cell = new BannerEntityCard();
+                                BannerCard bannerCard = new BannerCard();
+                                bannerCard.serviceManager = serviceManager;
+                                bannerCard.parseWith(cellData, resolver);
+                                List<BaseCell> bannerChildren = bannerCard.getCells();
+                                if (bannerChildren.size() > 0) {
+                                    cell = bannerCard.getCells().get(0);
+                                }
                                 break;
                             case TangramBuilder.TYPE_CONTAINER_SCROLL:
-                                cell = new LinearScrollEntityCard();
+                                LinearScrollCard linearScrollCard = new LinearScrollCard();
+                                linearScrollCard.serviceManager = serviceManager;
+                                linearScrollCard.parseWith(cellData, resolver);
+                                List<BaseCell> scrollChildren = linearScrollCard.getCells();
+                                if (scrollChildren.size() > 0) {
+                                    cell = linearScrollCard.getCells().get(0);
+                                }
                                 break;
                         }
                         if (cell != null) {
                             cell.serviceManager = serviceManager;
-                            cell.parent = this;
-                            cell.parentId = id;
+                            if (parent != null) {
+                                cell.parent = parent;
+                                cell.parentId = parent.id;
+                            }
                         } else {
-                            return null;
+                            return BaseCell.NaN;
                         }
                     } else {
                         cell = new BaseCell(cellType);
                         cell.serviceManager = serviceManager;
-                        cell.parent = this;
-                        cell.parentId = id;
+                        if (parent != null) {
+                            cell.parent = parent;
+                            cell.parentId = parent.id;
+                        }
                     }
                 }
-                parseCell(resolver, cellData, cell, appended);
+                if (parent != null) {
+                    parent.parseCell(resolver, cellData, cell, appended);
+                } else {
+                    resolver.parseCell(cell, cellData);
+                }
                 cell.setStringType(cellType);
                 return cell;
             } else {
@@ -328,21 +350,25 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
                 if (componentBinderResolver.has(cellType)) {
                     cell = new BaseCell(cellType);
                     cell.serviceManager = serviceManager;
-                    cell.parent = this;
-                    cell.parentId = id;
-                    parseCell(resolver, cellData, cell, appended);
+                    if (parent != null) {
+                        cell.parent = parent;
+                        cell.parentId = parent.id;
+                        parent.parseCell(resolver, cellData, cell, appended);
+                    } else {
+                        resolver.parseCell(cell, cellData);
+                    }
                     cell.setStringType(cellType);
                     return cell;
                 } else {
-                    return null;
+                    return BaseCell.NaN;
                 }
             }
         }
-        return null;
+        return BaseCell.NaN;
     }
 
     protected void parseCell(@NonNull MVHelper resolver, @NonNull JSONObject data, @NonNull final BaseCell cell, boolean appended) {
-        resolver.parseCell(resolver, cell, data);
+        resolver.parseCell(cell, data);
         //noinspection unchecked
         if (appended && !addCellInternal(cell, false)) {
             if (TangramBuilder.isPrintLog())
@@ -512,14 +538,17 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
                 exposureSupport.onExposure(this, offset, position);
             }
         }
-        if (offset == 0) {
-            ExposureSupport exposureSupport = serviceManager.getService(ExposureSupport.class);
-            if (exposureSupport != null) {
-                exposureSupport.onExposureReaptly(this, offset, position);
-            }
-        }
     }
 
+    public BaseCell getCellById(String id) {
+        for (int i = 0, size = mCells.size(); i < size; i++) {
+            BaseCell target = mCells.get(i);
+            if (target.id != null && target.id.equals(id)) {
+                return target;
+            }
+        }
+        return null;
+    }
 
     public List<BaseCell> getCells() {
         return Collections.unmodifiableList(mCells);
@@ -1084,24 +1113,12 @@ public abstract class Card extends ComponentLifecycle implements ITangramExprPar
         }
     }
 
-    @Override
-    public Object getValueBy(TangramExpr var) {
-        if (var.hasNextFragment()) {
-            String next = var.nextFragment();
-            try {
-                int index = Integer.parseInt(next);
-                if (mCells != null && mCells.size() > index && index >= 0) {
-                    return mCells.get(index).getValueBy(var);
-                } else {
-                    return null;
-                }
-            } catch (NumberFormatException e) {
-                //TODO return card json feild
-                return null;
-            }
-        } else {
-            //TODO return card json
-            return null;
+    public static final class NaNCard extends Card {
+
+        @Override
+        public boolean isValid() {
+            return false;
         }
     }
+
 }

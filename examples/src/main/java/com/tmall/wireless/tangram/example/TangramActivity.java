@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,7 @@ import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.TangramEngine;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.example.data.DEBUG;
 import com.tmall.wireless.tangram.example.data.RatioTextView;
 import com.tmall.wireless.tangram.example.data.SimpleImgView;
 import com.tmall.wireless.tangram.example.data.SingleImageView;
@@ -47,15 +48,25 @@ import com.tmall.wireless.tangram.example.data.VVTEST;
 import com.tmall.wireless.tangram.example.support.SampleClickSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
+import com.tmall.wireless.tangram.support.BannerSupport;
+import com.tmall.wireless.tangram.support.RxBannerScrolledListener.ScrollEvent;
 import com.tmall.wireless.tangram.support.async.AsyncLoader;
 import com.tmall.wireless.tangram.support.async.AsyncPageLoader;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 
+import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
 import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
+import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,7 +91,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.Callable;
 
 /**
  * Created by villadora on 15/8/18.
@@ -134,21 +145,16 @@ public class TangramActivity extends Activity {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            Picasso.setSingletonInstance(new Picasso.Builder(this).loggingEnabled(true).build());
-        } catch (Exception e) {
-
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         recyclerView = (RecyclerView) findViewById(R.id.main_view);
 
         //Step 1: init tangram
-        TangramBuilder.init(this, new IInnerImageSetter() {
+        TangramBuilder.init(this.getApplicationContext(), new IInnerImageSetter() {
             @Override
             public <IMAGE extends ImageView> void doLoadImageUrl(@NonNull IMAGE view,
                     @Nullable String url) {
-                Picasso.with(TangramActivity.this).load(url).into(view);
+                Picasso.with(TangramActivity.this.getApplicationContext()).load(url).into(view);
             }
         }, ImageView.class);
 
@@ -171,6 +177,7 @@ public class TangramActivity extends Activity {
         //Step 4: new engine
         engine = builder.build();
         engine.setVirtualViewTemplate(VVTEST.BIN);
+        engine.setVirtualViewTemplate(DEBUG.BIN);
         engine.getService(VafContext.class).setImageLoaderAdapter(new IImageLoaderAdapter() {
 
             private List<ImageTarget> cache = new ArrayList<ImageTarget>();
@@ -304,13 +311,15 @@ public class TangramActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
 
-        findViewById(R.id.first).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                engine.refresh(true);
-            }
-        });
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (engine != null) {
+            engine.destroy();
+        }
+        ImageUtils.setImageSetter(null);
     }
 
     public static byte[] getAssertsFile(Context context, String fileName) {

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,12 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
-import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.CellRender;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
 import com.tmall.wireless.tangram.support.CellSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
+import com.tmall.wireless.tangram.util.BDE;
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.virtualview.core.IContainer;
 import com.tmall.wireless.vaf.virtualview.core.ViewBase;
@@ -86,8 +86,8 @@ public class MVHelper {
         mVafContext = vafContext;
     }
 
-    public void parseCell(MVHelper resolver, BaseCell cell, JSONObject json) {
-        mvResolver.parseCell(resolver, cell, json);
+    public void parseCell(BaseCell cell, JSONObject json) {
+        mvResolver.parseCell(this, cell, json);
     }
 
     /**
@@ -116,6 +116,9 @@ public class MVHelper {
         try {
             mvResolver.register(getCellUniqueId(cell), cell, view);
             if (cell.serviceManager != null) {
+                if (cell.serviceManager.supportRx()) {
+                    cell.emitNext(BDE.BIND);
+                }
                 CellSupport cellSupport = cell.serviceManager.getService(CellSupport.class);
                 if (cellSupport != null) {
                     cellSupport.bindView(cell, view);
@@ -136,8 +139,8 @@ public class MVHelper {
                 renderView(cell, view);
                 renderStyle(cell, view);
             }
-            if (resolver().isCompatibleType(cell.stringType)) {
-                resolver().getCellClass(cell.stringType).cast(cell).bindView(view);
+            if (mvResolver.isCompatibleType(cell.stringType)) {
+                mvResolver.getCellClass(cell.stringType).cast(cell).bindView(view);
             }
             postMountView(cell, view);
             if (cell.serviceManager != null) {
@@ -160,13 +163,7 @@ public class MVHelper {
     public String getCellUniqueId(BaseCell cell) {
         String flareId = cellFlareIdMap.get(cell);
         if (flareId == null) {
-            String parentId = "";
-            if (cell.parent instanceof Card) {
-                parentId = ((Card) cell.parent).id;
-            } else if (cell.nestedParent instanceof BaseCell) {
-                parentId = ((BaseCell) cell.nestedParent).id;
-            }
-            flareId = String.format("%s_%s", cell.parent == null ? "null" : parentId, cell.pos);
+            flareId = String.format("%s_%s", cell.parent == null ? "null" : cell.parent.id, cell.pos);
             cellFlareIdMap.put(cell, flareId);
         }
         return flareId;
@@ -177,6 +174,11 @@ public class MVHelper {
             ViewBase vb = ((IContainer)view).getVirtualView();
             vb.reset();
         }
+        if (cell.serviceManager != null) {
+            if (cell.serviceManager.supportRx()) {
+                cell.emitNext(BDE.UNBIND);
+            }
+        }
         postUnMountView(cell, view);
         if (cell.serviceManager != null) {
             CellSupport cellSupport = cell.serviceManager.getService(CellSupport.class);
@@ -184,8 +186,8 @@ public class MVHelper {
                 cellSupport.unBindView(cell, view);
             }
         }
-        if (resolver().isCompatibleType(cell.stringType)) {
-            resolver().getCellClass(cell.stringType).cast(cell).unbindView(view);
+        if (mvResolver.isCompatibleType(cell.stringType)) {
+            mvResolver.getCellClass(cell.stringType).cast(cell).unbindView(view);
         }
     }
 
@@ -425,8 +427,8 @@ public class MVHelper {
                 }
             }
         }
-        if (resolver().isCompatibleType(cell.stringType)) {
-            resolver().getCellClass(cell.stringType).cast(cell).postBindView(view);
+        if (mvResolver.isCompatibleType(cell.stringType)) {
+            mvResolver.getCellClass(cell.stringType).cast(cell).postBindView(view);
         }
     }
 

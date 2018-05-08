@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,15 +32,20 @@ import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.dataparser.DataParser;
+import com.tmall.wireless.tangram.op.ParseComponentsOp;
+import com.tmall.wireless.tangram.op.ParseGroupsOp;
+import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
+import com.tmall.wireless.tangram.op.ParseSingleComponentOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.SlideCard;
 import com.tmall.wireless.tangram.structure.card.WrapCellCard;
-import com.tmall.wireless.tangram.structure.entitycard.BannerEntityCard;
-import com.tmall.wireless.tangram.structure.entitycard.LinearScrollEntityCard;
 import com.tmall.wireless.tangram.util.LogUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
-import com.tmall.wireless.tangram.util.Utils;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.functions.Function;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,10 +55,13 @@ import java.util.List;
 /**
  * DataParser parse JSONArray into Card/Cell
  */
-public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> {
+public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card, BaseCell> {
 
     private static final String TAG = "PojoDataParser";
 
+    /**
+     * {@inheritDoc}
+     */
     @NonNull
     @Override
     public List<Card> parseGroup(@NonNull JSONArray data, @NonNull final ServiceManager serviceManager) {
@@ -61,97 +69,66 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
         Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
         final MVHelper cellResolver = serviceManager.getService(MVHelper.class);
         Preconditions.checkState(cellResolver != null, "Must register CellResolver into ServiceManager first");
-
         final int size = data.length();
         final List<Card> result = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             JSONObject cardData = data.optJSONObject(i);
-            if (cardData != null) {
-                final String cardType = cardData.optString(Card.KEY_TYPE);
-                if (!TextUtils.isEmpty(cardType)) {
-                    final Card card = cardResolver.create(cardType);
-                    if (card != null) {
-                        card.rowId = i;
-                        card.serviceManager = serviceManager;
-                        card.parseWith(cardData, cellResolver);
-                        card.type = cardData.optInt(Card.KEY_TYPE, -1);
-                        card.stringType = cardType;
-                        if (card.isValid()) {
-                            if (card instanceof IDelegateCard) {
-                                List<Card> cards = ((IDelegateCard) card).getCards(new CardResolver() {
-                                    @Override
-                                    public Card create(String type) {
-                                        Card c = cardResolver.create(type);
-                                        c.serviceManager = serviceManager;
-                                        c.id = card.id;
-                                        c.setStringType(cardType);
-                                        c.stringType = cardType;
-                                        c.rowId = card.rowId;
-                                        return c;
-                                    }
-                                });
-                                for (Card c : cards) {
-                                    if (c.isValid()) {
-                                        result.add(c);
-                                    }
-                                }
-                            } else {
-                                if (card.style.slidable) {
-                                    result.add(new SlideCard(card));
-                                } else {
-                                    result.add(card);
-                                }
-                            }
+            final Card card = parseSingleGroup(cardData, serviceManager);
+            if (card != null) {
+                if (card instanceof IDelegateCard) {
+                    List<Card> cards = ((IDelegateCard) card).getCards(new CardResolver() {
+                        @Override
+                        public Card create(String type) {
+                            Card c = cardResolver.create(type);
+                            c.serviceManager = serviceManager;
+                            c.id = card.id;
+                            c.setStringType(type);
+                            c.rowId = card.rowId;
+                            return c;
                         }
-                    } else {
-                        final Card cellCard = new WrapCellCard();
-                        if (cellCard != null) {
-                            cellCard.rowId = i;
-                            cellCard.serviceManager = serviceManager;
-                            cellCard.parseWith(cardData, cellResolver);
-                            cellCard.setStringType(TangramBuilder.TYPE_CONTAINER_1C_FLOW);
-                            if (cellCard.isValid()) {
-                                result.add(cellCard);
-                            }
+                    });
+                    for (Card c : cards) {
+                        if (c.isValid()) {
+                            result.add(c);
                         }
                     }
                 } else {
-                    LogUtils.w(TAG, "Invalid card type when parse JSON data");
+                    result.add(card);
                 }
             }
         }
-
         cellResolver.resolver().setCards(result);
         return result;
     }
 
-    @Nullable
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
     @Override
     public List<BaseCell> parseComponent(JSONArray data, ServiceManager serviceManager) {
-        return parseComponent(data, serviceManager, null);
+        return parseComponent(data, null, serviceManager);
     }
 
-    @Nullable
-    public List<BaseCell> parseComponent(JSONArray data, ServiceManager serviceManager, Card card) {
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    @Override
+    public List<BaseCell> parseComponent(@Nullable JSONArray data, Card parent, ServiceManager serviceManager) {
         if (data == null) {
             return new ArrayList<>();
         }
-
-        final CardResolver cardResolver = serviceManager.getService(CardResolver.class);
-        Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
-        final MVHelper cellResolver = serviceManager.getService(MVHelper.class);
-        Preconditions.checkState(cellResolver != null, "Must register CellResolver into ServiceManager first");
-
         final int size = data.length();
         final List<BaseCell> result = new ArrayList<>(size);
-        //解析 body 组件
+        //parse body
         JSONArray componentArray = data;
         if (componentArray != null) {
             final int cellLength = componentArray.length();
             for (int i = 0; i < cellLength; i++) {
                 final JSONObject cellData = componentArray.optJSONObject(i);
-                BaseCell cell = createCell(cellResolver, cellData, serviceManager);
-                if (cell != null && cellResolver.isValid(cell, serviceManager)) {
+                BaseCell cell = parseSingleComponent(cellData, parent, serviceManager);
+                if (cell != null) {
                     result.add(cell);
                 }
             }
@@ -159,59 +136,148 @@ public final class PojoDataParser extends DataParser<JSONArray, Card, BaseCell> 
         return result;
     }
 
-    protected BaseCell createCell(@NonNull MVHelper resolver, @Nullable JSONObject cellData, ServiceManager serviceManager) {
-        if (cellData != null) {
-            BaseCell cell = null;
-            String cellType = cellData.optString(Card.KEY_TYPE);
-            if ((resolver != null && resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
-                if (resolver.resolver().isCompatibleType(cellType)) {
-                    cell = Utils.newInstance(resolver.resolver().getCellClass(cellType));
-
-                    //do not display when newInstance failed
-                    if (cell == null) {
-                        return null;
-                    }
-
-                    cell.serviceManager = serviceManager;
-                } else {
-                    if (Utils.isCard(cellData)) {
-                        switch (cellType) {
-                            //TODO support parse inline flow card
-                            case TangramBuilder.TYPE_CONTAINER_BANNER:
-                                cell = new BannerEntityCard();
-                                break;
-                            case TangramBuilder.TYPE_CONTAINER_SCROLL:
-                                cell = new LinearScrollEntityCard();
-                                break;
-                        }
-                        if (cell != null) {
-                            cell.serviceManager = serviceManager;
-                        }
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    @Override
+    public Card parseSingleGroup(@Nullable JSONObject data, final ServiceManager serviceManager) {
+        if (data == null) {
+            return Card.NaN;
+        }
+        final CardResolver cardResolver = serviceManager.getService(CardResolver.class);
+        Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
+        final MVHelper cellResolver = serviceManager.getService(MVHelper.class);
+        Preconditions.checkState(cellResolver != null, "Must register CellResolver into ServiceManager first");
+        final String cardType = data.optString(Card.KEY_TYPE);
+        if (!TextUtils.isEmpty(cardType)) {
+            final Card card = cardResolver.create(cardType);
+            if (card != null) {
+                card.serviceManager = serviceManager;
+                card.parseWith(data, cellResolver);
+                card.type = data.optInt(Card.KEY_TYPE, -1);
+                card.stringType = cardType;
+                if (card.isValid()) {
+                    if (card.style.slidable) {
+                        return new SlideCard(card);
                     } else {
-                        cell = new BaseCell(cellType);
-                        cell.serviceManager = serviceManager;
+                        return card;
                     }
                 }
-                if (cell != null) {
-                    resolver.parseCell(resolver, cell, cellData);
-                    cell.setStringType(cellType);
-                }
-                return cell;
             } else {
-                //support virtual view at layout
-                BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
-                if (componentBinderResolver.has(cellType)) {
-                    cell = new BaseCell(cellType);
-                    cell.serviceManager = serviceManager;
-                    resolver.parseCell(resolver, cell, cellData);
-                    cell.setStringType(cellType);
-                    return cell;
-                } else {
-                    return null;
+                final Card cellCard = new WrapCellCard();
+                if (cellCard != null) {
+                    cellCard.serviceManager = serviceManager;
+                    cellCard.parseWith(data, cellResolver);
+                    cellCard.setStringType(TangramBuilder.TYPE_CONTAINER_1C_FLOW);
+                    if (cellCard.isValid()) {
+                        return cellCard;
+                    }
                 }
             }
+        } else {
+            LogUtils.w(TAG, "Invalid card type when parse JSON data");
         }
-        return null;
+        return Card.NaN;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    @Override
+    public BaseCell parseSingleComponent(@Nullable JSONObject data, Card parent, ServiceManager serviceManager) {
+        if (data == null) {
+            return BaseCell.NaN;
+        }
+        final CardResolver cardResolver = serviceManager.getService(CardResolver.class);
+        Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
+        final MVHelper cellResolver = serviceManager.getService(MVHelper.class);
+        Preconditions.checkState(cellResolver != null, "Must register CellResolver into ServiceManager first");
+        BaseCell cell = Card.createCell(parent, cellResolver, data, serviceManager, true);
+        if (cellResolver.isValid(cell, serviceManager)) {
+            return cell;
+        } else {
+            return BaseCell.NaN;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    @Override
+    public ObservableTransformer<ParseGroupsOp, List<Card>> getGroupTransformer() {
+        return new ObservableTransformer<ParseGroupsOp, List<Card>>() {
+            @Override
+            public ObservableSource<List<Card>> apply(Observable<ParseGroupsOp> upstream) {
+                return upstream.map(new Function<ParseGroupsOp, List<Card>>() {
+                    @Override
+                    public List<Card> apply(ParseGroupsOp parseGroupsOp) throws Exception {
+                        return parseGroup(parseGroupsOp.getArg1(), parseGroupsOp.getArg2());
+                    }
+                });
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    @Override
+    public ObservableTransformer<ParseComponentsOp, List<BaseCell>> getComponentTransformer() {
+        return new ObservableTransformer<ParseComponentsOp, List<BaseCell>>() {
+            @Override
+            public ObservableSource<List<BaseCell>> apply(Observable<ParseComponentsOp> upstream) {
+                return upstream.map(new Function<ParseComponentsOp, List<BaseCell>>() {
+                    @Override
+                    public List<BaseCell> apply(ParseComponentsOp parseComponentsOp) throws Exception {
+                        return parseComponent(parseComponentsOp.getArg1(), parseComponentsOp.getArg2(), parseComponentsOp.getArg3());
+                    }
+                });
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    @Override
+    public ObservableTransformer<ParseSingleGroupOp, Card> getSingleGroupTransformer() {
+        return new ObservableTransformer<ParseSingleGroupOp, Card>() {
+            @Override
+            public ObservableSource<Card> apply(Observable<ParseSingleGroupOp> upstream) {
+                return upstream.map(new Function<ParseSingleGroupOp, Card>() {
+                    @Override
+                    public Card apply(ParseSingleGroupOp parseSingleGroupOp) throws Exception {
+                        return parseSingleGroup(parseSingleGroupOp.getArg1(), parseSingleGroupOp.getArg2());
+                    }
+                });
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @NonNull
+    @Override
+    public ObservableTransformer<ParseSingleComponentOp, BaseCell> getSingleComponentTransformer() {
+        return new ObservableTransformer<ParseSingleComponentOp, BaseCell>() {
+            @Override
+            public ObservableSource<BaseCell> apply(Observable<ParseSingleComponentOp> upstream) {
+                return upstream.map(new Function<ParseSingleComponentOp, BaseCell>() {
+                    @Override
+                    public BaseCell apply(ParseSingleComponentOp parseSingleComponentOp) throws Exception {
+                        return parseSingleComponent(parseSingleComponentOp.getArg1(), parseSingleComponentOp.getArg2(), parseSingleComponentOp
+
+                            .getArg3());
+                    }
+                });
+            }
+        };
     }
 
 }

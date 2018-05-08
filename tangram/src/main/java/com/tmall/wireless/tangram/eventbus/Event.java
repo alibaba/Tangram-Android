@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,17 +32,17 @@ import android.support.v4.util.ArrayMap;
 public class Event {
 
     /**
-     * Event type
+     * TangramOp1 type
      */
     public String type;
 
     /**
-     * Event producer's Id
+     * TangramOp1 producer's Id
      */
     public String sourceId;
 
     /**
-     * Event args
+     * TangramOp1 args
      */
     public ArrayMap<String, String> args;
 
@@ -68,7 +68,7 @@ public class Event {
 
     @Override
     public String toString() {
-        return "Event{" +
+        return "TangramOp1{" +
                 "args=" + args +
                 ", sourceId='" + sourceId + '\'' +
                 ", type=" + type +

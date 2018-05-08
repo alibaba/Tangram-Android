@@ -27,7 +27,7 @@
 buildscript {
     repositories {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-        maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
+//        maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
         mavenCentral()
         jcenter()
     }
@@ -44,7 +44,7 @@ buildscript {
 allprojects {
     repositories {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-        maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
+//        maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
         jcenter()
         mavenLocal()
     }

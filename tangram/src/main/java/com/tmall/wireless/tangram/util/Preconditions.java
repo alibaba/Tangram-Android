@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,9 @@ package com.tmall.wireless.tangram.util;
  * Precondition class borrows from facebook, which originally is taken from guava
  */
 
+import android.os.Looper;
 import android.support.annotation.Nullable;
+import io.reactivex.Observer;
 
 /**
  * Static convenience methods that help a method or constructor check whether it was invoked
@@ -451,5 +453,14 @@ public final class Preconditions {
         }
 
         return builder.toString();
+    }
+
+    public static boolean checkMainThread(Observer<?> observer) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            observer.onError(new IllegalStateException(
+                "Expected to be called on the main thread but was " + Thread.currentThread().getName()));
+            return false;
+        }
+        return true;
     }
 }

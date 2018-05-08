@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,12 +45,24 @@ public class Style {
 
     private static final LruCache<String, Integer> colorCache = new LruCache<>(100);
 
+    /**
+     * Use {@link #KEY_BACKGROUND_COLOR} instead
+     */
+    @Deprecated
     public static final String KEY_BG_COLOR = "bgColor";
 
     public static final String KEY_BACKGROUND_COLOR = "background-color";
 
+    /**
+     * Use {@link #KEY_BACKGROUND_IMAGE} instead
+     */
+    @Deprecated
     public static final String KEY_BG_IMAGE = "bgImage";
 
+    /**
+     * Use {@link #KEY_BACKGROUND_IMAGE} instead
+     */
+    @Deprecated
     public static final String KEY_STYLE_BG_IMAGE = "bgImgUrl";
 
     public static final String KEY_BACKGROUND_IMAGE = "background-image";
@@ -89,20 +101,14 @@ public class Style {
 
     public static final int MARGIN_LEFT_INDEX = 3;
 
-    public static final String DISPLAY_INLINE = "inline-block";
-
     public static final String DISPLAY_BLOCK = "block";
 
-    public static final int DISPLAY_INNER_INLINE = 0;
-
-    public static final int DISPLAY_INNER_BLOCK = 1;
-
-    private static final int[] DEFAULT_MARGIN = new int[]{0, 0, 0, 0};
+    private static final int[] DEFAULT_MARGIN = new int[] {0, 0, 0, 0};
 
     public int bgColor;
 
     /**
-     * alias of bgImgUrl
+     * Alias of bgImgUrl, use {@link #bgImgUrl} instead
      */
 	@Deprecated
     public String bgImage;
@@ -131,6 +137,7 @@ public class Style {
     public final int[] padding = new int[]{0, 0, 0, 0};
 
     public int width = VirtualLayoutManager.LayoutParams.MATCH_PARENT;
+
     public int height = VirtualLayoutManager.LayoutParams.WRAP_CONTENT;
 
     public float aspectRatio = Float.NaN;

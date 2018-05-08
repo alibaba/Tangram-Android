@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -215,6 +215,15 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 listener.onPageScrolled(currentItemPos, positionOffset, positionOffsetPixels, direction);
             }
         }
+        if (bannerSupport != null) {
+            List<BannerListener> listeners = bannerSupport.getScrolledListenerById(cell.id);
+            if (listeners != null) {
+                for (int i = 0; i < listeners.size(); i++) {
+                    BannerListener listener = listeners.get(i);
+                    listener.onPageScrolled(currentItemPos, positionOffset, positionOffsetPixels, direction);
+                }
+            }
+        }
     }
 
     @Override
@@ -246,6 +255,15 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 busSupport.post(BusSupport.obtainEvent(BusSupport.EVENT_ON_EXPOSURE, cell.id, null, eventContext));
             }
         }
+        if (bannerSupport != null) {
+            List<BannerListener> listeners = bannerSupport.getSelectedListenerById(cell.id);
+            if (listeners != null) {
+                for (int i = 0; i < listeners.size(); i ++) {
+                    BannerListener listener = listeners.get(i);
+                    listener.onPageSelected(currentItemPos);
+                }
+            }
+        }
 
     }
 
@@ -255,6 +273,15 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
             for (int j = 0; j < bannerSupport.getListeners().size(); j++) {
                 BannerListener listener = bannerSupport.getListeners().get(j);
                 listener.onPageScrollStateChanged(state);
+            }
+        }
+        if (bannerSupport != null) {
+            List<BannerListener> listeners = bannerSupport.getScrollStateChangedListenerById(cell.id);
+            if (listeners != null) {
+                for (int i = 0; i < listeners.size(); i ++) {
+                    BannerListener listener = listeners.get(i);
+                    listener.onPageScrollStateChanged(state);
+                }
             }
         }
     }
@@ -690,7 +717,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     private void bindHeaderView(BaseCell cell) {
-        if (cell != null) {
+        if (cell.isValid()) {
             View header = getHeaderViewFromRecycler(cell);
             if (header != null) {
                 ViewGroup.LayoutParams lp = header.getLayoutParams();
@@ -708,7 +735,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     private void bindFooterView(BaseCell cell) {
-        if (cell != null) {
+        if (cell.isValid()) {
             View footer = getFooterViewFromRecycler(cell);
             if (footer != null) {
                 ViewGroup.LayoutParams lp = footer.getLayoutParams();

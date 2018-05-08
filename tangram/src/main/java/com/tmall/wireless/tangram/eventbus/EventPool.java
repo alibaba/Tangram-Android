@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ import android.support.v4.util.Pools;
 /**
  * Created by longerian on 16/4/26.
  *
- * Event pool to recycle consumed event.
+ * TangramOp1 pool to recycle consumed event.
  */
 class EventPool {
 

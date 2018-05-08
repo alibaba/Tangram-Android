@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@ import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
-import com.tmall.wireless.tangram.dataparser.concrete.Cell;
 import com.tmall.wireless.tangram.dataparser.concrete.PojoAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.PojoDataParser;
 import com.tmall.wireless.tangram.eventbus.BusSupport;

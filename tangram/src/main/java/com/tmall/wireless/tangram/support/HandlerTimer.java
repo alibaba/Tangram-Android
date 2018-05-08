@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2017 Alibaba Group
+ * Copyright (c) 2018 Alibaba Group
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,32 +24,37 @@
 
 package com.tmall.wireless.tangram.support;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.os.Handler;
 import android.os.Looper;
-
+import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
+import com.tmall.wireless.tangram.support.TimerSupport.OnTickListener;
 
 public class HandlerTimer implements Runnable, ITimer {
     private Handler mHandler;
     private long mInterval;
     private TimerStatus mStatus;
-    private Runnable mTask;
 
     private long mStartTS = 0L;
 
-    public HandlerTimer(Runnable task) {
-        this(1000, task);
+    private Map<OnTickListener, IntervalTickListener> mListeners = new HashMap<>();
+
+    private List<IntervalTickListener> mCopyListeners = new ArrayList<IntervalTickListener>();
+
+    public HandlerTimer(long interval) {
+        this(interval, new Handler(Looper.getMainLooper()));
     }
 
-    public HandlerTimer(long interval, Runnable task) {
-        this(interval, task, new Handler(Looper.getMainLooper()));
-    }
-
-    public HandlerTimer(long interval, Runnable task, Handler handler) {
-        if (handler == null || task == null) {
+    public HandlerTimer(long interval, Handler handler) {
+        if (handler == null) {
             throw new NullPointerException("handler or task must not be null");
         }
         this.mInterval = interval;
-        this.mTask = task;
         this.mHandler = handler;
         this.mStatus = TimerStatus.Waiting;
     }
@@ -62,7 +67,7 @@ public class HandlerTimer implements Runnable, ITimer {
             return;
         }
 
-        mTask.run();
+        runTask();
 
         long delay = mInterval - (System.currentTimeMillis() - mStartTS) % mInterval;
         mHandler.postDelayed(this, delay == 0 ? mInterval : delay);
@@ -71,6 +76,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * start timer immediately
      */
+    @Override
     public void start() {
         start(false);
     }
@@ -78,6 +84,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * @param bySecond true, start timer with interval alignment; false, start timer immediately
      */
+    @Override
     public void start(boolean bySecond) {
         if (this.mStatus != TimerStatus.Running) {
             this.mStartTS = bySecond ? 0 : System.currentTimeMillis();
@@ -92,6 +99,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * pause timer
      */
+    @Override
     public void pause() {
         this.mStatus = TimerStatus.Paused;
         mHandler.removeCallbacks(this);
@@ -100,6 +108,7 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * resume timer
      */
+    @Override
     public void restart() {
         mHandler.removeCallbacks(this);
         this.mStatus = TimerStatus.Running;
@@ -109,14 +118,21 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * stop timer
      */
+    @Override
     public void stop() {
         mStatus = TimerStatus.Stopped;
         mHandler.removeCallbacks(this);
     }
 
+    @Override
+    public void clear() {
+        mListeners.clear();
+    }
+
     /**
      * cancel timer
      */
+    @Override
     public void cancel() {
         mStatus = TimerStatus.Stopped;
         mHandler.removeCallbacks(this);
@@ -125,24 +141,66 @@ public class HandlerTimer implements Runnable, ITimer {
     /**
      * @return current status
      */
+    @Override
     public TimerStatus getStatus() {
         return mStatus;
+    }
+
+    @Override
+    public void register(int interval, OnTickListener onTickListener, boolean intermediate) {
+        mListeners.put(onTickListener, new IntervalTickListener(interval, onTickListener, intermediate));
+        start(false);
+    }
+
+    @Override
+    public void unregister(OnTickListener onTickListener) {
+        mListeners.remove(onTickListener);
+    }
+
+    @Override
+    public boolean isRegistered(OnTickListener onTickListener) {
+        return mListeners.containsKey(onTickListener);
+    }
+
+    public void runTask() {
+        mCopyListeners.clear();
+        mCopyListeners.addAll(mListeners.values());
+        for (int i = 0, size = mCopyListeners.size(); i < size; i++) {
+            IntervalTickListener listener = mCopyListeners.get(i);
+            listener.onTick();
+        }
+        if (mListeners.isEmpty()) {
+            stop();
+        }
     }
 
     /**
      * Timer status
      */
+    @Keep
     public enum TimerStatus {
 
-        Waiting(0, "Wating"),
+        /**
+         * Waiting
+         */
+        Waiting(0, "Waiting"),
+        /**
+         * Running
+         */
         Running(1, "Running"),
+        /**
+         * Paused
+         */
         Paused(-1, "Paused"),
+        /**
+         * Stopped
+         */
         Stopped(-2, "Stopped");
 
         private int code;
         private String desc;
 
-        private TimerStatus(int code, String desc) {
+        TimerStatus(int code, String desc) {
             this.code = code;
             this.desc = desc;
         }
@@ -163,4 +221,32 @@ public class HandlerTimer implements Runnable, ITimer {
             this.desc = desc;
         }
     }
+
+    static final class IntervalTickListener {
+        private int interval;
+        private int count;
+
+        private OnTickListener mListener;
+
+        IntervalTickListener(int interval, @NonNull OnTickListener onTickListener, boolean intermediate) {
+            this.interval = interval;
+            this.count = 0;
+            this.mListener = onTickListener;
+
+            if (intermediate) {
+                onTickListener.onTick();
+            }
+        }
+
+        void onTick() {
+            count = (count + 1) % interval;
+            if (count == 0) {
+                if (mListener != null) {
+                    mListener.onTick();
+                }
+            }
+        }
+
+    }
+
 }
