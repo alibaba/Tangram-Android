@@ -24,32 +24,37 @@
 
 package com.tmall.wireless.tangram.support;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Keep;
+import android.support.annotation.NonNull;
+import com.tmall.wireless.tangram.support.TimerSupport.OnTickListener;
 
 public class HandlerTimer implements Runnable, ITimer {
     private Handler mHandler;
     private long mInterval;
     private TimerStatus mStatus;
-    private Runnable mTask;
 
     private long mStartTS = 0L;
 
-    public HandlerTimer(Runnable task) {
-        this(1000, task);
+    private Map<OnTickListener, IntervalTickListener> mListeners = new HashMap<>();
+
+    private List<IntervalTickListener> mCopyListeners = new ArrayList<IntervalTickListener>();
+
+    public HandlerTimer(long interval) {
+        this(interval, new Handler(Looper.getMainLooper()));
     }
 
-    public HandlerTimer(long interval, Runnable task) {
-        this(interval, task, new Handler(Looper.getMainLooper()));
-    }
-
-    public HandlerTimer(long interval, Runnable task, Handler handler) {
-        if (handler == null || task == null) {
+    public HandlerTimer(long interval, Handler handler) {
+        if (handler == null) {
             throw new NullPointerException("handler or task must not be null");
         }
         this.mInterval = interval;
-        this.mTask = task;
         this.mHandler = handler;
         this.mStatus = TimerStatus.Waiting;
     }
@@ -62,7 +67,7 @@ public class HandlerTimer implements Runnable, ITimer {
             return;
         }
 
-        mTask.run();
+        runTask();
 
         long delay = mInterval - (System.currentTimeMillis() - mStartTS) % mInterval;
         mHandler.postDelayed(this, delay == 0 ? mInterval : delay);
@@ -119,6 +124,11 @@ public class HandlerTimer implements Runnable, ITimer {
         mHandler.removeCallbacks(this);
     }
 
+    @Override
+    public void clear() {
+        mListeners.clear();
+    }
+
     /**
      * cancel timer
      */
@@ -134,6 +144,34 @@ public class HandlerTimer implements Runnable, ITimer {
     @Override
     public TimerStatus getStatus() {
         return mStatus;
+    }
+
+    @Override
+    public void register(int interval, OnTickListener onTickListener, boolean intermediate) {
+        mListeners.put(onTickListener, new IntervalTickListener(interval, onTickListener, intermediate));
+        start(false);
+    }
+
+    @Override
+    public void unregister(OnTickListener onTickListener) {
+        mListeners.remove(onTickListener);
+    }
+
+    @Override
+    public boolean isRegistered(OnTickListener onTickListener) {
+        return mListeners.containsKey(onTickListener);
+    }
+
+    public void runTask() {
+        mCopyListeners.clear();
+        mCopyListeners.addAll(mListeners.values());
+        for (int i = 0, size = mCopyListeners.size(); i < size; i++) {
+            IntervalTickListener listener = mCopyListeners.get(i);
+            listener.onTick();
+        }
+        if (mListeners.isEmpty()) {
+            stop();
+        }
     }
 
     /**
@@ -182,6 +220,33 @@ public class HandlerTimer implements Runnable, ITimer {
         public void setDesc(String desc) {
             this.desc = desc;
         }
+    }
+
+    static final class IntervalTickListener {
+        private int interval;
+        private int count;
+
+        private OnTickListener mListener;
+
+        IntervalTickListener(int interval, @NonNull OnTickListener onTickListener, boolean intermediate) {
+            this.interval = interval;
+            this.count = 0;
+            this.mListener = onTickListener;
+
+            if (intermediate) {
+                onTickListener.onTick();
+            }
+        }
+
+        void onTick() {
+            count = (count + 1) % interval;
+            if (count == 0) {
+                if (mListener != null) {
+                    mListener.onTick();
+                }
+            }
+        }
+
     }
 
 }

@@ -163,8 +163,7 @@ public class MVHelper {
     public String getCellUniqueId(BaseCell cell) {
         String flareId = cellFlareIdMap.get(cell);
         if (flareId == null) {
-            String parentId = cell.parent.id;
-            flareId = String.format("%s_%s", cell.parent == null ? "null" : parentId, cell.pos);
+            flareId = String.format("%s_%s", cell.parent == null ? "null" : cell.parent.id, cell.pos);
             cellFlareIdMap.put(cell, flareId);
         }
         return flareId;

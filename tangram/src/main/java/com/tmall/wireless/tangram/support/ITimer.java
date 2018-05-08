@@ -25,6 +25,7 @@
 package com.tmall.wireless.tangram.support;
 
 import com.tmall.wireless.tangram.support.HandlerTimer.TimerStatus;
+import com.tmall.wireless.tangram.support.TimerSupport.OnTickListener;
 
 /**
  * Created by villadora on 15/8/31.
@@ -57,6 +58,11 @@ public interface ITimer {
     void stop();
 
     /**
+     * clear listeners
+     */
+    void clear();
+
+    /**
      * cancel timer
      */
     void cancel();
@@ -66,4 +72,9 @@ public interface ITimer {
      */
     TimerStatus getStatus();
 
+    void register(int interval, OnTickListener onTickListener, boolean immediate);
+
+    void unregister(OnTickListener onTickListener);
+
+    boolean isRegistered(OnTickListener onTickListener);
 }

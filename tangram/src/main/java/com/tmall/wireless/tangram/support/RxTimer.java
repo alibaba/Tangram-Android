@@ -161,6 +161,11 @@ public class RxTimer implements ITimer {
     }
 
     @Override
+    public void clear() {
+        tickCache.clear();
+    }
+
+    @Override
     public TimerStatus getStatus() {
         return mStatus;
     }
