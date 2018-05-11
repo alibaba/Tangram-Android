@@ -40,7 +40,6 @@ import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.ComponentLifecycle;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.op.ClickExposureCellOp;
-import com.tmall.wireless.tangram.op.UpdateCellOp;
 import com.tmall.wireless.tangram.support.CellClickObservable;
 import com.tmall.wireless.tangram.support.CellExposureObservable;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
@@ -48,7 +47,6 @@ import com.tmall.wireless.tangram.util.BDE;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.LifeCycleProviderImpl;
-import io.reactivex.subjects.PublishSubject;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -135,8 +133,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public boolean mIsExposed = false;
 
     private SparseArray<Object> mTag;
-
-    private PublishSubject<UpdateCellOp> mUpdateCellOpObservable = PublishSubject.create();
 
     public BaseCell() {
         objectId = sIsGenIds ? sIdGen.getAndIncrement() : 0;
