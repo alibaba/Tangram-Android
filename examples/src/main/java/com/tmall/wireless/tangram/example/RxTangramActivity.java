@@ -554,7 +554,6 @@ public class RxTangramActivity extends Activity {
             engine.destroy();
         }
         mCompositeDisposable.dispose();
-        ImageUtils.setImageSetter(null);
     }
 
     public static byte[] getAssertsFile(Context context, String fileName) {
