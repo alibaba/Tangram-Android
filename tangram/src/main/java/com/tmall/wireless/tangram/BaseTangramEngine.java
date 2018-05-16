@@ -39,6 +39,7 @@ import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
 import com.alibaba.android.vlayout.extend.InnerRecycledViewPool;
+import com.alibaba.android.vlayout.extend.PerformanceMonitor;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.DataParser;
@@ -104,6 +105,8 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     private final IAdapterBuilder<C, L> mAdapterBuilder;
 
+    private PerformanceMonitor mPerformanceMonitor;
+
     private boolean isSupportRx;
 
     public BaseTangramEngine(@NonNull final Context context,
@@ -156,6 +159,15 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     * Add a custom performance monitor to record performance
+     * @param performanceMonitor
+     */
+    public void setPerformanceMonitor(
+            PerformanceMonitor performanceMonitor) {
+        mPerformanceMonitor = performanceMonitor;
+    }
+
+    /**
      * Bind a recyclerView to Tangram. After calling this, {@link GroupBasicAdapter}, {@link VirtualLayoutManager} are auto binded.
      * @param view A plain recyclerView with no adapter or layoutManager binded.
      */
@@ -171,6 +183,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
         this.mContentView.setLayoutManager(mLayoutManager);
         if (mGroupBasicAdapter == null) {
             this.mGroupBasicAdapter = mAdapterBuilder.newAdapter(mContext, mLayoutManager, this);
+            mGroupBasicAdapter.setPerformanceMonitor(mPerformanceMonitor);
         }
 
         if (mContentView.getRecycledViewPool() != null) {
