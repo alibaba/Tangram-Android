@@ -181,6 +181,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
         this.mContentView = view;
         this.mContentView.setLayoutManager(mLayoutManager);
+        mLayoutManager.setPerformanceMonitor(mPerformanceMonitor);
         if (mGroupBasicAdapter == null) {
             this.mGroupBasicAdapter = mAdapterBuilder.newAdapter(mContext, mLayoutManager, this);
             mGroupBasicAdapter.setPerformanceMonitor(mPerformanceMonitor);
