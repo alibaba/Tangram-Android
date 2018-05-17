@@ -57,6 +57,10 @@ import java.util.List;
 public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<BinderViewHolder<C, ? extends View>> {
 
 
+    protected static final String PHASE_CREATE = "create";
+    protected static final String PHASE_BIND = "bind";
+    protected static final String PHASE_UNBIND = "unbind";
+
     @NonNull
     private final Context mContext;
 
@@ -269,11 +273,11 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
         String cellType = getCellTypeFromItemType(viewType);
         ControlBinder<C, ? extends View> binder = mCompBinderResolver.create(cellType);
         if (mPerformanceMonitor != null) {
-            mPerformanceMonitor.recordStart("create", cellType);
+            mPerformanceMonitor.recordStart(PHASE_CREATE, cellType);
         }
         BinderViewHolder binderViewHolder = createViewHolder(binder, mContext, parent);
         if (mPerformanceMonitor != null) {
-            mPerformanceMonitor.recordStart("create", binderViewHolder.itemView);
+            mPerformanceMonitor.recordEnd(PHASE_CREATE, cellType);
         }
         return binderViewHolder;
     }
@@ -288,11 +292,11 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
         // position must be valid
         C data = mData.get(position);
         if (mPerformanceMonitor != null) {
-            mPerformanceMonitor.recordStart("bind", holder.itemView);
+            mPerformanceMonitor.recordStart(PHASE_BIND, holder.itemView);
         }
         holder.bind(data);
         if (mPerformanceMonitor != null) {
-            mPerformanceMonitor.recordEnd("bind", holder.itemView);
+            mPerformanceMonitor.recordEnd(PHASE_BIND, holder.itemView);
         }
     }
 
@@ -303,11 +307,11 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     @Override
     public void onViewRecycled(BinderViewHolder<C, ? extends View> holder) {
         if (mPerformanceMonitor != null) {
-            mPerformanceMonitor.recordStart("unbind", holder.itemView);
+            mPerformanceMonitor.recordStart(PHASE_UNBIND, holder.itemView);
         }
         holder.unbind();
         if (mPerformanceMonitor != null) {
-            mPerformanceMonitor.recordEnd("unbind", holder.itemView);
+            mPerformanceMonitor.recordEnd(PHASE_UNBIND, holder.itemView);
         }
     }
 
