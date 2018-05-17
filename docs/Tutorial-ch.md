@@ -5,6 +5,10 @@
 ```
 // gradle
 compile 'com.alibaba.android:tangram:2.0.5@aar'
+
+// 最新版本引入了rxjava，需要自行添加rx依赖
+compile 'io.reactivex.rxjava2:rxjava:2.1.12'
+compile 'io.reactivex.rxjava2:rxandroid:2.0.2'
 ```
 
 或者
@@ -15,6 +19,18 @@ compile 'com.alibaba.android:tangram:2.0.5@aar'
   <groupId>com.alibaba.android</groupId>
   <artifactId>tangram</artifactId>
   <version>2.0.5</version>
+  <type>aar</type>
+</dependency>
+<dependency>
+  <groupId>io.reactivex.rxjava2</groupId>
+  <artifactId>rxjava</artifactId>
+  <version>2.1.12</version>
+  <type>aar</type>
+</dependency>
+<dependency>
+  <groupId>io.reactivex.rxjava2</groupId>
+  <artifactId>rxandroid</artifactId>
+  <version>2.0.2</version>
   <type>aar</type>
 </dependency>
 ```
