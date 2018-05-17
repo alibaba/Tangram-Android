@@ -24,6 +24,7 @@
 
 package com.tmall.wireless.tangram;
 
+import com.alibaba.android.vlayout.extend.PerformanceMonitor;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
@@ -68,6 +69,7 @@ import com.tmall.wireless.tangram.view.LinearScrollView;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.ImageView;
 import com.tmall.wireless.vaf.framework.VafContext;
@@ -375,6 +377,8 @@ public class TangramBuilder {
 
         private IAdapterBuilder mPojoAdapterBuilder;
 
+        private PerformanceMonitor mPerformanceMonitor;
+
         private DataParser mDataParser;
 
         protected InnerBuilder(@NonNull final Context context, DefaultResolverRegistry registry) {
@@ -462,13 +466,21 @@ public class TangramBuilder {
         }
 
         /**
-         * set an custom {@link IAdapterBuilder} to build adapter, the default is {@link PojoAdapterBuilder} which
+         * set a custom {@link IAdapterBuilder} to build adapter, the default is {@link PojoAdapterBuilder} which
          * would create a {@link com.tmall.wireless.tangram.dataparser.concrete.PojoGroupBasicAdapter}
          * @param builder custom IadapterBuilder
          */
         public void setAdapterBuilder(@NonNull IAdapterBuilder builder) {
             Preconditions.checkNotNull(builder, "newInnerBuilder should not be null");
             this.mPojoAdapterBuilder = builder;
+        }
+
+        /**
+         * set a custom {@link PerformanceMonitor} to record performance of critical phase, such as creating view, binding view, unbind view, measuring view, layout view.
+         * @param performanceMonitor
+         */
+        public void setPerformanceMonitor(@Nullable PerformanceMonitor performanceMonitor) {
+            this.mPerformanceMonitor = performanceMonitor;
         }
 
         /**
@@ -496,6 +508,7 @@ public class TangramBuilder {
             TangramEngine tangramEngine =
                 new TangramEngine(mContext, mDataParser, mPojoAdapterBuilder);
 
+            tangramEngine.setPerformanceMonitor(mPerformanceMonitor);
             // register service with default services
             tangramEngine.register(MVHelper.class, mMVHelper);
             tangramEngine

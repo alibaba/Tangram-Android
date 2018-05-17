@@ -28,6 +28,7 @@ import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.VirtualLayoutAdapter;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+import com.alibaba.android.vlayout.extend.PerformanceMonitor;
 import com.tmall.wireless.tangram.core.protocol.ControlBinder;
 import com.tmall.wireless.tangram.core.protocol.ControlBinderResolver;
 import com.tmall.wireless.tangram.core.protocol.LayoutBinder;
@@ -56,6 +57,10 @@ import java.util.List;
 public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<BinderViewHolder<C, ? extends View>> {
 
 
+    protected static final String PHASE_CREATE = "create";
+    protected static final String PHASE_BIND = "bind";
+    protected static final String PHASE_UNBIND = "unbind";
+
     @NonNull
     private final Context mContext;
 
@@ -70,6 +75,8 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
     private LayoutBinderResolver<L, ? extends LayoutBinder<L>> mCardBinderResolver;
 
+    private PerformanceMonitor mPerformanceMonitor;
+
     public GroupBasicAdapter(@NonNull final Context context, @NonNull final VirtualLayoutManager layoutManager,
         @NonNull ControlBinderResolver<? extends ControlBinder<C, ? extends View>> cellBinderResolver,
         @NonNull LayoutBinderResolver<L, ? extends LayoutBinder<L>> cardBinderResolver) {
@@ -79,6 +86,11 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
         mCompBinderResolver = Preconditions.checkNotNull(cellBinderResolver, "componentBinderResolver should not be null");
         mCardBinderResolver = Preconditions.checkNotNull(cardBinderResolver, "layoutBinderResolver should not be null");
+    }
+
+    public void setPerformanceMonitor(
+            PerformanceMonitor performanceMonitor) {
+        mPerformanceMonitor = performanceMonitor;
     }
 
     private final SparseBooleanArray pendingDeleteMap = new SparseBooleanArray();
@@ -260,7 +272,14 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     public BinderViewHolder<C, ? extends View> onCreateViewHolder(ViewGroup parent, int viewType) {
         String cellType = getCellTypeFromItemType(viewType);
         ControlBinder<C, ? extends View> binder = mCompBinderResolver.create(cellType);
-        return createViewHolder(binder, mContext, parent);
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordStart(PHASE_CREATE, cellType);
+        }
+        BinderViewHolder binderViewHolder = createViewHolder(binder, mContext, parent);
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordEnd(PHASE_CREATE, cellType);
+        }
+        return binderViewHolder;
     }
 
 
@@ -272,7 +291,13 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     public void onBindViewHolder(BinderViewHolder<C, ? extends View> holder, int position) {
         // position must be valid
         C data = mData.get(position);
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordStart(PHASE_BIND, holder.itemView);
+        }
         holder.bind(data);
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordEnd(PHASE_BIND, holder.itemView);
+        }
     }
 
 
@@ -281,7 +306,13 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      */
     @Override
     public void onViewRecycled(BinderViewHolder<C, ? extends View> holder) {
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordStart(PHASE_UNBIND, holder.itemView);
+        }
         holder.unbind();
+        if (mPerformanceMonitor != null) {
+            mPerformanceMonitor.recordEnd(PHASE_UNBIND, holder.itemView);
+        }
     }
 
 
