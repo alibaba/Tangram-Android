@@ -106,37 +106,37 @@
     },
     "items": [
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info1",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info2",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info3",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info4",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info5",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info6",
         "style": {
         }
@@ -165,37 +165,37 @@
         },
         "items": [
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info1",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info2",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info3",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info4",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info5",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info6",
             "style": {
             }
@@ -226,37 +226,37 @@
         },
         "items": [
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info1",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info2",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info3",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info4",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info5",
             "style": {
             }
           },
           {
-            "type": 1,
+            "type": "testView",
             "msg": "info6",
             "style": {
             }
@@ -313,11 +313,11 @@
     },
     "items": [
       {
-        "type": 10,
+        "type": "singleImgView",
         "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png"
       },
       {
-        "type": 10,
+        "type": "singleImgView",
         "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png"
       }
     ]
@@ -330,11 +330,9 @@
     },
     "items": [
       {
-        "type": 1,
+        "type": "testView",
         "msg": "sticky",
         "style": {
-          "height": 80
-
         }
       }
     ]
@@ -357,37 +355,37 @@
     },
     "items": [
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info11",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info12",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info13",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info14",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info15",
         "style": {
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "msg": "info16",
         "style": {
         }
@@ -450,16 +448,16 @@
     },
     "items": [
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       }
     ]
   },
@@ -467,20 +465,20 @@
     "type": "3",
     "items": [
       {
-        "type": 1,
+        "type": "testView",
         "msg": "block",
         "style": {
           "display": "block"
         }
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       }
     ]
   },
@@ -488,16 +486,16 @@
     "type": 4,
     "items": [
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       }
     ]
   },
@@ -509,7 +507,7 @@
     },
     "items": [
       {
-        "type": 1,
+        "type": "testView",
         "style": {
           "height": 120
         },
@@ -522,7 +520,7 @@
     "id": "dividerShow",
     "items": [
       {
-        "type": 1,
+        "type": "testView",
         "msg": "I am a divider"
       }
     ]
@@ -537,16 +535,16 @@
     },
     "items": [
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       }
     ]
   },
@@ -559,7 +557,7 @@
     },
     "items": [
       {
-        "type": 1,
+        "type": "testView",
         "style": {
           "margin": [
             4,
@@ -570,7 +568,7 @@
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "style": {
           "margin": [
             0,
@@ -581,7 +579,7 @@
         }
       },
       {
-        "type": 1
+        "type": "testView"
       }
     ]
   },
@@ -591,10 +589,10 @@
     },
     "items": [
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       }
     ]
   },
@@ -602,7 +600,7 @@
     "type": "1",
     "items": [
       {
-        "type": 1
+        "type": "testView"
       }
     ]
   },
@@ -631,40 +629,40 @@
     },
     "items": [
       {
-        "type": 1,
+        "type": "testView",
         "style": {
           "colspan": 2
         }
       },
       {
-        "type": 1,
+        "type": "testView",
         "style": {
           "colspan": 2
         }
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       },
       {
-        "type": 1
+        "type": "testView"
       }
     ]
   },
