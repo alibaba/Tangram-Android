@@ -65,6 +65,7 @@ import com.tmall.wireless.tangram.example.data.TestViewHolder;
 import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
 import com.tmall.wireless.tangram.example.data.VVTEST;
 import com.tmall.wireless.tangram.example.support.SampleClickSupport;
+import com.tmall.wireless.tangram.example.support.SampleScrollSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
 import com.tmall.wireless.tangram.support.async.AsyncLoader;
@@ -304,6 +305,9 @@ public class TangramActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        //Demo for component to listen container's event
+        engine.register(SampleScrollSupport.class, new SampleScrollSupport(recyclerView));
     }
 
     @Override
