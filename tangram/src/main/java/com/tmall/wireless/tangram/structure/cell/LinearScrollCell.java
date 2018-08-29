@@ -28,6 +28,7 @@ import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
+import com.tmall.wireless.tangram.core.R;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
@@ -66,6 +67,8 @@ public class LinearScrollCell extends BaseCell {
     public static final int DEFAULT_DEFAULT_INDICATOR_COLOR = Color.parseColor("#80ffffff");
     public static final int DEFAULT_INDICATOR_COLOR = Color.parseColor("#ffffff");
 
+    public static final String KEY_HGAP = "hGap";
+
     public List<BaseCell> cells = new ArrayList<BaseCell>();
 
     public BaseCell mHeader;
@@ -81,6 +84,7 @@ public class LinearScrollCell extends BaseCell {
     public int bgColor = Color.TRANSPARENT;
     public int scrollMarginLeft;
     public int scrollMarginRight;
+    public double hGap;
 
     // current distance that responding recycler view has scrolled.
     public int currentDistance = 0;
@@ -149,6 +153,7 @@ public class LinearScrollCell extends BaseCell {
                 lp.width = Style.parseSize(cell.extras.optString("pageWidth"), 0);
             }
             binderViewHolder.itemView.setLayoutParams(lp);
+            binderViewHolder.itemView.setTag(R.id.TANGRAM_LINEAR_SCROLL_POS, position);
         }
 
         @Override

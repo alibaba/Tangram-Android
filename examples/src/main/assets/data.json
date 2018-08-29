@@ -1,6 +1,11 @@
 [
   {
-    "type": "container-oneColumn",
+    "type": "container-scroll",
+    "style": {
+      "pageWidth": 200,
+      "hGap": 100,
+      "pageHeight": 100
+    },
     "items": [
       {
         "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
@@ -77,12 +82,12 @@
     },
     "items": [
       {
-        "bizId":"item1",
+        "bizId": "item1",
         "type": 110,
         "msg": "info1"
       },
       {
-        "bizId":"item2",
+        "bizId": "item2",
         "type": 110,
         "msg": "info2"
       }
@@ -270,41 +275,62 @@
     "style": {
       "hGap": "15",
       "vGap": "15",
-      "margin": [null, null, null, null],
-      "padding": ["15", "15", "15", "15"]
+      "margin": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "padding": [
+        "15",
+        "15",
+        "15",
+        "15"
+      ]
     },
     "type": 25,
-    "items": [{
-      "title": "A",
-      "type": 199
-    }, {
-      "title": "B",
-      "type": 199
-    }, {
-      "title": "C",
-      "type": 199
-    }, {
-      "title": "D",
-      "type": 199
-    }, {
-      "title": "E",
-      "type": 199
-    }, {
-      "title": "F",
-      "type": 199
-    }, {
-      "title": "G",
-      "type": 199
-    }, {
-      "title": "H",
-      "type": 199
-    }, {
-      "title": "I",
-      "type": 199
-    }, {
-      "title": "G",
-      "type": 199
-    }]
+    "items": [
+      {
+        "title": "A",
+        "type": 199
+      },
+      {
+        "title": "B",
+        "type": 199
+      },
+      {
+        "title": "C",
+        "type": 199
+      },
+      {
+        "title": "D",
+        "type": 199
+      },
+      {
+        "title": "E",
+        "type": 199
+      },
+      {
+        "title": "F",
+        "type": 199
+      },
+      {
+        "title": "G",
+        "type": 199
+      },
+      {
+        "title": "H",
+        "type": 199
+      },
+      {
+        "title": "I",
+        "type": 199
+      },
+      {
+        "title": "G",
+        "type": 199
+      }
+    ]
   },
   {
     "type": 1,
@@ -326,7 +352,6 @@
     "type": 20,
     "style": {
       "sticky": "start"
-
     },
     "items": [
       {
