@@ -68,7 +68,6 @@ public class MVHelper {
     private ArrayMap<BaseCell, Method> postBindMap = new ArrayMap<>(128);
     private ArrayMap<BaseCell, Method> postUnBindMap = new ArrayMap<>(128);
     private ArrayMap<BaseCell, Method> cellInitedMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, String> cellFlareIdMap = new ArrayMap<>(128);
 
     public MVHelper(MVResolver mvResolver) {
         this.mvResolver = mvResolver;
@@ -98,7 +97,6 @@ public class MVHelper {
         postBindMap.clear();
         postUnBindMap.clear();
         cellInitedMap.clear();
-        cellFlareIdMap.clear();
         mvResolver.reset();
     }
 
@@ -114,7 +112,7 @@ public class MVHelper {
 
     public void mountView(BaseCell cell, View view) {
         try {
-            mvResolver.register(getCellUniqueId(cell), cell, view);
+            mvResolver.register(cell, view);
             if (cell.serviceManager != null) {
                 if (cell.serviceManager.supportRx()) {
                     cell.emitNext(BDE.BIND);
@@ -158,15 +156,6 @@ public class MVHelper {
                 }
             }
         }
-    }
-
-    public String getCellUniqueId(BaseCell cell) {
-        String flareId = cellFlareIdMap.get(cell);
-        if (flareId == null) {
-            flareId = String.format("%s_%s", cell.parent == null ? "null" : cell.parent.id, cell.pos);
-            cellFlareIdMap.put(cell, flareId);
-        }
-        return flareId;
     }
 
     public void unMountView(BaseCell cell, View view) {
