@@ -39,6 +39,7 @@ import com.tmall.wireless.tangram.util.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -67,7 +68,7 @@ public class MVResolver {
 
     private ArrayMap<String, Class<? extends BaseCell>> typeCellMap = new ArrayMap(64);
 
-    private ArrayMap<String, Card> idCardMap = new ArrayMap<>();
+    private HashMap<String, Card> idCardMap = new HashMap<>();
 
     private ArrayMap<BaseCell, View> mvMap = new ArrayMap<>(128);
 
