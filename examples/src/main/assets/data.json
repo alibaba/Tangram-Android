@@ -76,7 +76,7 @@
   },
   {
     "id": "banner1",
-    "type": 1,
+    "type": "container-oneColumn",
     "style": {
       "aspectRatio": 3.223
     },
@@ -94,6 +94,7 @@
     ]
   },
   {
+    "type":"container-banner",
     "style": {
       "pageWidth": 200,
       "pageHeight": 100,
@@ -288,7 +289,7 @@
         "15"
       ]
     },
-    "type": 25,
+    "type": "container-waterfall",
     "items": [
       {
         "title": "A",
@@ -333,7 +334,7 @@
     ]
   },
   {
-    "type": 1,
+    "type": "container-oneColumn",
     "style": {
       "aspectRatio": 3.223
     },
@@ -349,7 +350,7 @@
     ]
   },
   {
-    "type": 20,
+    "type": "container-sticky",
     "style": {
       "sticky": "start"
     },
@@ -418,7 +419,7 @@
     ]
   },
   {
-    "type": "5",
+    "type": "container-onePlusN",
     "style": {
       "aspectRatio": "1.778",
       "cols": [
@@ -463,7 +464,7 @@
     ]
   },
   {
-    "type": "2",
+    "type": "container-twoColumn",
     "style": {
       "hGap": 10,
       "vGap": 10,
@@ -487,7 +488,7 @@
     ]
   },
   {
-    "type": "3",
+    "type": "container-threeColumn",
     "items": [
       {
         "type": "testView",
@@ -508,7 +509,7 @@
     ]
   },
   {
-    "type": 4,
+    "type": "container-fourColumn",
     "items": [
       {
         "type": "testView"
@@ -525,7 +526,7 @@
     ]
   },
   {
-    "type": 28,
+    "type": "container-scrollFix",
     "id": "scrollFixShowOnEnter",
     "style": {
       "showType": "showONEnter"
@@ -541,7 +542,7 @@
     ]
   },
   {
-    "type": 1,
+    "type": "container-oneColumn",
     "id": "dividerShow",
     "items": [
       {
@@ -551,7 +552,7 @@
     ]
   },
   {
-    "type": 5,
+    "type": "container-onePlusN",
     "style": {
       "bgColor": "#e3e3e3",
       "cols": [
@@ -574,7 +575,7 @@
     ]
   },
   {
-    "type": 5,
+    "type": "container-onePlusN",
     "style": {
       "cols": [
         40
@@ -609,7 +610,7 @@
     ]
   },
   {
-    "type": 5,
+    "type": "container-onePlusN",
     "style": {
     },
     "items": [
@@ -622,7 +623,7 @@
     ]
   },
   {
-    "type": "1",
+    "type": "container-oneColumn",
     "items": [
       {
         "type": "testView"
@@ -630,7 +631,7 @@
     ]
   },
   {
-    "type": "9",
+    "type": "container-fiveColumn",
     "load": "com.tmall.request.test",
     "header": {
       "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
@@ -645,7 +646,7 @@
     ]
   },
   {
-    "type": "4",
+    "type": "container-fourColumn",
     "style": {
       "autoExpand": true,
       "enableColspan": true,
@@ -692,9 +693,10 @@
     ]
   },
   {
+    "type":"container-float",
     "style": {
       "align": "bottom_left",
-      "x": 200,
+      "x": 10,
       "y": 100
     },
     "items": [
@@ -709,14 +711,14 @@
             10,
             10
           ],
-          "height": 100,
-          "width": 100
+          "height": 50,
+          "width": 50
         }
       }
     ]
   },
   {
-    "type": "1",
+    "type": "container-oneColumn",
     "load": "com.tmall.request.load.more",
     "loadType": 1,
     "items": [
