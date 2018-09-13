@@ -117,7 +117,7 @@ dependencies {
             exclude group: 'com.android.support', module: 'support-annotations'
         }
     } else {
-        compile('com.alibaba.android:vlayout:1.2.17@aar') {
+        compile('com.alibaba.android:vlayout:1.2.18@aar') {
             changing = true
         }
     }
