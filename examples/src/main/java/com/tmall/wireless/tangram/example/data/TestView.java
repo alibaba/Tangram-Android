@@ -25,11 +25,14 @@
 package com.tmall.wireless.tangram.example.data;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.tmall.wireless.tangram.example.R;
+import com.tmall.wireless.tangram.example.support.SampleScrollSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.CellRender;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
@@ -37,7 +40,7 @@ import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
 /**
  * Created by villadora on 15/8/24.
  */
-public class TestView extends FrameLayout implements ITangramViewLifeCycle {
+public class TestView extends FrameLayout implements ITangramViewLifeCycle, SampleScrollSupport.IScrollListener {
     private TextView textView;
     private BaseCell cell;
 
@@ -56,7 +59,7 @@ public class TestView extends FrameLayout implements ITangramViewLifeCycle {
         init();
     }
 
-    private void init(){
+    private void init() {
         inflate(getContext(), R.layout.item, this);
         textView = (TextView) findViewById(R.id.title);
     }
@@ -65,6 +68,10 @@ public class TestView extends FrameLayout implements ITangramViewLifeCycle {
     public void cellInited(BaseCell cell) {
         setOnClickListener(cell);
         this.cell = cell;
+        if (cell.serviceManager != null) {
+            SampleScrollSupport scrollSupport = cell.serviceManager.getService(SampleScrollSupport.class);
+            scrollSupport.register(this);
+        }
     }
 
     @Override
@@ -89,5 +96,15 @@ public class TestView extends FrameLayout implements ITangramViewLifeCycle {
 
     @Override
     public void postUnBindView(BaseCell cell) {
+    }
+
+    @Override
+    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        Log.i("TestView", "onScrollStateChanged: ");
+    }
+
+    @Override
+    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        Log.i("TestView", "onScrolled: ");
     }
 }

@@ -133,6 +133,7 @@ public class LinearScrollCard extends Card {
             cell.retainScrollState = data.optBoolean(LinearScrollCell.KEY_RETAIN_SCROLL_STATE, true);
             cell.scrollMarginLeft = Style.parseSize(data.optString(LinearScrollCell.KEY_SCROLL_MARGIN_LEFT), 0);
             cell.scrollMarginRight = Style.parseSize(data.optString(LinearScrollCell.KEY_SCROLL_MARGIN_RIGHT), 0);
+            cell.hGap = data.optDouble(LinearScrollCell.KEY_HGAP, 0);
         }
     }
 

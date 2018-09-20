@@ -65,6 +65,7 @@ import com.tmall.wireless.tangram.example.data.TestViewHolder;
 import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
 import com.tmall.wireless.tangram.example.data.VVTEST;
 import com.tmall.wireless.tangram.example.support.SampleClickSupport;
+import com.tmall.wireless.tangram.example.support.SampleScrollSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
 import com.tmall.wireless.tangram.support.async.AsyncLoader;
@@ -152,6 +153,12 @@ public class TangramActivity extends Activity {
         builder = TangramBuilder.newInnerBuilder(this);
 
         //Step 3: register business cells and cards
+        // recommend to use string type to register component
+        builder.registerCell("testView", TestView.class);
+        builder.registerCell("singleImgView", SimpleImgView.class);
+        builder.registerCell("ratioTextView", RatioTextView.class);
+
+        // register component with integer type was not recommend to use
         builder.registerCell(1, TestView.class);
         builder.registerCell(10, SimpleImgView.class);
         builder.registerCell(2, SimpleImgView.class);
@@ -298,6 +305,9 @@ public class TangramActivity extends Activity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        //Demo for component to listen container's event
+        engine.register(SampleScrollSupport.class, new SampleScrollSupport(recyclerView));
     }
 
     @Override

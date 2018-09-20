@@ -30,6 +30,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
@@ -77,6 +78,8 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
     private boolean enableOverScrollPull;
 
     private List<BinderViewHolder> mViewHolders = new ArrayList<BinderViewHolder>();
+
+    private RecyclerView.ItemDecoration itemDecoration;
 
     private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -183,6 +186,29 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         }
 
         recyclerView.setRecycledViewPool(lSCell.getRecycledViewPool());
+
+        recyclerView.removeItemDecoration(itemDecoration);
+        if (lSCell.hGap > 0) {
+            itemDecoration = new RecyclerView.ItemDecoration() {
+                @Override
+                public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                    outRect.set(0, 0, 0, 0);
+
+                    int viewIndex = (int) view.getTag(R.id.TANGRAM_LINEAR_SCROLL_POS);
+                    if (viewIndex == lSCell.cells.size() - 1) {
+                        // last view only set left
+                        outRect.left = (int) (lSCell.hGap / 2);
+                    } else if (viewIndex == 0) {
+                        // first view only set right
+                        outRect.right = (int) (lSCell.hGap / 2);
+                    } else {
+                        outRect.left = (int) (lSCell.hGap / 2);
+                        outRect.right = (int) (lSCell.hGap / 2);
+                    }
+                }
+            };
+            recyclerView.addItemDecoration(itemDecoration);
+        }
 
         float[] starts = null;
         if (lSCell.cells != null && lSCell.cells.size() > 0) {
@@ -333,7 +359,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                 header.setId(R.id.TANGRAM_BANNER_HEADER_ID);
                 //为了解决在 item 复用过程中，itemView 的 layoutParams 复用造成 layout 错误,这里要提供一个新的 layoutParams。
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
                 lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
                 lp.bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
@@ -350,7 +376,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                 footer.setId(R.id.TANGRAM_BANNER_FOOTER_ID);
                 //为了解决在 item 复用过程中，itemView 的 layoutParams 复用造成 layout 错误,这里要提供一个新的 layoutParams。
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
                 lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
                 lp.bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
