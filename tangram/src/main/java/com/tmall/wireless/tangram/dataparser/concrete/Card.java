@@ -289,7 +289,7 @@ public abstract class Card extends ComponentLifecycle {
 
                     cell.serviceManager = serviceManager; // ensure service manager
                 } else {
-                    if (Utils.isCard(cellData) && parent != null) {
+                    if (Utils.isCard(cellData)) {
                         switch (cellType) {
                             case TangramBuilder.TYPE_CONTAINER_FLOW:
                             case TangramBuilder.TYPE_CONTAINER_1C_FLOW:

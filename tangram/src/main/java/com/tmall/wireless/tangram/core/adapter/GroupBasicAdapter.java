@@ -24,18 +24,6 @@
 
 package com.tmall.wireless.tangram.core.adapter;
 
-import com.alibaba.android.vlayout.LayoutHelper;
-import com.alibaba.android.vlayout.Range;
-import com.alibaba.android.vlayout.VirtualLayoutAdapter;
-import com.alibaba.android.vlayout.VirtualLayoutManager;
-import com.alibaba.android.vlayout.extend.PerformanceMonitor;
-import com.tmall.wireless.tangram.core.protocol.ControlBinder;
-import com.tmall.wireless.tangram.core.protocol.ControlBinderResolver;
-import com.tmall.wireless.tangram.core.protocol.LayoutBinder;
-import com.tmall.wireless.tangram.core.protocol.LayoutBinderResolver;
-import com.tmall.wireless.tangram.dataparser.concrete.Card;
-import com.tmall.wireless.tangram.util.Preconditions;
-
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -46,10 +34,25 @@ import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.android.vlayout.LayoutHelper;
+import com.alibaba.android.vlayout.Range;
+import com.alibaba.android.vlayout.VirtualLayoutAdapter;
+import com.alibaba.android.vlayout.VirtualLayoutManager;
+import com.alibaba.android.vlayout.extend.PerformanceMonitor;
+import com.tmall.wireless.tangram.core.protocol.ControlBinder;
+import com.tmall.wireless.tangram.core.protocol.ControlBinderResolver;
+import com.tmall.wireless.tangram.core.protocol.LayoutBinder;
+import com.tmall.wireless.tangram.core.protocol.LayoutBinderResolver;
+import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.support.InternalErrorSupport;
+import com.tmall.wireless.tangram.util.Preconditions;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by villadora on 15/8/19.
@@ -77,9 +80,11 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
     private PerformanceMonitor mPerformanceMonitor;
 
+    private InternalErrorSupport errorSupport;
+
     public GroupBasicAdapter(@NonNull final Context context, @NonNull final VirtualLayoutManager layoutManager,
-        @NonNull ControlBinderResolver<? extends ControlBinder<C, ? extends View>> cellBinderResolver,
-        @NonNull LayoutBinderResolver<L, ? extends LayoutBinder<L>> cardBinderResolver) {
+                             @NonNull ControlBinderResolver<? extends ControlBinder<C, ? extends View>> cellBinderResolver,
+                             @NonNull LayoutBinderResolver<L, ? extends LayoutBinder<L>> cardBinderResolver) {
         super(layoutManager);
 
         mContext = Preconditions.checkNotNull(context, "context should not be null");
@@ -91,6 +96,10 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     public void setPerformanceMonitor(
             PerformanceMonitor performanceMonitor) {
         mPerformanceMonitor = performanceMonitor;
+    }
+
+    public void setErrorSupport(InternalErrorSupport errorSupport) {
+        this.errorSupport = errorSupport;
     }
 
     private final SparseBooleanArray pendingDeleteMap = new SparseBooleanArray();
@@ -124,7 +133,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
                 pendingDeleteMap.put(key, true);
             }
         }
-        for (int i = 0, size = pendingDeleteMap.size(); i < size; i ++) {
+        for (int i = 0, size = pendingDeleteMap.size(); i < size; i++) {
             newMap.remove(pendingDeleteMap.keyAt(i));
         }
 
@@ -136,6 +145,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
     /**
      * set data without call {@link RecyclerView.Adapter#notifyDataSetChanged()}
+     *
      * @param cards new cards data
      */
     public void setData(@Nullable List<L> cards) {
@@ -143,7 +153,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     }
 
     /**
-     * @param cards new cards data
+     * @param cards   new cards data
      * @param silence true, call {@link RecyclerView.Adapter#notifyDataSetChanged()}; false do not call{@link RecyclerView.Adapter#notifyDataSetChanged()}
      */
     public void setData(@Nullable List<L> cards, boolean silence) {
@@ -225,7 +235,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      */
     @NonNull
     protected List<LayoutHelper> transformCards(@Nullable List<L> cards, final @NonNull List<C> data,
-        @NonNull List<Pair<Range<Integer>, L>> rangeCards) {
+                                                @NonNull List<Pair<Range<Integer>, L>> rangeCards) {
         if (cards == null || cards.size() == 0) {
             return new LinkedList<>();
         }
@@ -275,6 +285,15 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
         if (mPerformanceMonitor != null) {
             mPerformanceMonitor.recordStart(PHASE_CREATE, cellType);
         }
+
+        if (null == binder && null != errorSupport) {
+            Map<String, Object> infoMap = new HashMap<>();
+            infoMap.put("type", cellType);
+            infoMap.put("binderResolver", mCompBinderResolver.toString());
+            errorSupport.onError(InternalErrorSupport.ERROR_CREATE_VIEWHOLDER_NOT_FOUND_TYPE,
+                    "Couldn't found component match certain type: " + cellType, infoMap);
+        }
+
         BinderViewHolder binderViewHolder = createViewHolder(binder, mContext, parent);
         if (mPerformanceMonitor != null) {
             mPerformanceMonitor.recordEnd(PHASE_CREATE, cellType);
@@ -284,7 +303,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
 
     public abstract <V extends View> BinderViewHolder<C, V> createViewHolder(
-        @NonNull final ControlBinder<C, V> binder, @NonNull final Context context, final ViewGroup parent);
+            @NonNull final ControlBinder<C, V> binder, @NonNull final Context context, final ViewGroup parent);
 
 
     @Override
@@ -335,7 +354,6 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     }
 
     /**
-     *
      * @param card
      * @return card range of given instance
      */
@@ -351,7 +369,6 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     }
 
     /**
-     *
      * @param card
      * @return card index of given instance
      */
@@ -365,7 +382,6 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     }
 
     /**
-     *
      * @param position cell's adapter position
      * @return the card index of given cell's position
      */
@@ -390,7 +406,6 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     }
 
     /**
-     *
      * @param cell cell object
      * @return the card index of given cell object
      */
@@ -406,32 +421,30 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
      * @param card
      * @return the type of card
      */
-	@Deprecated
+    @Deprecated
     public abstract int getCardType(L card);
 
     /**
      * Get card range by id
+     *
      * @param id card id
      * @return range instance
      */
     public abstract Range<Integer> getCardRange(String id);
 
     /**
-     *
      * @param id card id
      * @return card instance
      */
     public abstract Card getCardById(String id);
 
     /**
-     *
      * @param type cell's type
      * @return last appearance position
      */
     public abstract int findLastPositionOfCell(String type);
 
     /**
-     *
      * @param type cell's type
      * @return first appearance position
      */
@@ -447,6 +460,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
     /**
      * Get Tangram cell type from recyclerView's item type
+     *
      * @param viewType
      * @return cell type in Tangram
      */
@@ -571,38 +585,44 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
     /**
      * !!! Do not call this method directly. It's not designed for users.
+     *
      * @param position the component position to be removed
      */
     abstract public void removeComponent(int position);
 
     /**
      * !!! Do not call this method directly. It's not designed for users.
+     *
      * @param component the component to be removed
      */
     abstract public void removeComponent(C component);
 
     /**
      * !!! Do not call this method directly. It's not designed for users.
+     *
      * @param group a group of components to be removed.
      */
     abstract public void removeComponents(L group);
 
     /**
      * !!! Do not call this method directly. It's not designed for users.
-     * @param pos the component position to be inserted
+     *
+     * @param pos        the component position to be inserted
      * @param components
      */
     abstract public void insertComponents(int pos, List<C> components);
 
     /**
      * !!! Do not call this method directly. It's not designed for users.
-     * @param idx the group index to be inserted
+     *
+     * @param idx   the group index to be inserted
      * @param group
      */
     abstract public void insertBatchComponents(int idx, List<L> group);
 
     /**
      * !!! Do not call this method directly. It's not designed for users.
+     *
      * @param oldComponent the old component to be replaced
      * @param newComponent the new component
      */
@@ -610,6 +630,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
     /**
      * !!! Do not call this method directly. It's not designed for users.
+     *
      * @param oldGroup the old group to be replaced
      * @param newGroup the new group
      */
@@ -628,7 +649,6 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
     }
 
     /**
-     *
      * @return total cell list
      */
     public List<C> getComponents() {

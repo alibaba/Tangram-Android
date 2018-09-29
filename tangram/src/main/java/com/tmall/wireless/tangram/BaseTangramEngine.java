@@ -60,6 +60,7 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
+import com.tmall.wireless.tangram.support.InternalErrorSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -185,6 +186,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
         if (mGroupBasicAdapter == null) {
             this.mGroupBasicAdapter = mAdapterBuilder.newAdapter(mContext, mLayoutManager, this);
             mGroupBasicAdapter.setPerformanceMonitor(mPerformanceMonitor);
+            mGroupBasicAdapter.setErrorSupport(getService(InternalErrorSupport.class));
         }
 
         if (mContentView.getRecycledViewPool() != null) {

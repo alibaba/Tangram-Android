@@ -24,14 +24,6 @@
 
 package com.tmall.wireless.tangram.example;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.alibaba.android.vlayout.Range;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -47,6 +39,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.alibaba.android.vlayout.Range;
 import com.libra.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.LoadedFrom;
@@ -65,21 +59,29 @@ import com.tmall.wireless.tangram.example.data.TestViewHolder;
 import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
 import com.tmall.wireless.tangram.example.data.VVTEST;
 import com.tmall.wireless.tangram.example.support.SampleClickSupport;
+import com.tmall.wireless.tangram.example.support.SampleErrorSupport;
 import com.tmall.wireless.tangram.example.support.SampleScrollSupport;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
+import com.tmall.wireless.tangram.support.InternalErrorSupport;
 import com.tmall.wireless.tangram.support.async.AsyncLoader;
 import com.tmall.wireless.tangram.support.async.AsyncPageLoader;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
-import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter;
 import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
 import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by villadora on 15/8/18.
@@ -141,7 +143,7 @@ public class TangramActivity extends Activity {
         TangramBuilder.init(this.getApplicationContext(), new IInnerImageSetter() {
             @Override
             public <IMAGE extends ImageView> void doLoadImageUrl(@NonNull IMAGE view,
-                    @Nullable String url) {
+                                                                 @Nullable String url) {
                 Picasso.with(TangramActivity.this.getApplicationContext()).load(url).into(view);
             }
         }, ImageView.class);
@@ -166,7 +168,7 @@ public class TangramActivity extends Activity {
         builder.registerCell(110,
                 TestViewHolderCell.class,
                 new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TextView.class));
-        builder.registerCell(199,SingleImageView.class);
+        builder.registerCell(199, SingleImageView.class);
         builder.registerVirtualView("vvtest");
         //Step 4: new engine
         engine = builder.build();
@@ -280,6 +282,7 @@ public class TangramActivity extends Activity {
 
         //Step 6: enable auto load more if your page's data is lazy loaded
         engine.enableAutoLoadMore(true);
+        engine.register(InternalErrorSupport.class, new SampleErrorSupport());
 
         //Step 7: bind recyclerView to engine
         engine.bindView(recyclerView);

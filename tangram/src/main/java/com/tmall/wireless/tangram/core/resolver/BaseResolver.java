@@ -62,4 +62,10 @@ public abstract class BaseResolver<T, O> implements Resolver<T, O> {
     public boolean has(String type) {
         return mSparseArray.containsKey(type);
     }
+
+
+    @Override
+    public String toString() {
+        return mSparseArray.toString();
+    }
 }
