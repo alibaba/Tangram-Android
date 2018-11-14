@@ -57,6 +57,15 @@ public class LinearScrollCell extends BaseCell {
      * foreground of indicator
      */
     public static final String KEY_INDICATOR_COLOR = "indicatorColor";
+
+    /**
+     * measure
+     */
+    public static final String KEY_INDICATOR_HEIGHT = "indicatorHeight";
+    public static final String KEY_INDICATOR_WIDTH = "indicatorWidth";
+    public static final String KEY_DEFAULT_INDICATOR_WIDTH = "defaultIndicatorWidth";
+    public static final String KEY_INDICATOR_MARGIN = "indicatorMargin";
+
     public static final String KEY_HAS_INDICATOR = "hasIndicator";
     public static final String KEY_FOOTER_TYPE = "footerType";
     public static final String KEY_RETAIN_SCROLL_STATE = "retainScrollState";
@@ -64,10 +73,20 @@ public class LinearScrollCell extends BaseCell {
     public static final String KEY_SCROLL_MARGIN_LEFT = "scrollMarginLeft";
     public static final String KEY_SCROLL_MARGIN_RIGHT = "scrollMarginRight";
 
+
+    public static final String KEY_MAX_ROWS = "maxRows";
+    public static final String KEY_MAX_COLS = "maxCols";
+
     public static final int DEFAULT_DEFAULT_INDICATOR_COLOR = Color.parseColor("#80ffffff");
     public static final int DEFAULT_INDICATOR_COLOR = Color.parseColor("#ffffff");
+    public static final int DEFAULT_MAX_ROWS = 1;
+    public static final int DEFAULT_INDICATOR_WIDTH = Style.parseSize("40rp", 0);
+    public static final int DEFAULT_DEFAULT_INDICATOR_WIDTH = Style.parseSize("80rp", 0);
+    public static final int DEFAULT_INDICATOR_HEIGHT = Style.parseSize("4rp", 0);
+    public static final int DEFAULT_INDICATOR_MARGIN = Style.parseSize("14rp", 0);
 
     public static final String KEY_HGAP = "hGap";
+    public static final String KEY_VGAP = "vGap";
 
     public List<BaseCell> cells = new ArrayList<BaseCell>();
 
@@ -78,13 +97,20 @@ public class LinearScrollCell extends BaseCell {
     public double pageHeight = Double.NaN;
     public int defaultIndicatorColor = DEFAULT_DEFAULT_INDICATOR_COLOR;
     public int indicatorColor = DEFAULT_INDICATOR_COLOR;
+    public double indicatorWidth = Double.NaN;
+    public double indicatorHeight = Double.NaN;
+    public double defaultIndicatorWidth = Double.NaN;
     public boolean hasIndicator = true;
     public String footerType;
     public Adapter adapter;
+    public int maxRows;
+    public int maxCols;
     public int bgColor = Color.TRANSPARENT;
     public int scrollMarginLeft;
     public int scrollMarginRight;
     public double hGap;
+    public double vGap;
+    public double indicatorMargin;
 
     // current distance that responding recycler view has scrolled.
     public int currentDistance = 0;
@@ -119,6 +145,19 @@ public class LinearScrollCell extends BaseCell {
         return null;
     }
 
+    public int getMapperPosition(int rawPosition) {
+        int cellCount = cells == null ? 0 : cells.size();
+        if (cellCount == 0) {
+            return rawPosition;
+        }
+
+        int columnCount = (int)(cellCount * 1.0f / maxRows + 0.5f);
+        int rowIndex = rawPosition / maxRows;
+        int columnIndex = rawPosition % maxRows;
+
+        return columnIndex * columnCount + rowIndex;
+    }
+
     @SuppressWarnings("unchecked")
     public class Adapter extends RecyclerView.Adapter<BinderViewHolder> {
         private GroupBasicAdapter adapter;
@@ -134,8 +173,9 @@ public class LinearScrollCell extends BaseCell {
 
         @Override
         public void onBindViewHolder(BinderViewHolder binderViewHolder, int position) {
-            binderViewHolder.bind(cells.get(position));
-            BaseCell cell = cells.get(position);
+            int mapperPosition = getMapperPosition(position);
+            binderViewHolder.bind(cells.get(mapperPosition));
+            BaseCell cell = cells.get(mapperPosition);
             RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(binderViewHolder.itemView.getLayoutParams());
             if (!Double.isNaN(pageWidth)) {
                 lp.width = (int) (pageWidth + 0.5);
@@ -153,7 +193,7 @@ public class LinearScrollCell extends BaseCell {
                 lp.width = Style.parseSize(cell.extras.optString("pageWidth"), 0);
             }
             binderViewHolder.itemView.setLayoutParams(lp);
-            binderViewHolder.itemView.setTag(R.id.TANGRAM_LINEAR_SCROLL_POS, position);
+            binderViewHolder.itemView.setTag(R.id.TANGRAM_LINEAR_SCROLL_POS, mapperPosition);
         }
 
         @Override
