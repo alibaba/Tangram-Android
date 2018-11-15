@@ -306,6 +306,13 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         bindFooterView(lSCell.mFooter);
     }
 
+    /**
+     * Set indicator measure
+     * @param indicator indicator view
+     * @param width indicator width
+     * @param height indicator height
+     * @param margin indicator top margin
+     */
     private void setIndicatorMeasure(View indicator, int width, int height, int margin) {
         if (indicator != null) {
             ViewGroup.LayoutParams layoutParams = indicator.getLayoutParams();
