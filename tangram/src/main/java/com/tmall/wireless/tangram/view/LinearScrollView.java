@@ -33,16 +33,13 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -51,20 +48,15 @@ import com.tmall.wireless.tangram.core.R;
 import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
-import com.tmall.wireless.tangram.eventbus.BusSupport;
-import com.tmall.wireless.tangram.ext.HorizontalOverScrollBounceEffectDecoratorExt;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.cell.LinearScrollCell;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
 
-import me.everything.android.ui.overscroll.adapters.RecyclerViewOverScrollDecorAdapter;
 
 /**
  * Created by Kunlun on 9/17/16.
  */
-public class LinearScrollView extends LinearLayout implements ITangramViewLifeCycle,
-        HorizontalOverScrollBounceEffectDecoratorExt.OnMotionEventListener,
-        HorizontalOverScrollBounceEffectDecoratorExt.OnOverScrollListener {
+public class LinearScrollView extends LinearLayout implements ITangramViewLifeCycle {
     private RecyclerView recyclerView;
     private GridLayoutManager layoutManager;
     private View indicator, indicatorContainer;
@@ -75,10 +67,6 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
     private float totalDistanceOfIndicator = 0;
     // total distance that recycler view can scroll.
     private float totalDistance = 0;
-
-    private int touchSlop;
-    private HorizontalOverScrollBounceEffectDecoratorExt overScrollDecorator;
-    private boolean enableOverScrollPull;
 
     private List<BinderViewHolder> mViewHolders = new ArrayList<BinderViewHolder>();
 
@@ -129,51 +117,6 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         indicatorContainer = findViewById(R.id.tangram_linearscrollview_indicator_container);
 
         totalDistanceOfIndicator = Style.dp2px(34);
-
-        touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-        overScrollDecorator = new HorizontalOverScrollBounceEffectDecoratorExt(new RecyclerViewOverScrollDecorAdapter(recyclerView));
-    }
-
-    private float xDown;
-    private float yDown;
-
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-
-        int action = ev.getAction();
-        float x = ev.getRawX();
-        float y = ev.getRawY();
-
-        switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                xDown = x;
-                yDown = y;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                int xDistance = (int) (x - xDown);
-                int yDistance = (int) (y - yDown);
-
-                if (Math.abs(xDistance) > touchSlop && Math.abs(xDistance) > Math.abs(yDistance)) {
-                    if (!recyclerView.canScrollHorizontally(-1) && xDistance > 0
-                            || (!recyclerView.canScrollHorizontally(1) && xDistance < 0)) {
-                        enableOverScrollPull = true;
-                        return true;
-                    } else {
-                        enableOverScrollPull = false;
-                    }
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                if (enableOverScrollPull) {
-                    return true;
-                }
-                break;
-            default:
-                break;
-        }
-
-        return false;
     }
 
     @Override
@@ -203,15 +146,32 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                 public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
                     outRect.set(0, 0, 0, 0);
 
+                    int cellCount = lSCell.cells.size();
+                    int viewIndex = (int) view.getTag(R.id.TANGRAM_LINEAR_SCROLL_POS);
                     int rowCount = (int)(lSCell.cells.size() * 1.0f / lSCell.maxRows + 0.5f);
 
-                    int viewIndex = (int) view.getTag(R.id.TANGRAM_LINEAR_SCROLL_POS);
+                    boolean isLastCellInRow = false;
+                    if ((viewIndex + 1) % rowCount == 0) {
+                        // the last cell in every row
+                        isLastCellInRow = true;
+                    }
+
+                    if (viewIndex == (cellCount - 1)) {
+                        // the last cell in cells
+                        isLastCellInRow = true;
+                    }
+
                     if (viewIndex % rowCount == 0) {
-                        // last view only set left
-                        outRect.right = (int) (lSCell.hGap / 2);
-                    } else if (((viewIndex + 1) % rowCount == 0) || (viewIndex == lSCell.cells.size() - 1)) {
                         // first view only set right
+                        outRect.right = (int) (lSCell.hGap / 2);
+                    } else if (isLastCellInRow) {
+                        // last view only set left
                         outRect.left = (int) (lSCell.hGap / 2);
+
+                        if (lSCell.maxRows > 1 && (cellCount % lSCell.maxRows == 1) && (viewIndex == cellCount - 1)) {
+                            // the last cell in penultimate row
+                            outRect.right = (int) (lSCell.hGap / 2);
+                        }
                     } else {
                         outRect.left = (int) (lSCell.hGap / 2);
                         outRect.right = (int) (lSCell.hGap / 2);
@@ -223,15 +183,19 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
 
         float[] starts = null;
         if (lSCell.cells != null && lSCell.cells.size() > 0) {
-            starts = new float[lSCell.cells.size()];
             int maxRowCount = lSCell.cells.size();
             if (lSCell.maxRows > 1) {
                 maxRowCount  = (int)(maxRowCount * 1.0f / lSCell.maxRows + 0.5f);
             }
+
+            starts = new float[maxRowCount];
             for (int i = 0; i < maxRowCount; i++) {
+                int rowIndex = lSCell.maxRows * i;
+                int mapperIndex = lSCell.getMapperPosition(rowIndex);
+
                 starts[i] = totalDistance;
 
-                BaseCell bc = lSCell.cells.get(lSCell.getMapperPosition(i));
+                BaseCell bc = lSCell.cells.get(mapperIndex);
                 if (bc.style != null && bc.style.margin.length > 0) {
                     totalDistance = totalDistance + bc.style.margin[1] + bc.style.margin[3];
                 }
@@ -242,11 +206,9 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                         totalDistance += lSCell.pageWidth;
                     }
                 }
-            }
-
-            if (lSCell.hGap > 0) {
-                int rowCount = (int) (lSCell.cells.size() * 1.0f / lSCell.maxRows + 0.5f);
-                totalDistance += (rowCount - 1) * lSCell.hGap;
+                if (i > 0 && lSCell.hGap > 0) {
+                    totalDistance += lSCell.hGap;
+                }
             }
         }
         totalDistance -= getScreenWidth();
@@ -279,18 +241,14 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
             indicatorContainer.setVisibility(GONE);
         }
 
-        overScrollDecorator.setOnOverScrollListener(this);
-        overScrollDecorator.setOnMotionEventListener(this);
-
         recyclerView.addOnScrollListener(onScrollListener);
 
         setBackgroundColor(lSCell.bgColor);
 
-        if (lSCell.retainScrollState) {
-            int position = computeFirstCompletelyVisibleItemPositionForScrolledX(starts);
+        if (lSCell.retainScrollState && starts != null) {
             GridLayoutManager lm = (GridLayoutManager) recyclerView.getLayoutManager();
-            lm.scrollToPositionWithOffset(position,
-                    starts == null || starts.length <= position ? 0 : (int) (starts[position] - lSCell.currentDistance));
+            int position = computeFirstCompletelyVisibleItemPositionForScrolledX(starts);
+            lm.scrollToPositionWithOffset(position * lSCell.maxRows, (int) (starts[position] - lSCell.currentDistance));
         }
         if (lSCell.scrollMarginLeft > 0 || lSCell.scrollMarginRight > 0) {
             setPadding(lSCell.scrollMarginLeft, 0, lSCell.scrollMarginRight, 0);
@@ -343,11 +301,11 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
             return 0;
         }
         for (int i = 0; i < starts.length; i++) {
-            if (starts[i] > lSCell.currentDistance) {
+            if (starts[i] >= lSCell.currentDistance) {
                 return i;
             }
         }
-        return 0;
+        return starts.length - 1;
     }
 
     @Override
@@ -361,9 +319,6 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         if (lSCell.hasIndicator) {
             indicator.setTranslationX(0);
         }
-
-        overScrollDecorator.setOnOverScrollListener(null);
-        overScrollDecorator.setOnMotionEventListener(null);
 
         recyclerView.removeOnScrollListener(onScrollListener);
         recyclerView.setAdapter(null);
@@ -385,28 +340,6 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         Configuration configuration = resources.getConfiguration();
         return configuration.orientation == Configuration.ORIENTATION_PORTRAIT ?
                 dm.widthPixels : dm.heightPixels;
-    }
-
-    @Override
-    public void onMotionEvent(View view, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (lSCell != null && lSCell.serviceManager != null) {
-                BusSupport busSupport = lSCell.serviceManager.getService(BusSupport.class);
-                ArrayMap<String, String> params = new ArrayMap<String, String>();
-                params.put("spmcOffset", String.valueOf(lSCell.cells.size()));
-                busSupport.post(BusSupport.obtainEvent("onMotionEvent", null, params, null));
-            }
-        }
-    }
-
-    @Override
-    public void onOverScroll(View view, float offset) {
-        if (lSCell != null && lSCell.serviceManager != null) {
-            BusSupport busSupport = lSCell.serviceManager.getService(BusSupport.class);
-            ArrayMap<String, String> params = new ArrayMap<String, String>();
-            params.put("offset", String.valueOf(offset));
-            busSupport.post(BusSupport.obtainEvent("onOverScroll", null, params, null));
-        }
     }
 
     private void bindHeaderView(BaseCell cell) {

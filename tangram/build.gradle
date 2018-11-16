@@ -132,10 +132,6 @@ dependencies {
     } else {
         compile 'com.alibaba.android:ultraviewpager:1.0.6.9@aar'
     }
-    compile('me.everything:overscroll-decor-android:1.0.1@aar') {
-        transitive true
-        exclude group: 'com.android.support', module: 'recyclerview-v7'
-    }
     if (project.hasProperty('virtualViewDevMode')) {
         println 'compile with virtualview source code'
         compile(project(':virtualview')) {
