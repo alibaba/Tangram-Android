@@ -74,12 +74,12 @@ def VERSION = System.properties['version'] ?: '10'
 def VERSION_NAME = System.properties['versionName'] ?: '0.1.0'
 
 android {
-    compileSdkVersion Integer.parseInt(System.properties['compileSdkVersion'] ?: '22')
-    buildToolsVersion System.properties['buildToolsVersion'] ?: '21.0.2'
+    compileSdkVersion Integer.parseInt(System.properties['compileSdkVersion'] ?: '26')
+    buildToolsVersion System.properties['buildToolsVersion'] ?: '26.0.2'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion Integer.parseInt(System.properties['targetSdkVersion'] ?: '19')
+        targetSdkVersion Integer.parseInt(System.properties['targetSdkVersion'] ?: '26')
         versionCode Integer.parseInt(VERSION)
         versionName VERSION_NAME
     }
@@ -131,27 +131,6 @@ dependencies {
         compile project(':ultraviewpager')
     } else {
         compile 'com.alibaba.android:ultraviewpager:1.0.6.9@aar'
-    }
-    if (project.hasProperty('virtualViewDevMode')) {
-        println 'compile with virtualview source code'
-        compile(project(':virtualview')) {
-
-            exclude group: 'com.android.support', module: 'appcompat'
-            exclude group: 'com.android.support', module: 'appcompat-v7'
-            exclude group: 'com.android.support', module: 'support-v7-recyclerview'
-            exclude group: 'com.android.support', module: 'support-v4'
-            exclude group: 'com.android.support', module: 'support-annotations'
-        }
-    } else {
-        compile('com.alibaba.android:virtualview:1.3.8@aar') {
-            transitive true
-            exclude group: 'com.android.support', module: 'appcompat'
-            exclude group: 'com.android.support', module: 'appcompat-v7'
-            exclude group: 'com.android.support', module: 'support-v7-recyclerview'
-            exclude group: 'com.android.support', module: 'support-v4'
-            exclude group: 'com.android.support', module: 'support-annotations'
-            exclude group: 'com.android.support', module: 'support-compat'
-        }
     }
 }
 

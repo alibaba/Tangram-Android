@@ -28,8 +28,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -43,21 +41,16 @@ import android.widget.TextView;
 import com.alibaba.android.vlayout.Range;
 import com.libra.Utils;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Picasso.LoadedFrom;
-import com.squareup.picasso.RequestCreator;
-import com.squareup.picasso.Target;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.TangramEngine;
 import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
-import com.tmall.wireless.tangram.example.data.DEBUG;
 import com.tmall.wireless.tangram.example.data.RatioTextView;
 import com.tmall.wireless.tangram.example.data.SimpleImgView;
 import com.tmall.wireless.tangram.example.data.SingleImageView;
 import com.tmall.wireless.tangram.example.data.TestView;
 import com.tmall.wireless.tangram.example.data.TestViewHolder;
 import com.tmall.wireless.tangram.example.data.TestViewHolderCell;
-import com.tmall.wireless.tangram.example.data.VVTEST;
 import com.tmall.wireless.tangram.example.support.SampleClickSupport;
 import com.tmall.wireless.tangram.example.support.SampleErrorSupport;
 import com.tmall.wireless.tangram.example.support.SampleScrollSupport;
@@ -68,10 +61,6 @@ import com.tmall.wireless.tangram.support.async.AsyncLoader;
 import com.tmall.wireless.tangram.support.async.AsyncPageLoader;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
-import com.tmall.wireless.vaf.framework.VafContext;
-import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.IImageLoaderAdapter;
-import com.tmall.wireless.vaf.virtualview.Helper.ImageLoader.Listener;
-import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,7 +69,6 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -94,43 +82,6 @@ public class TangramActivity extends Activity {
     TangramEngine engine;
     TangramBuilder.InnerBuilder builder;
     RecyclerView recyclerView;
-
-    private static class ImageTarget implements Target {
-
-        ImageBase mImageBase;
-
-        Listener mListener;
-
-        public ImageTarget(ImageBase imageBase) {
-            mImageBase = imageBase;
-        }
-
-        public ImageTarget(Listener listener) {
-            mListener = listener;
-        }
-
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap, LoadedFrom from) {
-            mImageBase.setBitmap(bitmap, true);
-            if (mListener != null) {
-                mListener.onImageLoadSuccess(bitmap);
-            }
-            Log.d("TangramActivity", "onBitmapLoaded " + from);
-        }
-
-        @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
-            if (mListener != null) {
-                mListener.onImageLoadFailed();
-            }
-            Log.d("TangramActivity", "onBitmapFailed ");
-        }
-
-        @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-            Log.d("TangramActivity", "onPrepareLoad ");
-        }
-    }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
@@ -170,38 +121,10 @@ public class TangramActivity extends Activity {
                 new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TextView.class));
         builder.registerCell(199, SingleImageView.class);
         builder.registerVirtualView("vvtest");
+        builder.registerRenderService(new VirtualViewRenderService());
         //Step 4: new engine
         engine = builder.build();
-        engine.setVirtualViewTemplate(VVTEST.BIN);
-        engine.setVirtualViewTemplate(DEBUG.BIN);
-        engine.getService(VafContext.class).setImageLoaderAdapter(new IImageLoaderAdapter() {
 
-            private List<ImageTarget> cache = new ArrayList<ImageTarget>();
-
-            @Override
-            public void bindImage(String uri, final ImageBase imageBase, int reqWidth, int reqHeight) {
-                RequestCreator requestCreator = Picasso.with(TangramActivity.this).load(uri);
-                Log.d("TangramActivity", "bindImage request width height " + reqHeight + " " + reqWidth);
-                if (reqHeight > 0 || reqWidth > 0) {
-                    requestCreator.resize(reqWidth, reqHeight);
-                }
-                ImageTarget imageTarget = new ImageTarget(imageBase);
-                cache.add(imageTarget);
-                requestCreator.into(imageTarget);
-            }
-
-            @Override
-            public void getBitmap(String uri, int reqWidth, int reqHeight, final Listener lis) {
-                RequestCreator requestCreator = Picasso.with(TangramActivity.this).load(uri);
-                Log.d("TangramActivity", "getBitmap request width height " + reqHeight + " " + reqWidth);
-                if (reqHeight > 0 || reqWidth > 0) {
-                    requestCreator.resize(reqWidth, reqHeight);
-                }
-                ImageTarget imageTarget = new ImageTarget(lis);
-                cache.add(imageTarget);
-                requestCreator.into(imageTarget);
-            }
-        });
         Utils.setUedScreenWidth(720);
 
         //Step 5: add card load support if you have card that loading cells async

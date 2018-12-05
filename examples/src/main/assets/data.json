@@ -3,32 +3,40 @@
     "type": "container-scroll",
     "style": {
       "pageWidth": 200,
-      "hGap": 100,
+      "hGap": 10,
       "pageHeight": 100
     },
+    "componentInfo": [
+      {
+        "name": "vvtest",
+        "type": "VirtualView",
+        "version": "1",
+        "url": ""
+      }
+    ],
     "items": [
       {
         "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
         "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
-        "title": "标题1",
+        "title": "rs标题1",
+        "type": "dxTest"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "rs标题2",
         "type": "vvtest"
       },
       {
         "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
         "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
-        "title": "标题2",
+        "title": "rs标题3",
         "type": "vvtest"
       },
       {
         "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
         "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
-        "title": "标题3",
-        "type": "vvtest"
-      },
-      {
-        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
-        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
-        "title": "标题4",
+        "title": "rs标题4",
         "type": "vvtest"
       }
     ]
@@ -82,19 +90,23 @@
     },
     "items": [
       {
-        "bizId": "item1",
-        "type": 110,
-        "msg": "info1"
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "msg": "标题1",
+        "title": "说说你的故事",
+        "type": "vvtest"
       },
       {
-        "bizId": "item2",
-        "type": 110,
-        "msg": "info2"
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "msg": "标题2",
+        "title": "Five to Go 大学生短片",
+        "type": "vvtest"
       }
     ]
   },
   {
-    "type":"container-banner",
+    "type": "container-banner",
     "style": {
       "pageWidth": 200,
       "pageHeight": 100,
@@ -637,7 +649,8 @@
       "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
       "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
       "title": "标题1",
-      "type": "vvtest"
+      "type": "vvtest",
+      "renderService": "VirtualView"
     },
     "style": {
       "autoExpand": true
@@ -693,7 +706,7 @@
     ]
   },
   {
-    "type":"container-float",
+    "type": "container-float",
     "style": {
       "align": "bottom_left",
       "x": 10,

@@ -28,6 +28,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.core.R;
@@ -71,17 +72,14 @@ public class BaseCellBinder<T extends ViewHolderCreator.ViewHolder, V extends Vi
 
     @NonNull
     @Override
-    public V createView(Context context, ViewGroup parent) {
+    public V createView(Context context, ViewGroup parent, ComponentInfo info) {
         V v;
         if (viewHolderCreator != null) {
             v = viewHolderCreator.create(context, parent);
         } else if (mViewCreator != null) {
             v = mViewCreator.create(context, parent);
         } else {
-            v = (V) mMvHelper.getVafContext().getContainerService().getContainer(type, true);
-        }
-        if (v.getId() <= 0) {
-            v.setId(R.id.TANGRAM_VIEW_CONTAINER_ID);
+            v = (V) mMvHelper.renderManager().createView(context, parent, info);
         }
 
         return v;

@@ -29,10 +29,12 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tmall.wireless.tangram.dataparser.concrete.ComponentInfo;
+
 /**
  * Created by villadora on 15/12/8.
  */
 public interface ViewCreator<V extends View> {
     @NonNull
-    V createView(Context context, ViewGroup parent);
+    V createView(Context context, ViewGroup parent, ComponentInfo componentInfo);
 }

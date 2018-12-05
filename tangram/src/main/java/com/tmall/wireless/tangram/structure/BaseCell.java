@@ -33,10 +33,12 @@ import android.support.v4.util.ArrayMap;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageView;
+
 import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.dataparser.concrete.ComponentInfo;
 import com.tmall.wireless.tangram.dataparser.concrete.ComponentLifecycle;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.op.ClickExposureCellOp;
@@ -47,6 +49,7 @@ import com.tmall.wireless.tangram.util.BDE;
 import com.tmall.wireless.tangram.util.IInnerImageSetter;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.LifeCycleProviderImpl;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -118,6 +121,8 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
      */
     public final long objectId;
 
+    public ComponentInfo componentInfo;
+
     /**
      * the original json data
      */
@@ -140,6 +145,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     /**
      * Use {@link #BaseCell(String)} instead
+     *
      * @param type
      */
     @Deprecated
@@ -215,7 +221,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     public boolean hasParam(String key) {
         return extras.has(key) ||
-            style != null && style.extras != null && style.extras.has(key);
+                style != null && style.extras != null && style.extras.has(key);
     }
 
     public Object optParam(String key) {
@@ -344,6 +350,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     /**
      * bind a tag to baseCell
+     *
      * @param key
      * @param value
      */
@@ -356,6 +363,7 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     /**
      * get a tag from baseCell
+     *
      * @param key
      * @return
      */
@@ -460,7 +468,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
     public LifeCycleProviderImpl<BDE> getLifeCycleProvider() {
         return mLifeCycleProvider;
     }
-
 
 
 }

@@ -24,17 +24,6 @@
 
 package com.tmall.wireless.tangram.dataparser.concrete;
 
-import com.alibaba.android.vlayout.LayoutHelper;
-import com.alibaba.android.vlayout.Range;
-import com.alibaba.android.vlayout.VirtualLayoutManager;
-
-import android.util.Log;
-import com.tmall.wireless.tangram.MVHelper;
-import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
-import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
-import com.tmall.wireless.tangram.core.protocol.ControlBinder;
-import com.tmall.wireless.tangram.structure.BaseCell;
-
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -42,13 +31,21 @@ import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.util.SparseArray;
-import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.alibaba.android.vlayout.LayoutHelper;
+import com.alibaba.android.vlayout.Range;
+import com.alibaba.android.vlayout.VirtualLayoutManager;
+import com.tmall.wireless.tangram.MVHelper;
+import com.tmall.wireless.tangram.core.adapter.BinderViewHolder;
+import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
+import com.tmall.wireless.tangram.core.protocol.ControlBinder;
+import com.tmall.wireless.tangram.core.protocol.ElementRenderService;
+import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.support.CellSupport;
 import com.tmall.wireless.tangram.support.PageDetectorSupport;
-import com.tmall.wireless.vaf.framework.ViewManager;
-import java.lang.annotation.Inherited;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -70,8 +67,6 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
     private MVHelper mMvHelper;
 
-    private ViewManager mViewManager;
-
     /*
      * This used to store cell.type <=> itemType mapping, they are not the same!
      * the same cell.type can be different itemTypes for better recycle mechanism
@@ -81,11 +76,9 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     PojoGroupBasicAdapter(@NonNull Context context, @NonNull VirtualLayoutManager layoutManager,
                           @NonNull BaseCellBinderResolver componentBinderResolver,
                           @NonNull BaseCardBinderResolver cardBinderResolver,
-                          @NonNull MVHelper mvHelper,
-                          @NonNull ViewManager viewManager) {
+                          @NonNull MVHelper mvHelper) {
         super(context, layoutManager, componentBinderResolver, cardBinderResolver);
         this.mMvHelper = mvHelper;
-        this.mViewManager = viewManager;
         //if true, this adapter's items have stable IDs, but BaseCell.objectId return 0. So not use.
         //setHasStableIds(true);
     }
@@ -120,8 +113,10 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     }
 
     @Override
-    public <V extends View> BinderViewHolder<BaseCell, V> createViewHolder(@NonNull ControlBinder<BaseCell, V> binder, @NonNull Context context, ViewGroup parent) {
-        V view = binder.createView(context, parent);
+    public <V extends View> BinderViewHolder<BaseCell, V> createViewHolder(@NonNull ControlBinder<BaseCell, V> binder,
+                                                                           @NonNull Context context, ViewGroup parent,
+                                                                           String cellType) {
+        V view = binder.createView(context, parent, mMvHelper.renderManager().getComponentInfo(cellType));
         return new BinderViewHolder<>(view, binder);
     }
 
@@ -135,7 +130,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
             Pair<Range<Integer>, Card> pair = mCards.get(idx);
             pair.second.onBindCell(position - pair.first.getLower(), position, mLastBindPosition < 0 || mLastBindPosition < position);
             PageDetectorSupport pageDetectorSupport = pair.second.serviceManager
-                .getService(PageDetectorSupport.class);
+                    .getService(PageDetectorSupport.class);
             if (pageDetectorSupport != null) {
                 pageDetectorSupport.onBindItem(position, mLastBindPosition < 0 || mLastBindPosition < position, getItemByPosition(position));
             }
@@ -176,29 +171,31 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
      */
     @Override
     public int getItemType(BaseCell item) {
-        // if the item is a keyType, which means item.type is not the key
-        int version = mViewManager != null ? mViewManager.getViewVersion(item.stringType) : 0;
+        // normally we use item.type as identity key
+        // note, this now only be executed in MainThread, atomic not actually needed
+        String stringType = item.stringType;
+
+        // if the item is a keyType, which means item.type is not the key, use it.
+        // when data custom the typeKey, we ignore the result of render service.
         if (!TextUtils.isEmpty(item.typeKey)) {
             // we should use getTypeKey()
-            String typeKey = item.typeKey + version;
-            if (!mStrKeys.containsKey(typeKey)) {
-                int newType = mTypeId.getAndIncrement();
-                mStrKeys.put(typeKey, newType);
-                mId2Types.put(newType, item.stringType);
+            stringType = item.typeKey;
+        } else if (item.componentInfo != null) {
+            // in MVHelper#isValid ensured a componentInfo's renderService could not be null, so just use it!
+            // if render service custom item type and not empty, use it as itemType
+            stringType += item.componentInfo.getVersion() + item.componentInfo.getType();
+            String renderType = mMvHelper.renderManager().getRenderService(item.componentInfo.getType()).getItemViewType(stringType);
+            if (!TextUtils.isEmpty(renderType)) {
+                stringType = renderType;
             }
-
-            return mStrKeys.get(typeKey).intValue();
-        } else {
-            // otherwise, use item.type as identity key
-            // note, this now only be executed in MainThread, atomic not actually needed
-            String stringType = item.stringType + version;
-            if (!mStrKeys.containsKey(stringType)) {
-                int newType = mTypeId.getAndIncrement();
-                mStrKeys.put(stringType, newType);
-                mId2Types.put(newType, item.stringType);
-            }
-            return mStrKeys.get(stringType).intValue();
         }
+
+        if (!mStrKeys.containsKey(stringType)) {
+            int newType = mTypeId.getAndIncrement();
+            mStrKeys.put(stringType, newType);
+            mId2Types.put(newType, item.stringType);
+        }
+        return mStrKeys.get(stringType);
     }
 
 
@@ -390,6 +387,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
     /**
      * !!! Do not call this method directly. It's not designed for users.
+     *
      * @param component the component to be removed
      */
     @Override
