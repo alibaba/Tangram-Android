@@ -15,7 +15,7 @@ public class ComponentInfo {
 
     private String type;
 
-    private int version;
+    private long version;
 
     private String url;
 
@@ -25,7 +25,7 @@ public class ComponentInfo {
     public ComponentInfo(JSONObject json) {
         this.name = json.optString(NAME);
         this.type = json.optString(TYPE);
-        this.version = json.optInt(VERSION);
+        this.version = json.optLong(VERSION);
         this.url = json.optString(URL);
     }
 
@@ -45,11 +45,11 @@ public class ComponentInfo {
         this.type = type;
     }
 
-    public int getVersion() {
+    public long getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(long version) {
         this.version = version;
     }
 

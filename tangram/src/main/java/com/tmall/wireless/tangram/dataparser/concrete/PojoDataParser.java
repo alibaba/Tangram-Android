@@ -55,7 +55,7 @@ import java.util.List;
 /**
  * DataParser parse JSONArray into Card/Cell
  */
-public final class PojoDataParser extends DataParser<JSONObject, JSONArray, Card, BaseCell> {
+public class PojoDataParser extends DataParser<JSONObject, JSONArray, Card, BaseCell> {
 
     private static final String TAG = "PojoDataParser";
 
