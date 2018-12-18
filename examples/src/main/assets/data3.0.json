@@ -1,0 +1,740 @@
+[
+  {
+    "type": "container-scroll",
+    "style": {
+      "pageWidth": 200,
+      "hGap": 10,
+      "pageHeight": 100
+    },
+    "componentInfo": [
+      {
+        "name": "vvtest",
+        "type": "VirtualView",
+        "version": "1",
+        "url": ""
+      }
+    ],
+    "items": [
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "rs标题1",
+        "type": "dxTest"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "rs标题2",
+        "type": "vvtest"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "rs标题3",
+        "type": "vvtest"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "title": "rs标题4",
+        "type": "vvtest"
+      }
+    ]
+  },
+  {
+    "type": "container-oneColumn",
+    "items": [
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "msg": "暴走大事件第五季暴走大事件第五季暴走大事件第五季",
+        "play": "23343454",
+        "danmu": "13234",
+        "test": "分区1",
+        "type": "Debug"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "msg": "说说你在B站的故事",
+        "play": "5445667",
+        "danmu": "2134",
+        "test": "分区2",
+        "type": "Debug"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "msg": "切格瓦拉东京偷车切格瓦拉东京偷车切格瓦拉东京偷车",
+        "play": "496",
+        "danmu": "23",
+        "test": "分区3",
+        "type": "Debug"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "msg": "Five to Go 大学生短片",
+        "play": "369",
+        "danmu": "5",
+        "test": "分区4",
+        "type": "Debug"
+      }
+    ]
+  },
+  {
+    "id": "banner1",
+    "type": "container-oneColumn",
+    "style": {
+      "aspectRatio": 3.223
+    },
+    "items": [
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "msg": "标题1",
+        "title": "说说你的故事",
+        "type": "vvtest"
+      },
+      {
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+        "msg": "标题2",
+        "title": "Five to Go 大学生短片",
+        "type": "vvtest"
+      }
+    ]
+  },
+  {
+    "type": "container-banner",
+    "style": {
+      "pageWidth": 200,
+      "pageHeight": 100,
+      "indicatorMargin": "5",
+      "infinite": "true",
+      "indicatorImg2": "https://img.alicdn.com/tps/TB1XRNFNXXXXXXKXXXXXXXXXXXX-32-4.png",
+      "indicatorImg1": "https://img.alicdn.com/tps/TB16i4qNXXXXXbBXFXXXXXXXXXX-32-4.png",
+      "scrollMarginLeft": "10",
+      "indicatorGap": "2",
+      "indicatorHeight": "1.5",
+      "itemRatio": "2.654",
+      "scrollMarginRight": "10",
+      "indicatorGravity": "center",
+      "hGap": "20"
+    },
+    "items": [
+      {
+        "type": "testView",
+        "msg": "info1",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info2",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info3",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info4",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info5",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info6",
+        "style": {
+        }
+      }
+    ]
+  },
+  {
+    "type": "container-oneColumn",
+    "items": [
+      {
+        "id": "banner1",
+        "type": "container-banner",
+        "style": {
+          "indicatorMargin": "5",
+          "infinite": "true",
+          "indicatorImg2": "https://img.alicdn.com/tps/TB1XRNFNXXXXXXKXXXXXXXXXXXX-32-4.png",
+          "indicatorImg1": "https://img.alicdn.com/tps/TB16i4qNXXXXXbBXFXXXXXXXXXX-32-4.png",
+          "scrollMarginLeft": "10",
+          "indicatorGap": "2",
+          "indicatorHeight": "1.5",
+          "itemRatio": "2.654",
+          "scrollMarginRight": "10",
+          "indicatorGravity": "center",
+          "hGap": "20",
+          "height": 200
+        },
+        "items": [
+          {
+            "type": "testView",
+            "msg": "info1",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info2",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info3",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info4",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info5",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info6",
+            "style": {
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "container-oneColumn",
+    "items": [
+      {
+        "type": "container-scroll",
+        "style": {
+          "pageWidth": 200,
+          "pageHeight": 100,
+          "indicatorMargin": "5",
+          "infinite": "true",
+          "indicatorImg2": "https://img.alicdn.com/tps/TB1XRNFNXXXXXXKXXXXXXXXXXXX-32-4.png",
+          "indicatorImg1": "https://img.alicdn.com/tps/TB16i4qNXXXXXbBXFXXXXXXXXXX-32-4.png",
+          "scrollMarginLeft": "10",
+          "indicatorGap": "2",
+          "indicatorHeight": "1.5",
+          "itemRatio": "2.654",
+          "scrollMarginRight": "10",
+          "indicatorGravity": "center",
+          "hGap": "20"
+        },
+        "items": [
+          {
+            "type": "testView",
+            "msg": "info1",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info2",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info3",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info4",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info5",
+            "style": {
+            }
+          },
+          {
+            "type": "testView",
+            "msg": "info6",
+            "style": {
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "BuyCate",
+    "style": {
+      "hGap": "15",
+      "vGap": "15",
+      "margin": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "padding": [
+        "15",
+        "15",
+        "15",
+        "15"
+      ]
+    },
+    "type": "container-waterfall",
+    "items": [
+      {
+        "title": "A",
+        "type": "testView"
+      },
+      {
+        "title": "B",
+        "type": "testView"
+      },
+      {
+        "title": "C",
+        "type": "testView"
+      },
+      {
+        "title": "D",
+        "type": "testView"
+      },
+      {
+        "title": "E",
+        "type": "testView"
+      },
+      {
+        "title": "F",
+        "type": "testView"
+      },
+      {
+        "title": "G",
+        "type": "testView"
+      },
+      {
+        "title": "H",
+        "type": "testView"
+      },
+      {
+        "title": "I",
+        "type": "testView"
+      },
+      {
+        "title": "G",
+        "type": "testView"
+      }
+    ]
+  },
+  {
+    "type": "container-oneColumn",
+    "style": {
+      "aspectRatio": 3.223
+    },
+    "items": [
+      {
+        "type": "singleImgView",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png"
+      },
+      {
+        "type": "singleImgView",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png"
+      }
+    ]
+  },
+  {
+    "type": "container-sticky",
+    "style": {
+      "sticky": "start"
+    },
+    "items": [
+      {
+        "type": "testView",
+        "msg": "sticky",
+        "style": {
+        }
+      }
+    ]
+  },
+  {
+    "type": "container-banner",
+    "id": "banner2",
+    "style": {
+      "indicatorImg1": "https://gw.alicdn.com/tps/TB16RaxLpXXXXbIXFXXXXXXXXXX-14-14.png",
+      "indicatorImg2": "https://gw.alicdn.com/tps/TB1m79uLpXXXXXUXVXXXXXXXXXX-18-16.png",
+      "indicatorGravity": "center",
+      "indicatorPosition": "inside",
+      "indicatorMargin": 10,
+      "indicatorGap": 2,
+      "scrollMarginLeft": 20,
+      "scrollMarginRight": 20,
+      "hGap": 12,
+      "pageRatio": 0.5,
+      "bgColor": "#ffffff"
+    },
+    "items": [
+      {
+        "type": "testView",
+        "msg": "info11",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info12",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info13",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info14",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info15",
+        "style": {
+        }
+      },
+      {
+        "type": "testView",
+        "msg": "info16",
+        "style": {
+        }
+      }
+    ]
+  },
+  {
+    "type": "container-onePlusN",
+    "style": {
+      "aspectRatio": "1.778",
+      "cols": [
+        43.467
+      ],
+      "rows": [
+        43.602
+      ]
+    },
+    "items": [
+      {
+        "type": "testView",
+        "action": "xxx",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png",
+        "style": {
+          "margin": "[0,1,0,0]"
+        }
+      },
+      {
+        "type": "testView",
+        "action": "xxx",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png",
+        "style": {
+          "margin": "[0,0,1,0]"
+        }
+      },
+      {
+        "type": "testView",
+        "action": "xxx",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png",
+        "style": {
+          "margin": "[0,1,0,0]"
+        }
+      },
+      {
+        "type": "testView",
+        "action": "xxx",
+        "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png",
+        "style": {
+        }
+      }
+    ]
+  },
+  {
+    "type": "container-twoColumn",
+    "style": {
+      "hGap": 10,
+      "vGap": 10,
+      "cols": [
+        35.5
+      ]
+    },
+    "items": [
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      }
+    ]
+  },
+  {
+    "type": "container-threeColumn",
+    "items": [
+      {
+        "type": "testView",
+        "msg": "block",
+        "style": {
+          "display": "block"
+        }
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      }
+    ]
+  },
+  {
+    "type": "container-fourColumn",
+    "items": [
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      }
+    ]
+  },
+  {
+    "type": "container-scrollFix",
+    "id": "scrollFixShowOnEnter",
+    "style": {
+      "showType": "showONEnter"
+    },
+    "items": [
+      {
+        "type": "testView",
+        "style": {
+          "height": 120
+        },
+        "msg": "showOnEnter"
+      }
+    ]
+  },
+  {
+    "type": "container-oneColumn",
+    "id": "dividerShow",
+    "items": [
+      {
+        "type": "testView",
+        "msg": "I am a divider"
+      }
+    ]
+  },
+  {
+    "type": "container-onePlusN",
+    "style": {
+      "bgColor": "#e3e3e3",
+      "cols": [
+        "46.667"
+      ]
+    },
+    "items": [
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      }
+    ]
+  },
+  {
+    "type": "container-onePlusN",
+    "style": {
+      "cols": [
+        40
+      ]
+    },
+    "items": [
+      {
+        "type": "testView",
+        "style": {
+          "margin": [
+            4,
+            4,
+            2,
+            0
+          ]
+        }
+      },
+      {
+        "type": "testView",
+        "style": {
+          "margin": [
+            0,
+            0,
+            4,
+            0
+          ]
+        }
+      },
+      {
+        "type": "testView"
+      }
+    ]
+  },
+  {
+    "type": "container-onePlusN",
+    "style": {
+    },
+    "items": [
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      }
+    ]
+  },
+  {
+    "type": "container-oneColumn",
+    "items": [
+      {
+        "type": "testView"
+      }
+    ]
+  },
+  {
+    "type": "container-fiveColumn",
+    "load": "com.tmall.request.test",
+    "header": {
+      "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
+      "title": "标题1",
+      "type": "vvtest",
+      "renderService": "VirtualView"
+    },
+    "style": {
+      "autoExpand": true
+    },
+    "items": [
+    ]
+  },
+  {
+    "type": "container-fourColumn",
+    "style": {
+      "autoExpand": true,
+      "enableColspan": true,
+      "vGap": "2",
+      "hGap": "2"
+    },
+    "items": [
+      {
+        "type": "testView",
+        "style": {
+          "colspan": 2
+        }
+      },
+      {
+        "type": "testView",
+        "style": {
+          "colspan": 2
+        }
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      },
+      {
+        "type": "testView"
+      }
+    ]
+  },
+  {
+    "type": "container-float",
+    "style": {
+      "align": "bottom_left",
+      "x": 10,
+      "y": 100
+    },
+    "items": [
+      {
+        "type": "2",
+        "action": "xxx",
+        "imgUrl": "https://img.alicdn.com/tps/TB11Y5hPVXXXXbaXpXXXXXXXXXX-186-158.png",
+        "style": {
+          "margin": [
+            10,
+            10,
+            10,
+            10
+          ],
+          "height": 50,
+          "width": 50
+        }
+      }
+    ]
+  },
+  {
+    "type": "container-oneColumn",
+    "load": "com.tmall.request.load.more",
+    "loadType": 1,
+    "items": [
+    ]
+  }
+]

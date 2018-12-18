@@ -419,16 +419,6 @@ public class TangramBuilder {
         }
 
         /**
-         * Now do noting, just exist for compatibility.
-         * register item render by virtual view
-         *
-         * @param type
-         */
-        @Deprecated
-        public <V extends View> void registerVirtualView(String type) {
-        }
-
-        /**
          * set a custom {@link IAdapterBuilder} to build adapter, the default is {@link PojoAdapterBuilder} which
          * would create a {@link PojoGroupBasicAdapter}
          *

@@ -491,6 +491,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
                     fixStyle.x = Style.parseSize(styleJson.optString(KEY_X), 0);
                     fixStyle.y = Style.parseSize(styleJson.optString(KEY_Y), 0);
+                    card.style = fixStyle;
                 } else if (card instanceof LinearScrollCard) {
                     LinearScrollCard linearScrollCard = (LinearScrollCard) card;
                     JSONObject obj = new JSONObject();
@@ -715,6 +716,12 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             }
 
             parseCell(cell, cellData);
+            if (parent != null) {
+                boolean ret = parent.addCellInternal(cell, false);
+                if (!ret && TangramBuilder.isPrintLog()) {
+                    LogUtils.w(TAG, "Parse invalid cell with data: " + cellData.toString());
+                }
+            }
             return cell;
         } else {
             BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);

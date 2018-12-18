@@ -120,10 +120,13 @@ public class LinearScrollCell extends BaseCell {
     @Override
     public void onAdded() {
         super.onAdded();
-        adapter = new Adapter(getAdapter());
     }
 
     public void setCells(List<BaseCell> cells) {
+        if (adapter == null) {
+            adapter = new Adapter(getAdapter());
+        }
+
         this.cells.clear();
         if (cells != null && cells.size() > 0) {
             this.cells.addAll(cells);
@@ -151,7 +154,7 @@ public class LinearScrollCell extends BaseCell {
             return rawPosition;
         }
 
-        int columnCount = (int)(cellCount * 1.0f / maxRows + 0.5f);
+        int columnCount = (int) (cellCount * 1.0f / maxRows + 0.5f);
         int rowIndex = rawPosition / maxRows;
         int columnIndex = rawPosition % maxRows;
 

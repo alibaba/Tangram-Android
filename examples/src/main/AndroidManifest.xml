@@ -46,6 +46,8 @@
 
         <activity android:name="com.tmall.wireless.tangram.example.TangramActivity">
         </activity>
+        <activity android:name="com.tmall.wireless.tangram.example.tangram3.Tangram3Activity">
+        </activity>
         <activity android:name="com.tmall.wireless.tangram.example.RxTangramActivity">
         </activity>
         <activity android:name="com.tmall.wireless.tangram.example.TangramDataParserActivity">
