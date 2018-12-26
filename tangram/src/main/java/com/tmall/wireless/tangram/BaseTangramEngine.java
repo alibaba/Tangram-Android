@@ -80,6 +80,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * {@link O} is the type of data, {@link T} is the array type of data, {@link C} is the class of Group, {@link L} is the class of Component
@@ -91,7 +92,7 @@ import java.util.Map;
 public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
 
-    private Map<Class<?>, Object> mServices = new ArrayMap<>();
+    private ConcurrentHashMap<Class<?>, Object> mServices = new ConcurrentHashMap<>();
 
     @NonNull
     private final Context mContext;
