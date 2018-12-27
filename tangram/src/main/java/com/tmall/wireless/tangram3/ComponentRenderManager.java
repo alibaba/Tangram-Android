@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 public class ComponentRenderManager {
-    public static final String COMPONENTINFO = "componentInfo";
 
     private ArrayMap<String, ElementRenderService> renderServiceMap = new ArrayMap<>(5);
 
@@ -130,19 +129,14 @@ public class ComponentRenderManager {
         }
     }
 
-    public void parseComponentInfo(JSONObject cardJson) {
-        if (cardJson == null || !cardJson.has(COMPONENTINFO)) {
+    public void setComponentInfoList(List<ComponentInfo> componentInfoList) {
+        componentInfoMap.clear();
+
+        if (componentInfoList == null) {
             return;
         }
 
-        JSONArray componentInfoArray = cardJson.optJSONArray(COMPONENTINFO);
-        if (componentInfoArray == null) {
-            return;
-        }
-
-        for (int i = 0; i < componentInfoArray.length(); i++) {
-            JSONObject json = componentInfoArray.optJSONObject(i);
-            ComponentInfo info = new ComponentInfo(json);
+        for (ComponentInfo info : componentInfoList) {
             if (renderServiceMap.get(info.getType()) != null) {
                 info = renderServiceMap.get(info.getType()).onParseComponentInfo(info);
                 if (info != null && !TextUtils.isEmpty(info.getType())) {

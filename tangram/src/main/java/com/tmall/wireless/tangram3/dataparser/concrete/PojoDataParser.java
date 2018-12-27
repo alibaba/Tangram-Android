@@ -27,6 +27,7 @@ package com.tmall.wireless.tangram3.dataparser.concrete;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -210,9 +211,11 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
     public static final String KEY_Y = "y";
 
+    public static final String COMPONENTINFO = "componentInfo";
+
     private CardResolver cardResolver;
 
-    private MVHelper mvHelper;
+    protected MVHelper mvHelper;
 
     @NonNull
     @Override
@@ -286,7 +289,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
         checkCardResolverAndMVHelper(serviceManager);
 
-        final String cardType = data.optString(KEY_TYPE);
+        final String cardType = parseCardType(data);
         if (!TextUtils.isEmpty(cardType)) {
             Card card = cardResolver.create(cardType);
             if (card == null) {
@@ -297,29 +300,9 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             card.dataParser = this;
             card.serviceManager = serviceManager;
             card.extras = data;
-            card.stringType = data.optString(KEY_TYPE);
-            card.id = data.optString(KEY_ID, card.id == null ? "" : card.id);
+            card.stringType = cardType;
 
-            mvHelper.renderManager().parseComponentInfo(data);
-
-            // parsing header
-            JSONObject header = data.optJSONObject(KEY_HEADER);
-            BaseCell headerCell = parseSingleComponent(header, card, serviceManager);
-            parseHeaderCell(headerCell, card);
-
-            // parsing body
-            JSONArray componentArray = data.optJSONArray(KEY_ITEMS);
-            if (componentArray != null) {
-                final int cellLength = componentArray.length();
-                for (int i = 0; i < cellLength; i++) {
-                    final JSONObject cellData = componentArray.optJSONObject(i);
-                    parseSingleComponent(cellData, card, card.serviceManager);
-                }
-            }
-            // parsing footer
-            JSONObject footer = data.optJSONObject(KEY_FOOTER);
-            BaseCell footerCell = parseSingleComponent(footer, card, serviceManager);
-            parseFooterCell(footerCell, card);
+            parseCard(card, data, serviceManager);
 
             JSONObject styleJson = data.optJSONObject(KEY_STYLE);
 
@@ -672,7 +655,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
     private BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,
                                 @NonNull ServiceManager serviceManager) {
         BaseCell cell = null;
-        String cellType = cellData.optString(KEY_TYPE);
+        String cellType = parseCellType(cellData);
         if ((resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
 
             if (Utils.isCard(cellData)) {
@@ -752,14 +735,14 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         }
     }
 
-    private void parseCell(BaseCell cell, JSONObject json) {
+    protected void parseCell(BaseCell cell, JSONObject json) {
         if (json != null) {
             cell.extras = json;
             cell.id = json.optString(KEY_BIZ_ID);
             if (TextUtils.isEmpty(cell.id) && json.has(KEY_ID)) {
                 cell.id = json.optString(KEY_ID);
             }
-            cell.stringType = json.optString(KEY_TYPE);
+            cell.stringType = parseCellType(json);
             cell.typeKey = json.optString(KEY_TYPE_KEY);
             String reuseId = json.optString(KEY_TYPE_REUSEID);
             if (!TextUtils.isEmpty(reuseId)) {
@@ -774,7 +757,61 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         }
     }
 
-    private void parseHeaderCell(BaseCell headerCell, Card card) {
+    protected void parseCard(Card card, JSONObject data, ServiceManager serviceManager) {
+        card.id = data.optString(KEY_ID, card.id == null ? "" : card.id);
+
+        mvHelper.renderManager().setComponentInfoList(parseComponentInfo(data));
+
+        // parsing header
+        JSONObject header = data.optJSONObject(KEY_HEADER);
+        BaseCell headerCell = parseSingleComponent(header, card, serviceManager);
+        parseHeaderCell(headerCell, card);
+
+        // parsing body
+        JSONArray componentArray = data.optJSONArray(KEY_ITEMS);
+        if (componentArray != null) {
+            final int cellLength = componentArray.length();
+            for (int i = 0; i < cellLength; i++) {
+                final JSONObject cellData = componentArray.optJSONObject(i);
+                parseSingleComponent(cellData, card, card.serviceManager);
+            }
+        }
+        // parsing footer
+        JSONObject footer = data.optJSONObject(KEY_FOOTER);
+        BaseCell footerCell = parseSingleComponent(footer, card, serviceManager);
+        parseFooterCell(footerCell, card);
+    }
+
+    protected List<ComponentInfo> parseComponentInfo(JSONObject cardJson) {
+        if (cardJson == null || !cardJson.has(COMPONENTINFO)) {
+            return null;
+        }
+
+        JSONArray componentInfoArray = cardJson.optJSONArray(COMPONENTINFO);
+        if (componentInfoArray == null) {
+            return null;
+        }
+
+        ArrayList<ComponentInfo> componentInfoList = new ArrayList<>(128);
+
+        for (int i = 0; i < componentInfoArray.length(); i++) {
+            JSONObject json = componentInfoArray.optJSONObject(i);
+            ComponentInfo info = new ComponentInfo(json);
+            componentInfoList.add(info);
+        }
+
+        return componentInfoList;
+    }
+
+    protected String parseCardType(JSONObject json) {
+        return json.optString(KEY_TYPE);
+    }
+
+    protected String parseCellType(JSONObject json) {
+        return json.optString(KEY_TYPE);
+    }
+
+    protected void parseHeaderCell(BaseCell headerCell, Card card) {
         card.mHeader = headerCell;
         if (card instanceof GridCard) {
             GridCard gridCard = (GridCard) card;
@@ -785,7 +822,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         }
     }
 
-    private void parseFooterCell(BaseCell footerCell, Card card) {
+    protected void parseFooterCell(BaseCell footerCell, Card card) {
         card.mFooter = footerCell;
         if (card instanceof GridCard) {
             GridCard gridCard = (GridCard) card;
