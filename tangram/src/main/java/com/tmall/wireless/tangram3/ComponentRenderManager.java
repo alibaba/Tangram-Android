@@ -11,9 +11,6 @@ import com.tmall.wireless.tangram3.core.protocol.ElementRenderService;
 import com.tmall.wireless.tangram3.dataparser.concrete.ComponentInfo;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -140,7 +137,7 @@ public class ComponentRenderManager {
             if (renderServiceMap.get(info.getType()) != null) {
                 info = renderServiceMap.get(info.getType()).onParseComponentInfo(info);
                 if (info != null && !TextUtils.isEmpty(info.getType())) {
-                    componentInfoMap.put(info.getName(), info);
+                    componentInfoMap.put(info.getId(), info);
                 }
             }
         }
