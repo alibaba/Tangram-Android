@@ -31,6 +31,7 @@ import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.alibaba.fastjson.JSONObject;
 import com.tmall.wireless.tangram3.Engine;
 import com.tmall.wireless.tangram3.core.service.ServiceManager;
 import com.tmall.wireless.tangram3.dataparser.concrete.Card;
@@ -42,9 +43,6 @@ import com.tmall.wireless.tangram3.util.BDE;
 import com.tmall.wireless.tangram3.util.IInnerImageSetter;
 import com.tmall.wireless.tangram3.util.ImageUtils;
 import com.tmall.wireless.tangram3.util.LifeCycleProviderImpl;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -211,88 +209,6 @@ public class BaseCell extends ComponentLifecycle implements View.OnClickListener
         } else {
             ImageUtils.doLoadImageUrl(view, imgUrl);
         }
-    }
-
-    public boolean hasParam(String key) {
-        return extras.has(key) ||
-                style != null && style.extras != null && style.extras.has(key);
-    }
-
-    public Object optParam(String key) {
-        if (extras.has(key)) {
-            return extras.opt(key);
-        }
-        if (style != null && style.extras != null) {
-            return style.extras.opt(key);
-        }
-        return null;
-    }
-
-    public long optLongParam(String key) {
-        if (extras.has(key)) {
-            return extras.optLong(key);
-        }
-        if (style != null && style.extras != null) {
-            return style.extras.optLong(key);
-        }
-        return 0;
-    }
-
-    public int optIntParam(String key) {
-        if (extras.has(key)) {
-            return extras.optInt(key);
-        }
-        if (style != null && style.extras != null) {
-            return style.extras.optInt(key);
-        }
-        return 0;
-    }
-
-    public String optStringParam(String key) {
-        if (extras.has(key)) {
-            return extras.optString(key);
-        }
-        if (style != null && style.extras != null) {
-            return style.extras.optString(key);
-        }
-        return "";
-    }
-
-    public double optDoubleParam(String key) {
-        if (extras.has(key)) {
-            return extras.optDouble(key);
-        }
-        if (style != null && style.extras != null) {
-            return style.extras.optDouble(key);
-        }
-        return Double.NaN;
-    }
-
-    public boolean optBoolParam(String key) {
-        if (extras.has(key)) {
-            return extras.optBoolean(key);
-        }
-        return style != null && style.extras != null && style.extras.optBoolean(key);
-    }
-
-    public JSONObject optJsonObjectParam(String key) {
-        if (extras.has(key)) {
-            return extras.optJSONObject(key);
-        }
-        if (style != null && style.extras != null) {
-            return style.extras.optJSONObject(key);
-        }
-        return null;
-    }
-
-    public JSONArray optJsonArrayParam(String key) {
-        if (extras.has(key)) {
-            return extras.optJSONArray(key);
-        }
-        if (style != null && style.extras != null) {
-            return style.extras.optJSONArray(key);
-        }
-        return null;
     }
 
     /**

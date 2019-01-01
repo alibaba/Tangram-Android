@@ -58,8 +58,8 @@ public class LinearCard extends Card {
                 helper.setAspectRatio(style.aspectRatio);
             }
 
-            if (style.extras != null && style.extras.has(KEY_DIVIDE_HEIGHT)) {
-                helper.setDividerHeight(Style.parseSize(style.extras.optString(KEY_DIVIDE_HEIGHT), 0));
+            if (style.extras != null && style.extras.containsKey(KEY_DIVIDE_HEIGHT)) {
+                helper.setDividerHeight(Style.parseSize(style.extras.getString(KEY_DIVIDE_HEIGHT), 0));
             }
 
 

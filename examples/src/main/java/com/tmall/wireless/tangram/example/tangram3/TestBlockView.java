@@ -82,7 +82,7 @@ public class TestBlockView extends FrameLayout implements ITangramViewLifeCycle,
         }
         textView.setText(
                 cell.id + " pos: " + pos + " " + parent + " " + cell
-                        .optParam("msg"));
+                        .extras.get("msg"));
 
         if (pos > 57) {
             textView.setBackgroundColor(0x66cccf00 + (pos - 50) * 128);

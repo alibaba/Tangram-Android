@@ -71,7 +71,7 @@ public class TestImageView extends LinearLayout implements ITangramViewLifeCycle
         initUI(context, DEFAULT_ICON_SIZE);
     }
 
-    private void initUI(Context context, int size){
+    private void initUI(Context context, int size) {
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER_HORIZONTAL);
         setBackgroundColor(Color.WHITE);
@@ -112,17 +112,17 @@ public class TestImageView extends LinearLayout implements ITangramViewLifeCycle
                     Thread.sleep(500L);
                     int pos = cell.pos;
                     return cell.id + " pos: " + pos + " " + cell.parent.getClass().getSimpleName() + " " + cell
-                        .optStringParam("title");
+                            .extras.getString("title");
                 }
             }).subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())
-            .compose(lifeCycleProvider.<String>bindUntil(BDE.UNBIND))
-            .subscribe(new Consumer<String>() {
-                @Override
-                public void accept(String s) throws Exception {
-                    titleTextView.setText(s);
-                }
-            });
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .compose(lifeCycleProvider.<String>bindUntil(BDE.UNBIND))
+                    .subscribe(new Consumer<String>() {
+                        @Override
+                        public void accept(String s) throws Exception {
+                            titleTextView.setText(s);
+                        }
+                    });
 
             Observable.just(cell).map(new Function<BaseCell, Integer>() {
                 @Override
@@ -132,24 +132,24 @@ public class TestImageView extends LinearLayout implements ITangramViewLifeCycle
                     if (pos > 57) {
                         return 0x66cccf00 + (pos - 50) * 128;
                     } else if (pos % 2 == 0) {
-                         return 0xaaaaff55;
+                        return 0xaaaaff55;
                     } else {
                         return 0xcceeeeee;
                     }
                 }
             }).subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(lifeCycleProvider.<Integer>bindUntil(BDE.UNBIND))
-                .subscribe(new Consumer<Integer>() {
-                    @Override
-                    public void accept(Integer s) throws Exception {
-                        icon.setBackgroundColor(s);
-                    }
-                });
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .compose(lifeCycleProvider.<Integer>bindUntil(BDE.UNBIND))
+                    .subscribe(new Consumer<Integer>() {
+                        @Override
+                        public void accept(Integer s) throws Exception {
+                            icon.setBackgroundColor(s);
+                        }
+                    });
         } else {
             int pos = cell.pos;
             titleTextView.setText(cell.id + " pos: " + pos + " " + cell.parent.getClass().getSimpleName() + " " + cell
-                .optStringParam("title"));
+                    .extras.getString("title"));
             if (pos > 57) {
                 icon.setBackgroundColor(0x66cccf00 + (pos - 50) * 128);
             } else if (pos % 2 == 0) {
@@ -173,7 +173,7 @@ public class TestImageView extends LinearLayout implements ITangramViewLifeCycle
         }
     }
 
-    public static boolean isEmpty(String string){
+    public static boolean isEmpty(String string) {
         return string == null || string.isEmpty() || "null".equalsIgnoreCase(string);
     }
 

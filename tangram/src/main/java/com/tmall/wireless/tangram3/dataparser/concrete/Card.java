@@ -28,7 +28,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -41,24 +40,17 @@ import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.layout.BaseLayoutHelper;
 import com.alibaba.android.vlayout.layout.FixAreaLayoutHelper;
 import com.alibaba.android.vlayout.layout.MarginLayoutHelper;
+import com.alibaba.fastjson.JSONObject;
 import com.tmall.wireless.tangram3.Engine;
 import com.tmall.wireless.tangram3.MVHelper;
 import com.tmall.wireless.tangram3.TangramBuilder;
 import com.tmall.wireless.tangram3.core.service.ServiceManager;
 import com.tmall.wireless.tangram3.dataparser.DataParser;
 import com.tmall.wireless.tangram3.structure.BaseCell;
-import com.tmall.wireless.tangram3.structure.card.BannerCard;
-import com.tmall.wireless.tangram3.structure.card.LinearScrollCard;
 import com.tmall.wireless.tangram3.support.CardSupport;
 import com.tmall.wireless.tangram3.support.ExposureSupport;
 import com.tmall.wireless.tangram3.util.ImageUtils;
-import com.tmall.wireless.tangram3.util.LogUtils;
 import com.tmall.wireless.tangram3.util.Preconditions;
-import com.tmall.wireless.tangram3.util.Utils;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -125,11 +117,6 @@ public abstract class Card extends ComponentLifecycle {
      * api name of loading more data
      */
     public String load;
-
-    /**
-     * api params of loading more data
-     */
-    public JSONObject loadParams;
 
     /**
      * if data has been loaded
@@ -248,7 +235,7 @@ public abstract class Card extends ComponentLifecycle {
                     }
                 }
                 if (!hasCustomAnimatorHelper) {
-                    final int duration = style.extras != null ? style.extras.optInt(Style.KEY_ANIMATION_DURATION) : 0;
+                    final int duration = style.extras != null ? style.extras.getIntValue(Style.KEY_ANIMATION_DURATION) : 0;
                     if (duration > 0) {
                         fixHelper.setFixViewAnimatorHelper(new FixAreaLayoutHelper.FixViewAnimatorHelper() {
                             @Override
@@ -750,68 +737,6 @@ public abstract class Card extends ComponentLifecycle {
         if (serviceManager != null) {
             return serviceManager.getService(MVHelper.class);
         }
-        return null;
-    }
-
-    public Object optParam(String key) {
-        if (extras.has(key))
-            return extras.opt(key);
-        if (style != null && style.extras != null)
-            return style.extras.opt(key);
-        return null;
-    }
-
-    public long optLongParam(String key) {
-        if (extras.has(key))
-            return extras.optLong(key);
-        if (style != null && style.extras != null)
-            return style.extras.optLong(key);
-        return 0;
-    }
-
-    public int optIntParam(String key) {
-        if (extras.has(key))
-            return extras.optInt(key);
-        if (style != null && style.extras != null)
-            return style.extras.optInt(key);
-        return 0;
-    }
-
-    public String optStringParam(String key) {
-        if (extras.has(key))
-            return extras.optString(key);
-        if (style != null && style.extras != null)
-            return style.extras.optString(key);
-        return "";
-    }
-
-    public double optDoubleParam(String key) {
-        if (extras.has(key))
-            return extras.optDouble(key);
-        if (style != null && style.extras != null)
-            return style.extras.optDouble(key);
-        return Double.NaN;
-    }
-
-    public boolean optBoolParam(String key) {
-        if (extras.has(key))
-            return extras.optBoolean(key);
-        return style != null && style.extras != null && style.extras.optBoolean(key);
-    }
-
-    public JSONObject optJsonObjectParam(String key) {
-        if (extras.has(key))
-            return extras.optJSONObject(key);
-        if (style != null && style.extras != null)
-            return style.extras.optJSONObject(key);
-        return null;
-    }
-
-    public JSONArray optJsonArrayParam(String key) {
-        if (extras.has(key))
-            return extras.optJSONArray(key);
-        if (style != null && style.extras != null)
-            return style.extras.optJSONArray(key);
         return null;
     }
 

@@ -4,10 +4,10 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.alibaba.fastjson.JSONObject;
 import com.tmall.wireless.tangram3.TangramEngine;
 import com.tmall.wireless.tangram3.dataparser.concrete.ComponentInfo;
 
-import org.json.JSONObject;
 
 import java.util.List;
 

@@ -54,6 +54,7 @@ android {
 
 dependencies {
     compile project(':tangram')
+    compile 'com.alibaba:fastjson:1.1.54.android@jar'
     compile 'com.android.support:support-v4:26.0.2@aar'
     compile 'com.android.support:support-annotations:26.0.2'
     compile 'io.reactivex.rxjava2:rxjava:2.0.1'

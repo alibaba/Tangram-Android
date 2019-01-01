@@ -29,7 +29,6 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 import com.tmall.wireless.tangram3.structure.BaseCell;
-import com.tmall.wireless.tangram3.structure.CellRender;
 
 /**
  * Created by mikeafc on 16/4/30.
@@ -47,7 +46,6 @@ public class SimpleEmptyView extends FrameLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    @CellRender
     public void cellInited(BaseCell cell) {
 
     }

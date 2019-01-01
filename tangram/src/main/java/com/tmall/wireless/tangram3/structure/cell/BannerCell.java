@@ -30,12 +30,11 @@ import android.view.ViewGroup;
 
 import com.alibaba.android.vlayout.RecyclablePagerAdapter;
 import com.alibaba.android.vlayout.VirtualLayoutManager.LayoutParams;
+import com.alibaba.fastjson.JSONObject;
 import com.tmall.ultraviewpager.UltraViewPagerAdapter;
 import com.tmall.wireless.tangram3.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram3.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram3.structure.BaseCell;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -141,16 +140,15 @@ public class BannerCell extends BaseCell {
     public void setSpecialInterval(JSONObject jsonObject) {
         if (jsonObject != null) {
             this.mSpecialInterval = new SparseIntArray();
-            Iterator<String> itr = jsonObject.keys();
-            while (itr.hasNext()) {
-                String key = itr.next();
+            for (String key : jsonObject.keySet()) {
                 try {
                     int index = Integer.parseInt(key);
-                    int value = jsonObject.optInt(key);
+                    int value = jsonObject.getIntValue(key);
                     if (value > 0) {
                         this.mSpecialInterval.put(index, value);
                     }
-                } catch (NumberFormatException e) {
+                } catch (Exception e) {
+
                 }
             }
         }

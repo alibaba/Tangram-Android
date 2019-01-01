@@ -36,6 +36,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.widget.ImageView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.libra.Utils;
 import com.squareup.picasso.Picasso;
 import com.tmall.wireless.tangram.example.R;
@@ -43,9 +45,6 @@ import com.tmall.wireless.tangram3.TangramBuilder;
 import com.tmall.wireless.tangram3.TangramEngine;
 import com.tmall.wireless.tangram.example.support.SampleScrollSupport;
 import com.tmall.wireless.tangram3.util.IInnerImageSetter;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -122,9 +121,9 @@ public class Tangram3Activity extends Activity {
         String json = new String(getAssertsFile(this, "data3.0.json"));
         JSONArray data = null;
         try {
-            data = new JSONArray(json);
+            data = JSON.parseArray(json);
             engine.setData(data);
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

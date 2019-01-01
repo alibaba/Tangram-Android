@@ -90,9 +90,9 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
             if ((view.getPaddingLeft() != itemMarginLeft ||
-                view.getPaddingTop() != itemMarginTop ||
-                view.getPaddingRight() != itemMarginRight ||
-                view.getPaddingBottom() != itemMarginBottom)) {
+                    view.getPaddingTop() != itemMarginTop ||
+                    view.getPaddingRight() != itemMarginRight ||
+                    view.getPaddingBottom() != itemMarginBottom)) {
                 view.setPadding(itemMarginLeft, itemMarginTop, itemMarginRight, itemMarginBottom);
             }
         }
@@ -104,19 +104,19 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
         int childWidth = (int) ((MeasureSpec.getSize(childWidthSpec) - getPaddingLeft() - getPaddingRight()) * pagerAdapter.getPageWidth(getCurrentItem()));
         int childHeight = 0;
 
-        if (!Double.isNaN(itemRatio)) {
+        if (!Double.isNaN(itemRatio) || itemRatio != 0) {
             int itemHeight = (int) (childWidth / itemRatio);
             for (int i = 0; i < childCount; i++) {
                 View view = getChildAt(i);
                 view.measure(MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY));
+                        MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY));
             }
         } else {
             for (int i = 0; i < childCount; i++) {
                 View view = getChildAt(i);
                 if (pagerAdapter.getPageWidth(getCurrentItem()) != 1) {
                     view.measure(MeasureSpec.makeMeasureSpec(childWidth, MeasureSpec.EXACTLY),
-                        MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
                 } else {
                     view.measure(childWidthSpec, childHeightSpec);
                 }
@@ -168,7 +168,7 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
     public void setAdapter(PagerAdapter adapter) {
         if (adapter != null) {
             if (pagerAdapter == null || pagerAdapter != adapter) {
-                pagerAdapter = (UltraViewPagerAdapter)adapter;
+                pagerAdapter = (UltraViewPagerAdapter) adapter;
                 pagerAdapter.setCenterListener(this);
                 pagerAdapter.setEnableLoop(enableLoop);
                 //pagerAdapter.setMultiScrRatio(multiScrRatio);

@@ -29,9 +29,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
+import com.alibaba.fastjson.JSONObject;
 import com.tmall.wireless.tangram3.TangramBuilder;
-
-import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -129,6 +128,7 @@ public class Utils {
      * http://img07.taobaocdn.com/tfscom/T10DjXXn4oXXbSV1s__105829.jpg_100x100q90.jpg_.webp --> return 100/100
      * http://img03.taobaocdn.com/tps/i3/T1JYROXuRhXXajR_DD-1680-446.jpg_q50.jpg --> return 1680/446
      * </pre>
+     *
      * @param imageUrl image url
      * @return ratio of with to height parsed from url
      */
@@ -197,7 +197,7 @@ public class Utils {
 
     public static boolean isCard(JSONObject cellData) {
         if (cellData != null) {
-            String type = cellData.optString("type");
+            String type = cellData.getString("type");
             switch (type) {
                 case TangramBuilder.TYPE_CONTAINER_BANNER:
                 case TangramBuilder.TYPE_CONTAINER_SCROLL:

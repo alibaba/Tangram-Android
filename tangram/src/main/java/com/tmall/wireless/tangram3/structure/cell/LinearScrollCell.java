@@ -191,9 +191,9 @@ public class LinearScrollCell extends BaseCell {
                 margins = cell.style.margin;
             }
             lp.setMargins(margins[3], margins[0], margins[1], margins[2]);
-            //chils cell's pageWidth override pageWidth in style
-            if (cell.extras.has("pageWidth")) {
-                lp.width = Style.parseSize(cell.extras.optString("pageWidth"), 0);
+            //TODO should not resolve json in tangram. chils cell's pageWidth override pageWidth in style
+            if (cell.extras.containsKey("pageWidth")) {
+                lp.width = Style.parseSize(cell.extras.getString("pageWidth"), 0);
             }
             binderViewHolder.itemView.setLayoutParams(lp);
             binderViewHolder.itemView.setTag(R.id.TANGRAM_LINEAR_SCROLL_POS, mapperPosition);

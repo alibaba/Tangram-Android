@@ -126,6 +126,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:26.0.2'
     compile 'com.android.support:support-v4:26.0.2'
     compile 'com.android.support:support-annotations:26.0.2'
+    compile 'com.alibaba:fastjson:1.1.54.android@jar'
     if (project.hasProperty('ultraViewPagerDevMode')) {
         println 'compile with ultraViewPager source code'
         compile project(':ultraviewpager')

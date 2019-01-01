@@ -31,10 +31,8 @@ import android.support.v4.util.LruCache;
 import android.text.TextUtils;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+import com.alibaba.fastjson.JSONObject;
 import com.tmall.wireless.tangram3.util.TangramViewMetrics;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 

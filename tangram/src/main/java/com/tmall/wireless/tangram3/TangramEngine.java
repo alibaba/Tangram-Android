@@ -35,42 +35,24 @@ import android.view.View;
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.tmall.wireless.tangram3.dataparser.DataParser;
 import com.tmall.wireless.tangram3.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram3.dataparser.concrete.Card;
 import com.tmall.wireless.tangram3.ext.PullFromEndListener;
 import com.tmall.wireless.tangram3.ext.SwipeItemTouchListener;
-import com.tmall.wireless.tangram3.op.AppendGroupOp;
-import com.tmall.wireless.tangram3.op.AppendGroupsOp;
-import com.tmall.wireless.tangram3.op.InsertCellOp;
-import com.tmall.wireless.tangram3.op.InsertCellsOp;
-import com.tmall.wireless.tangram3.op.InsertGroupOp;
-import com.tmall.wireless.tangram3.op.InsertGroupsOp;
-import com.tmall.wireless.tangram3.op.RemoveCellOp;
-import com.tmall.wireless.tangram3.op.RemoveCellPositionOp;
-import com.tmall.wireless.tangram3.op.RemoveGroupIdxOp;
-import com.tmall.wireless.tangram3.op.RemoveGroupOp;
-import com.tmall.wireless.tangram3.op.ReplaceCellOp;
-import com.tmall.wireless.tangram3.op.ReplaceGroupContentOp;
-import com.tmall.wireless.tangram3.op.ReplaceGroupOp;
-import com.tmall.wireless.tangram3.op.UpdateCellOp;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 import com.tmall.wireless.tangram3.support.ExposureSupport;
 import com.tmall.wireless.tangram3.support.SimpleClickSupport;
 import com.tmall.wireless.tangram3.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram3.util.Predicate;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import io.reactivex.functions.Consumer;
 
 /**
  * Created by villadora on 15/8/24.
@@ -869,11 +851,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray> impl
         if (cell != null && mGroupBasicAdapter != null) {
             int position = mGroupBasicAdapter.getPositionByItem(cell);
             if (position >= 0) {
-                try {
-                    cell.extras.put("_flag_invalidate_", true);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                cell.extras.put("_flag_invalidate_", true);
                 mGroupBasicAdapter.notifyItemChanged(position);
             }
         }

@@ -233,10 +233,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         mIndicator.setCurrItem(currentItemPos);
 
         if (cell != null && cell.extras != null) {
-            try {
-                cell.extras.put(CURRENT_POS, currentItemPos);
-            } catch (JSONException e) {
-            }
+            cell.extras.put(CURRENT_POS, currentItemPos);
         }
 
         if (bannerSupport != null) {
@@ -249,9 +246,9 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
             BusSupport busSupport = cell.serviceManager.getService(BusSupport.class);
             if (busSupport != null) {
                 EventContext eventContext = new EventContext();
-                if (((BannerCell)cell).mCells != null && currentItemPos >= 0
-                    && currentItemPos < ((BannerCell)cell).mCells.size()) {
-                    eventContext.producer = ((BannerCell)cell).mCells.get(currentItemPos);
+                if (((BannerCell) cell).mCells != null && currentItemPos >= 0
+                        && currentItemPos < ((BannerCell) cell).mCells.size()) {
+                    eventContext.producer = ((BannerCell) cell).mCells.get(currentItemPos);
                 }
                 busSupport.post(BusSupport.obtainEvent(BusSupport.EVENT_ON_EXPOSURE, cell.id, null, eventContext));
             }
@@ -259,7 +256,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (bannerSupport != null) {
             List<BannerListener> listeners = bannerSupport.getSelectedListenerById(cell.id);
             if (listeners != null) {
-                for (int i = 0; i < listeners.size(); i ++) {
+                for (int i = 0; i < listeners.size(); i++) {
                     BannerListener listener = listeners.get(i);
                     listener.onPageSelected(currentItemPos);
                 }
@@ -279,7 +276,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (bannerSupport != null) {
             List<BannerListener> listeners = bannerSupport.getScrollStateChangedListenerById(cell.id);
             if (listeners != null) {
-                for (int i = 0; i < listeners.size(); i ++) {
+                for (int i = 0; i < listeners.size(); i++) {
                     BannerListener listener = listeners.get(i);
                     listener.onPageScrollStateChanged(state);
                 }
@@ -340,11 +337,11 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         VirtualLayoutManager.LayoutParams layoutParams = (VirtualLayoutManager.LayoutParams) getLayoutParams();
         layoutParams.setMargins(bannerCell.margin[3], bannerCell.margin[0], bannerCell.margin[1], bannerCell.margin[2]);
         mUltraViewPager.setItemRatio(bannerCell.itemRatio);
-        currentItemPos = bannerCell.optIntParam(CURRENT_POS);
+        currentItemPos = bannerCell.extras.getIntValue(CURRENT_POS);
         mUltraViewPager.setCurrentItem(currentItemPos);
         updateIndicators(bannerCell.mIndicatorFocus, bannerCell.mIndicatorNor,
-            bannerCell.mIndicatorRadius, bannerCell.mIndicatorColor,
-            bannerCell.mIndicatorDefaultColor);
+                bannerCell.mIndicatorRadius, bannerCell.mIndicatorColor,
+                bannerCell.mIndicatorDefaultColor);
         recycleView();
         bindHeaderView(bannerCell.mHeader);
         bindFooterView(bannerCell.mFooter);
@@ -425,7 +422,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 View header = mHeaderViewHolders.get(i).itemView;
                 LayoutParams lp = (LayoutParams) header.getLayoutParams();
                 header.layout(left + lp.leftMargin, top + lp.topMargin, header.getMeasuredWidth(),
-                    top + lp.topMargin + header.getMeasuredHeight());
+                        top + lp.topMargin + header.getMeasuredHeight());
                 top += lp.topMargin + header.getMeasuredHeight() + lp.bottomMargin;
             }
         }
@@ -442,8 +439,8 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 View footer = mFooterViewHolders.get(i).itemView;
                 LayoutParams lp = (LayoutParams) footer.getLayoutParams();
                 footer.layout(left + lp.leftMargin, top + lp.topMargin, footer.getMeasuredWidth(),
-                    top + lp.topMargin + footer.getMeasuredHeight());
-                top +=  + lp.topMargin + footer.getMeasuredHeight() + lp.bottomMargin;
+                        top + lp.topMargin + footer.getMeasuredHeight());
+                top += +lp.topMargin + footer.getMeasuredHeight() + lp.bottomMargin;
             }
         }
     }
@@ -576,7 +573,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 }
                 ImageView[] old = mImageViews;
                 mImageViews = new ImageView[count];
-                System.arraycopy(old, 0,mImageViews, 0, Math.min(old.length, count));
+                System.arraycopy(old, 0, mImageViews, 0, Math.min(old.length, count));
                 for (int i = 0; i < mImageViews.length; i++) {
                     if (mImageViews[i] == null) {
                         mImageViews[i] = ImageUtils.createImageInstance(getContext());
@@ -601,18 +598,18 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 }
                 if (style == STYLE_DOT) {
                     mImageViews[i].setImageDrawable(getGradientDrawable(position == i ? focusColor : norColor, radius));
-                } else if (style == STYLE_IMG){
+                } else if (style == STYLE_IMG) {
                 }
             }
-			if (style == STYLE_IMG) {
-	            if (init) {
-	                for (int i = 0; i < mImageViews.length; i++) {
-	                    ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
+            if (style == STYLE_IMG) {
+                if (init) {
+                    for (int i = 0; i < mImageViews.length; i++) {
+                        ImageUtils.doLoadImageUrl(mImageViews[i], position == i ? focusUrl : norUrl);
                         if (i == currentItemPos) {
                             mImageViews[i].setTag(R.id.TANGRAM_BANNER_INDICATOR_POS, currentItemPos);
                         }
                     }
-	            } else {
+                } else {
                     for (int i = 0; i < mImageViews.length; i++) {
                         ImageView imageView = mImageViews[i];
                         if (imageView.getTag(R.id.TANGRAM_BANNER_INDICATOR_POS) == null) {
@@ -624,8 +621,8 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                     }
                     mImageViews[currentItemPos].setTag(R.id.TANGRAM_BANNER_INDICATOR_POS, currentItemPos);
                     ImageUtils.doLoadImageUrl(mImageViews[currentItemPos], focusUrl);
-				}
-			}
+                }
+            }
         }
 
         public void setCurrItem(int position) {
@@ -633,7 +630,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 for (int i = 0; i < mImageViews.length; i++) {
                     if (style == STYLE_DOT) {
                         mImageViews[i].setImageDrawable(getGradientDrawable(position == i ? focusColor : norColor, radius));
-                    } else if (style == STYLE_IMG){
+                    } else if (style == STYLE_IMG) {
                         ImageView imageView = mImageViews[i];
                         if (imageView.getTag(R.id.TANGRAM_BANNER_INDICATOR_POS) == null) {
                             continue;
@@ -652,7 +649,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
 
         private GradientDrawable getGradientDrawable(int color, float radius) {
             GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
-                new int[]{color, color});
+                    new int[]{color, color});
             gradientDrawable.setShape(GradientDrawable.OVAL);
             gradientDrawable.setCornerRadius(radius);
             return gradientDrawable;
@@ -724,7 +721,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 ViewGroup.LayoutParams lp = header.getLayoutParams();
                 if (lp == null || !(lp instanceof LayoutParams)) {
                     lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
                 }
                 ((LayoutParams) lp).topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
                 ((LayoutParams) lp).leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
@@ -742,7 +739,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
                 ViewGroup.LayoutParams lp = footer.getLayoutParams();
                 if (lp == null || !(lp instanceof LayoutParams)) {
                     lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
                 }
                 ((LayoutParams) lp).topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
                 ((LayoutParams) lp).leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];

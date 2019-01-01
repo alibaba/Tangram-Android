@@ -1,6 +1,6 @@
 package com.tmall.wireless.tangram3.dataparser.concrete;
 
-import org.json.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 
 public class ComponentInfo {
     public static final String NAME = "name";
@@ -27,11 +27,11 @@ public class ComponentInfo {
     }
 
     public ComponentInfo(JSONObject json) {
-        this.name = json.optString(NAME);
-        this.id = json.optString(ID);
-        this.type = json.optString(TYPE);
-        this.version = json.optLong(VERSION);
-        this.url = json.optString(URL);
+        this.name = json.getString(NAME);
+        this.id = json.getString(ID);
+        this.type = json.getString(TYPE);
+        this.version = json.getLongValue(VERSION);
+        this.url = json.getString(URL);
     }
 
     public String getId() {
