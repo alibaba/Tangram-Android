@@ -701,9 +701,9 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                                 @NonNull ServiceManager serviceManager) {
         BaseCell cell = null;
         String cellType = parseCellType(cellData);
-        if ((resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellData)) {
+        if ((resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellType)) {
 
-            if (Utils.isCard(cellData)) {
+            if (Utils.isCard(cellType)) {
                 switch (cellType) {
                     case TangramBuilder.TYPE_CONTAINER_FLOW:
                     case TangramBuilder.TYPE_CONTAINER_1C_FLOW:
