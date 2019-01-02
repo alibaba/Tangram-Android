@@ -24,7 +24,7 @@
 
 package com.tmall.wireless.tangram.eventbus;
 
-import android.support.v4.util.ArrayMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by longerian on 16/4/26.
@@ -44,7 +44,7 @@ public class Event {
     /**
      * TangramOp1 args
      */
-    public ArrayMap<String, String> args;
+    public ConcurrentHashMap<String, String> args;
 
     /**
      * Context
@@ -52,7 +52,7 @@ public class Event {
     public EventContext eventContext;
 
     public Event() {
-        args = new ArrayMap<>();
+        args = new ConcurrentHashMap<>();
     }
 
     /**

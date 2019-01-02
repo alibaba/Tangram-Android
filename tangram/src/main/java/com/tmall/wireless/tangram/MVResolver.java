@@ -25,9 +25,7 @@
 package com.tmall.wireless.tangram;
 
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
-import android.util.SparseArray;
 import android.view.View;
 
 import com.tmall.wireless.tangram.core.service.ServiceManager;
@@ -36,12 +34,12 @@ import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.util.Utils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by mikeafc on 16/4/26.
@@ -64,15 +62,15 @@ public class MVResolver {
 
     public static final String KEY_POSITION = "position";
 
-    private ArrayMap<String, Class<? extends View>> typeViewMap = new ArrayMap<>(64);
+    private ConcurrentHashMap<String, Class<? extends View>> typeViewMap = new ConcurrentHashMap<>(64);
 
-    private ArrayMap<String, Class<? extends BaseCell>> typeCellMap = new ArrayMap(64);
+    private ConcurrentHashMap<String, Class<? extends BaseCell>> typeCellMap = new ConcurrentHashMap(64);
 
-    private HashMap<String, Card> idCardMap = new HashMap<>();
+    private ConcurrentHashMap<String, Card> idCardMap = new ConcurrentHashMap<>();
 
-    private ArrayMap<BaseCell, View> mvMap = new ArrayMap<>(128);
+    private ConcurrentHashMap<BaseCell, View> mvMap = new ConcurrentHashMap<>(128);
 
-    private ArrayMap<View, BaseCell> vmMap = new ArrayMap<>(128);
+    private ConcurrentHashMap<View, BaseCell> vmMap = new ConcurrentHashMap<>(128);
 
     private ServiceManager mServiceManager;
 

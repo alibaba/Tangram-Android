@@ -33,13 +33,12 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by longerian on 17/1/27.
@@ -51,7 +50,7 @@ public class SlideCard extends WrapperCard implements SwipeCard {
 
     public static final String KEY_PAGE_COUNT = "pageCount";
 
-    private ArrayMap<String, String> args = new ArrayMap<String, String>();
+    private ConcurrentHashMap<String, String> args = new ConcurrentHashMap<String, String>();
 
     private int mIndex;
 

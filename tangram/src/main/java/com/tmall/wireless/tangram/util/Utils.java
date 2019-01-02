@@ -24,20 +24,16 @@
 
 package com.tmall.wireless.tangram.util;
 
+import android.text.TextUtils;
+import android.util.Log;
+import android.util.Pair;
+
 import com.tmall.wireless.tangram.TangramBuilder;
 
 import org.json.JSONObject;
 
-import android.support.v4.util.ArrayMap;
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.Pair;
-import android.util.SparseBooleanArray;
-import android.util.SparseIntArray;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +47,7 @@ public class Utils {
     private static final Pattern REGEX_2 = Pattern.compile("(\\d+)-(\\d+)(_?q\\d+)?(\\.[jpg|png|gif])");
 
     public static <K, V> Map<K, V> newMap(K k1, V v1, K k2, V v2) {
-        ArrayMap<K, V> map = new ArrayMap<>();
+        ConcurrentHashMap<K, V> map = new ConcurrentHashMap<>();
         map.put(k1, v1);
         map.put(k2, v2);
         return map;
@@ -116,7 +112,7 @@ public class Utils {
         return Float.NaN;
     }
 
-    private static ArrayMap<String, Pair<Integer, Integer>> imageSizeMap = new ArrayMap<>();
+    private static ConcurrentHashMap<String, Pair<Integer, Integer>> imageSizeMap = new ConcurrentHashMap<>();
 
     /**
      * <pre>

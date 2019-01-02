@@ -27,7 +27,6 @@ package com.tmall.wireless.tangram.eventbus;
 import org.json.JSONObject;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -148,7 +147,7 @@ public class BusSupport implements IDispatcherDelegate {
      * returned object's field is filled provided params.
      */
     public static Event obtainEvent(String type, String sourceId,
-            ArrayMap<String, String> args, EventContext eventContext) {
+                                    ConcurrentHashMap<String, String> args, EventContext eventContext) {
         Event event = EventPool.sharedInstance().acquire();
         event.type = type;
         event.sourceId = sourceId;

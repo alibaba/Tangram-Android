@@ -30,8 +30,6 @@ import com.alibaba.android.vlayout.layout.BaseLayoutHelper;
 import com.alibaba.android.vlayout.layout.FixAreaLayoutHelper;
 import com.alibaba.android.vlayout.layout.MarginLayoutHelper;
 
-import android.support.v4.util.ArrayMap;
-
 import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.TangramBuilder;
@@ -69,6 +67,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Basic Card, which will represent LayoutHelpers
@@ -124,7 +123,7 @@ public abstract class Card extends ComponentLifecycle {
     protected BaseCell mFooter;
 
     @NonNull
-    protected ArrayMap<Range<Integer>, Card> mChildren = new ArrayMap<>();
+    protected ConcurrentHashMap<Range<Integer>, Card> mChildren = new ConcurrentHashMap<>();
 
     @NonNull
     protected List<BaseCell> mCells = new ArrayList<>();
@@ -580,7 +579,7 @@ public abstract class Card extends ComponentLifecycle {
     }
 
     @NonNull
-    public ArrayMap<Range<Integer>, Card> getChildren() {
+    public ConcurrentHashMap<Range<Integer>, Card> getChildren() {
         return mChildren;
     }
 
@@ -1053,8 +1052,8 @@ public abstract class Card extends ComponentLifecycle {
 
     public Card findChildCardById(String id) {
         if (!mChildren.isEmpty()) {
-            for (int i = 0, size = mChildren.size(); i < size; i++) {
-                Card card = mChildren.valueAt(i);
+            for (Map.Entry<Range<Integer>, Card> entry : mChildren.entrySet()) {
+                Card card = entry.getValue();
                 if (card != null && card.id.equals(id)) {
                     return card;
                 }
@@ -1063,7 +1062,7 @@ public abstract class Card extends ComponentLifecycle {
         return null;
     }
 
-    public ArrayMap<Range<Integer>, Card> getChildrenCards() {
+    public ConcurrentHashMap<Range<Integer>, Card> getChildrenCards() {
         return mChildren;
     }
 

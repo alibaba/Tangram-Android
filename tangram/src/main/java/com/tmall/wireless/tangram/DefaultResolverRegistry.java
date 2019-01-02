@@ -25,8 +25,6 @@
 package com.tmall.wireless.tangram;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
-import android.util.SparseArray;
 import android.view.View;
 
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
@@ -38,6 +36,8 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.structure.viewcreator.ViewHolderCreator;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * The place to register cell and card, all build-in and user cell, card ared registed here finally.
  */
@@ -47,7 +47,7 @@ public class DefaultResolverRegistry {
     final BaseCellBinderResolver mDefaultCellBinderResolver = new BaseCellBinderResolver();
     final BaseCardBinderResolver mDefaultCardBinderResolver = new BaseCardBinderResolver(mDefaultCardResolver);
 
-    ArrayMap<String, ViewHolderCreator> viewHolderMap = new ArrayMap<>(64);
+    ConcurrentHashMap<String, ViewHolderCreator> viewHolderMap = new ConcurrentHashMap<>(64);
 
     MVHelper mMVHelper;
 
