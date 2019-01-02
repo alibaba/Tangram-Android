@@ -130,7 +130,7 @@ dependencies {
         println 'compile with ultraViewPager source code'
         compile project(':ultraviewpager')
     } else {
-        compile 'com.alibaba.android:ultraviewpager:1.0.6.9@aar'
+        compile 'com.alibaba.android:ultraviewpager:1.0.7.8@aar'
     }
     if (project.hasProperty('virtualViewDevMode')) {
         println 'compile with virtualview source code'
