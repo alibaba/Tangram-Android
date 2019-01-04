@@ -328,6 +328,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                         gridCard.mColumn = style.column;
                     }
                     card = gridCard;
+                    card.style = style;
                 } else if (card instanceof BannerCard) {
                     BannerCard bannerCard = (BannerCard) card;
                     if (bannerCard.cell == null)
