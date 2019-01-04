@@ -120,9 +120,9 @@ public class BaseCell extends ComponentLifecycle implements View.OnClickListener
      */
     public JSONObject extras = new JSONObject();
 
-    public GridDisplayType gridDisplayType;
+    public GridDisplayType gridDisplayType = GridDisplayType.inline;
 
-    public int colSpan;
+    public int colSpan = 1;
 
     private ArrayMap<String, Object> userParams;
 

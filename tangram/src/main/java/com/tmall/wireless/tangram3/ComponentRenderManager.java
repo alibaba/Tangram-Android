@@ -127,8 +127,6 @@ public class ComponentRenderManager {
     }
 
     public void setComponentInfoList(List<ComponentInfo> componentInfoList) {
-        componentInfoMap.clear();
-
         if (componentInfoList == null) {
             return;
         }

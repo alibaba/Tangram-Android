@@ -327,6 +327,17 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     if (style.column > 0) {
                         gridCard.mColumn = style.column;
                     }
+
+                    for (BaseCell cell : card.mCells) {
+                        if (cell.style.extras != null) {
+                            int colSpan = cell.style.extras.getIntValue("colSpan");
+                            if (colSpan == 0) {
+                                colSpan = 1;
+                            }
+                            cell.colSpan = colSpan;
+                        }
+                    }
+
                     card = gridCard;
                     card.style = style;
                 } else if (card instanceof BannerCard) {
