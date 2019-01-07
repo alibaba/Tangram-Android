@@ -29,7 +29,7 @@ public abstract class ElementRenderService {
 
     abstract public void onDownloadComponentInfo(List<ComponentInfo> componentInfoList);
 
-    public String getItemViewType(String type) {
+    public String getItemViewType(String type, ComponentInfo componentInfo) {
         return null;
     }
 }

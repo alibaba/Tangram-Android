@@ -27,6 +27,9 @@ public class ComponentRenderManager {
     }
 
     public View createView(Context context, ViewGroup parent, ComponentInfo info) {
+        if (info == null) {
+            return new View(context);
+        }
         return renderServiceMap.get(info.getType()).createView(context, parent, info);
     }
 
@@ -126,22 +129,16 @@ public class ComponentRenderManager {
         }
     }
 
-    public void setComponentInfoList(List<ComponentInfo> componentInfoList) {
-        if (componentInfoList == null) {
-            return;
-        }
-
-        for (ComponentInfo info : componentInfoList) {
-            if (renderServiceMap.get(info.getType()) != null) {
-                info = renderServiceMap.get(info.getType()).onParseComponentInfo(info);
-                if (info != null && !TextUtils.isEmpty(info.getType())) {
-                    componentInfoMap.put(info.getId(), info);
-                }
-            }
-        }
+    public void putComponentInfo(ComponentInfo info) {
+        renderServiceMap.get(info.getType()).onParseComponentInfo(info);
+        componentInfoMap.put(info.getId(), info);
     }
 
-    public ComponentInfo getComponentInfo(String type) {
-        return componentInfoMap.get(type);
+    public ComponentInfo getComponentInfo(String id) {
+        return componentInfoMap.get(id);
+    }
+
+    public ArrayMap<String, ComponentInfo> getComponentInfoMap() {
+        return componentInfoMap;
     }
 }

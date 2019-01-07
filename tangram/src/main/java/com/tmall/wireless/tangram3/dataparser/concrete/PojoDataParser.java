@@ -58,7 +58,9 @@ import com.tmall.wireless.tangram3.util.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.alibaba.android.vlayout.layout.FixLayoutHelper.BOTTOM_LEFT;
 import static com.alibaba.android.vlayout.layout.FixLayoutHelper.BOTTOM_RIGHT;
@@ -251,7 +253,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
     @NonNull
     @Override
-    public List<BaseCell> parseComponent(@Nullable JSONArray data, Card parent, ServiceManager serviceManager) {
+    public List<BaseCell> parseComponent(@Nullable JSONArray data, Card parent, ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap) {
         if (data == null) {
             return new ArrayList<>();
         }
@@ -262,7 +264,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         final int cellLength = data.size();
         for (int i = 0; i < cellLength; i++) {
             final JSONObject cellData = data.getJSONObject(i);
-            BaseCell cell = parseSingleComponent(cellData, parent, serviceManager);
+            BaseCell cell = parseSingleComponent(cellData, parent, serviceManager, componentInfoMap);
             if (cell != null) {
                 result.add(cell);
             }
@@ -296,7 +298,9 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             card.extras = data;
             card.stringType = cardType;
 
-            parseCard(card, data, serviceManager);
+            Map<String, ComponentInfo> infoMap = parseComponentInfo(data);
+
+            parseCard(card, data, serviceManager, infoMap);
 
             JSONObject styleJson = data.getJSONObject(KEY_STYLE);
 
@@ -350,7 +354,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                         obj.put("type", TangramBuilder.TYPE_CAROUSEL_CELL);
                         obj.put("bizId", bannerCard.id);
 
-                        parseSingleComponent(obj, bannerCard, serviceManager);
+                        parseSingleComponent(obj, bannerCard, serviceManager, infoMap);
 
                         if (!bannerCard.getCells().isEmpty()) {
                             bannerCard.cell.mCells.addAll(bannerCard.getCells());
@@ -521,7 +525,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                         obj.put("type", TangramBuilder.TYPE_LINEAR_SCROLL_CELL);
                         obj.put("bizId", linearScrollCard.id);
 
-                        parseSingleComponent(obj, linearScrollCard, serviceManager);
+                        parseSingleComponent(obj, linearScrollCard, serviceManager, infoMap);
 
                         if (!linearScrollCard.getCells().isEmpty()) {
                             linearScrollCard.cell.cells.addAll(linearScrollCard.getCells());
@@ -605,14 +609,14 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
     @NonNull
     @Override
-    public BaseCell parseSingleComponent(@Nullable JSONObject data, Card parent, ServiceManager serviceManager) {
+    public BaseCell parseSingleComponent(@Nullable JSONObject data, Card parent, ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap) {
         if (data == null) {
             return BaseCell.NaN;
         }
 
         checkCardResolverAndMVHelper(serviceManager);
 
-        BaseCell cell = createCell(parent, mvHelper, data, serviceManager);
+        BaseCell cell = createCell(parent, mvHelper, data, serviceManager, componentInfoMap);
 
         if (mvHelper.isValid(cell, serviceManager)) {
             return cell;
@@ -710,7 +714,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
     }
 
     private BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,
-                                @NonNull ServiceManager serviceManager) {
+                                @NonNull ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap) {
         BaseCell cell = null;
         String cellType = parseCellType(cellData);
         if ((resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellType)) {
@@ -766,12 +770,14 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         } else {
             BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
             // if cell type not register and has component info, register it!
-            if (!componentBinderResolver.has(cellType) && resolver.renderManager().getComponentInfo(cellType) != null) {
+            if (!componentBinderResolver.has(cellType) && componentInfoMap != null && componentInfoMap.containsKey(cellType)) {
                 componentBinderResolver.register(cellType, new BaseCellBinder<>(cellType, resolver));
             }
             if (componentBinderResolver.has(cellType)) {
                 cell = new BaseCell(cellType);
-                cell.componentInfo = resolver.renderManager().getComponentInfo(cellType);
+                if (componentInfoMap != null) {
+                    cell.componentInfo = componentInfoMap.get(cellType);
+                }
                 cell.serviceManager = serviceManager;
                 if (parent != null) {
                     cell.parent = parent;
@@ -818,17 +824,15 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         }
     }
 
-    protected void parseCard(Card card, JSONObject data, ServiceManager serviceManager) {
+    protected void parseCard(Card card, JSONObject data, ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap) {
         card.id = data.getString(KEY_ID);
         if (card.id == null) {
             card.id = "";
         }
 
-        mvHelper.renderManager().setComponentInfoList(parseComponentInfo(data));
-
         // parsing header
         JSONObject header = data.getJSONObject(KEY_HEADER);
-        BaseCell headerCell = parseSingleComponent(header, card, serviceManager);
+        BaseCell headerCell = parseSingleComponent(header, card, serviceManager, componentInfoMap);
         parseHeaderCell(headerCell, card);
 
         // parsing body
@@ -837,16 +841,16 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             final int cellLength = componentArray.size();
             for (int i = 0; i < cellLength; i++) {
                 final JSONObject cellData = componentArray.getJSONObject(i);
-                parseSingleComponent(cellData, card, card.serviceManager);
+                parseSingleComponent(cellData, card, card.serviceManager, componentInfoMap);
             }
         }
         // parsing footer
         JSONObject footer = data.getJSONObject(KEY_FOOTER);
-        BaseCell footerCell = parseSingleComponent(footer, card, serviceManager);
+        BaseCell footerCell = parseSingleComponent(footer, card, serviceManager, componentInfoMap);
         parseFooterCell(footerCell, card);
     }
 
-    protected List<ComponentInfo> parseComponentInfo(JSONObject cardJson) {
+    protected Map<String, ComponentInfo> parseComponentInfo(JSONObject cardJson) {
         if (cardJson == null || !cardJson.containsKey(COMPONENTINFO)) {
             return null;
         }
@@ -856,15 +860,16 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             return null;
         }
 
-        ArrayList<ComponentInfo> componentInfoList = new ArrayList<>(128);
+        Map<String, ComponentInfo> componentInfoMap = new HashMap<>(128);
 
         for (int i = 0; i < componentInfoArray.size(); i++) {
             JSONObject json = componentInfoArray.getJSONObject(i);
             ComponentInfo info = new ComponentInfo(json);
-            componentInfoList.add(info);
+            mvHelper.renderManager().putComponentInfo(info);
+            componentInfoMap.put(info.getId(), info);
         }
 
-        return componentInfoList;
+        return componentInfoMap;
     }
 
     protected String parseCardType(JSONObject json) {

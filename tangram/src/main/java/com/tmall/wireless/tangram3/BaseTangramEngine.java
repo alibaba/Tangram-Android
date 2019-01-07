@@ -47,6 +47,7 @@ import com.tmall.wireless.tangram3.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram3.dataparser.concrete.BaseCellBinder;
 import com.tmall.wireless.tangram3.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram3.dataparser.concrete.Card;
+import com.tmall.wireless.tangram3.dataparser.concrete.ComponentInfo;
 import com.tmall.wireless.tangram3.eventbus.BusSupport;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 import com.tmall.wireless.tangram3.support.BannerSupport;
@@ -445,7 +446,12 @@ public class BaseTangramEngine<O, T> implements ServiceManager {
      * @return Parsed data list.
      */
     public List<Card> parseData(@Nullable T data) {
-        return mDataParser.parseGroup(data, this);
+        List<Card> cardList = mDataParser.parseGroup(data, this);
+        MVHelper mvHelper = (MVHelper) mServices.get(MVHelper.class);
+        if (mvHelper != null) {
+            mvHelper.renderManager().onDownloadTemplate();
+        }
+        return cardList;
     }
 
     /**
@@ -456,8 +462,8 @@ public class BaseTangramEngine<O, T> implements ServiceManager {
      * @return Parsed data list.
      * @since 3.0.0
      */
-    public List<BaseCell> parseComponent(@Nullable Card parent, @Nullable T data) {
-        return mDataParser.parseComponent(data, parent, this);
+    public List<BaseCell> parseComponent(@Nullable Card parent, @Nullable T data, @Nullable Map<String, ComponentInfo> componentInfoMap) {
+        return mDataParser.parseComponent(data, parent, this, componentInfoMap);
     }
 
     /**
@@ -479,8 +485,8 @@ public class BaseTangramEngine<O, T> implements ServiceManager {
      * @return Parsed data.
      * @since 3.0.0
      */
-    public BaseCell parseSingleComponent(@Nullable Card parent, @Nullable O data) {
-        return mDataParser.parseSingleComponent(data, parent, this);
+    public BaseCell parseSingleComponent(@Nullable Card parent, @Nullable O data, @Nullable Map<String, ComponentInfo> componentInfoMap) {
+        return mDataParser.parseSingleComponent(data, parent, this, componentInfoMap);
     }
 
     /**

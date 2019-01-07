@@ -27,12 +27,14 @@ package com.tmall.wireless.tangram3.dataparser;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.tmall.wireless.tangram3.dataparser.concrete.Card;
-import com.tmall.wireless.tangram3.dataparser.concrete.Style;
 import com.tmall.wireless.tangram3.core.service.ServiceManager;
+import com.tmall.wireless.tangram3.dataparser.concrete.Card;
+import com.tmall.wireless.tangram3.dataparser.concrete.ComponentInfo;
+import com.tmall.wireless.tangram3.dataparser.concrete.Style;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * DataParser parse data into structures
@@ -43,13 +45,13 @@ public abstract class DataParser<O, T> {
     public abstract List<Card> parseGroup(@Nullable T data, ServiceManager serviceManager);
 
     @NonNull
-    public abstract List<BaseCell> parseComponent(@Nullable T data, Card parent, ServiceManager serviceManager);
+    public abstract List<BaseCell> parseComponent(@Nullable T data, Card parent, ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap);
 
     @NonNull
     public abstract Card parseSingleGroup(@Nullable O data, ServiceManager serviceManager);
 
     @NonNull
-    public abstract BaseCell parseSingleComponent(@Nullable O data, Card parent, ServiceManager serviceManager);
+    public abstract BaseCell parseSingleComponent(@Nullable O data, Card parent, ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap);
 
     @NonNull
     public abstract <T extends Style> T parseStyle(@NonNull T style, @Nullable O data);

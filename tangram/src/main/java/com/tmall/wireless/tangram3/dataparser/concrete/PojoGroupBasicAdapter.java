@@ -172,7 +172,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
             // in MVHelper#isValid ensured a componentInfo's renderService could not be null, so just use it!
             // if render service custom item type and not empty, use it as itemType
             stringType += item.componentInfo.getVersion() + item.componentInfo.getType();
-            String renderType = mMvHelper.renderManager().getRenderService(item.componentInfo.getType()).getItemViewType(stringType);
+            String renderType = mMvHelper.renderManager().getRenderService(item.componentInfo.getType()).getItemViewType(stringType, item.componentInfo);
             if (!TextUtils.isEmpty(renderType)) {
                 stringType = renderType;
             }
