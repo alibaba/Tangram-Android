@@ -22,11 +22,20 @@ public class ComponentRenderManager {
 
     private ArrayMap<String, ComponentInfo> componentInfoMap = new ArrayMap<>(128);
 
+    private List<BaseCell> cellList;
+
+    public void setCellList(List<BaseCell> cellList) {
+        this.cellList = cellList;
+    }
+
     public ElementRenderService getRenderService(String sdkName) {
         return renderServiceMap.get(sdkName);
     }
 
     public View createView(Context context, ViewGroup parent, ComponentInfo info) {
+        if (info == null){
+            return new View(context);
+        }
         return renderServiceMap.get(info.getType()).createView(context, parent, info);
     }
 
@@ -133,15 +142,58 @@ public class ComponentRenderManager {
 
         for (ComponentInfo info : componentInfoList) {
             if (renderServiceMap.get(info.getType()) != null) {
-                info = renderServiceMap.get(info.getType()).onParseComponentInfo(info);
-                if (info != null && !TextUtils.isEmpty(info.getType())) {
-                    componentInfoMap.put(info.getId(), info);
+                ComponentInfo ret = renderServiceMap.get(info.getType()).onParseComponentInfo(info);
+
+                if (TextUtils.isEmpty(info.getType())) {
+                    continue;
+                }
+
+                if (ret == null) {
+                    // if need degrade, remove from map
+                    componentInfoMap.remove(info.getId());
+                    for (BaseCell cell : cellList) {
+                        if (cell.componentInfo != null && cell.componentInfo.getId().equals(info.getId())) {
+                            cell.componentInfo = null;
+                        }
+                    }
+                } else {
+                    componentInfoMap.put(ret.getId(), ret);
                 }
             }
         }
     }
 
-    public ComponentInfo getComponentInfo(String type) {
-        return componentInfoMap.get(type);
+    /**
+     * Refresh component info
+     */
+    public void refreshComponentInfo() {
+        List<ComponentInfo> infoList = new ArrayList<>(componentInfoMap.values().size());
+        infoList.addAll(componentInfoMap.values());
+
+        for (ComponentInfo info : infoList) {
+            if (renderServiceMap.get(info.getType()) != null) {
+                ComponentInfo ret = renderServiceMap.get(info.getType()).onParseComponentInfo(info);
+
+                if (TextUtils.isEmpty(info.getType())) {
+                    continue;
+                }
+
+                if (ret == null) {
+                    // if need degrade, remove from map
+                    componentInfoMap.remove(info.getId());
+                    for (BaseCell cell : cellList) {
+                        if (cell.componentInfo != null && cell.componentInfo.getId().equals(info.getId())) {
+                            cell.componentInfo = null;
+                        }
+                    }
+                } else {
+                    componentInfoMap.put(ret.getId(), ret);
+                }
+            }
+        }
+    }
+
+    public ComponentInfo getComponentInfo(String id) {
+        return componentInfoMap.get(id);
     }
 }

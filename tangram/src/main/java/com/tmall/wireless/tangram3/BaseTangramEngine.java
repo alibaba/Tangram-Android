@@ -314,6 +314,9 @@ public class BaseTangramEngine<O, T> implements ServiceManager {
             mvHelper.renderManager().onDownloadTemplate();
         }
         this.mGroupBasicAdapter.setData(data);
+        if (mvHelper != null) {
+            mvHelper.renderManager().setCellList(mGroupBasicAdapter.getComponents());
+        }
     }
 
     /**
