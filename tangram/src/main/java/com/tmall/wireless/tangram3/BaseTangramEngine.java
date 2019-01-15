@@ -510,14 +510,6 @@ public class BaseTangramEngine<O, T> implements ServiceManager {
         return type.cast(service);
     }
 
-    public void setSupportRx(boolean supportRx) {
-        isSupportRx = supportRx;
-        TimerSupport timerSupport = getService(TimerSupport.class);
-        if (timerSupport != null) {
-            timerSupport.setSupportRx(supportRx);
-        }
-    }
-
     @Override
     public boolean supportRx() {
         return isSupportRx;

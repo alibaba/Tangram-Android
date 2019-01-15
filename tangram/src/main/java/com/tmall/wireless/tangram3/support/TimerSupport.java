@@ -42,18 +42,6 @@ public class TimerSupport {
 
     private ITimer mDefaultTimer = new HandlerTimer(MILLISECOND);
 
-    public void setSupportRx(boolean supportRx) {
-        if (supportRx) {
-            if (!(mDefaultTimer instanceof RxTimer)) {
-                mDefaultTimer = new RxTimer(MILLISECOND);
-            }
-        } else {
-            if (!(mDefaultTimer instanceof HandlerTimer)) {
-                mDefaultTimer = new HandlerTimer(MILLISECOND);
-            }
-        }
-    }
-
     public void register(int interval, @NonNull OnTickListener onTickListener) {
         register(interval, onTickListener, false);
     }

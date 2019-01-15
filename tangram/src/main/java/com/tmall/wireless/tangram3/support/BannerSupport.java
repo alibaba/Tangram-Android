@@ -26,13 +26,10 @@ package com.tmall.wireless.tangram3.support;
 
 import android.support.v4.util.ArrayMap;
 
-import com.tmall.wireless.tangram3.support.RxBannerScrolledListener.ScrollEvent;
 import com.tmall.wireless.tangram3.ext.BannerListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.Observable;
 
 /**
  * You can get banner scroll info from this support
@@ -76,42 +73,6 @@ public class BannerSupport {
 
     public List<BannerListener> getScrollStateChangedListenerById(String id) {
         return mScrollStateListenerArrayMap.get(id);
-    }
-
-    public Observable<Integer> observeSelected(String id) {
-        List<BannerListener> list = mSelectedListenerArrayMap.get(id);
-        if (list == null) {
-            list = new ArrayList<>();
-            mSelectedListenerArrayMap.put(id, list);
-        }
-        RxBannerSelectedListener rxBannerSelectedListener = new RxBannerSelectedListener();
-        list.add(rxBannerSelectedListener);
-        BannerSelectedObservable bannerSupportObservable = new BannerSelectedObservable(rxBannerSelectedListener);
-        return bannerSupportObservable;
-    }
-
-    public Observable<ScrollEvent> observeScrolled(String id) {
-        List<BannerListener> list = mScrolledListenerArrayMap.get(id);
-        if (list == null) {
-            list = new ArrayList<>();
-            mScrolledListenerArrayMap.put(id, list);
-        }
-        RxBannerScrolledListener rxBannerSelectedListener = new RxBannerScrolledListener();
-        list.add(rxBannerSelectedListener);
-        BannerScrolledObservable bannerSupportObservable = new BannerScrolledObservable(rxBannerSelectedListener);
-        return bannerSupportObservable;
-    }
-
-    public Observable<Integer> observeScrollStateChanged(String id) {
-        List<BannerListener> list = mScrollStateListenerArrayMap.get(id);
-        if (list == null) {
-            list = new ArrayList<>();
-            mScrollStateListenerArrayMap.put(id, list);
-        }
-        RxBannerScrollStateChangedListener rxBannerSelectedListener = new RxBannerScrollStateChangedListener();
-        list.add(rxBannerSelectedListener);
-        BannerScrollStateChangedObservable bannerSupportObservable = new BannerScrollStateChangedObservable(rxBannerSelectedListener);
-        return bannerSupportObservable;
     }
 
     public void destroy() {

@@ -26,8 +26,6 @@ package com.tmall.wireless.tangram3.support.async;
 
 import com.tmall.wireless.tangram3.TangramEngine;
 import com.tmall.wireless.tangram3.dataparser.concrete.Card;
-import com.tmall.wireless.tangram3.op.LoadGroupOp;
-import com.tmall.wireless.tangram3.op.LoadMoreOp;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 
 import java.util.List;
@@ -226,30 +224,6 @@ public class CardLoadSupport {
     }
 
     /**
-     * Combine with {@link #observeCardLoading()}, use this method as success consumer to subscribe to the Observable.<br />
-     * If your request success, provide a {@link LoadGroupOp} with original card and non-empty List<BaseCell>.<br />
-     * Otherwise, provide a {@link LoadGroupOp} with original card and empty List<BaseCell>.
-     * @return A consumer to consume load event.
-     */
-    public Consumer<LoadGroupOp> asDoLoadFinishConsumer() {
-        return new Consumer<LoadGroupOp>() {
-            @Override
-            public void accept(LoadGroupOp result) throws Exception {
-                Card card = result.getArg1();
-                card.loading = false;
-                List<BaseCell> cells = result.getArg2();
-                if (cells != null && !cells.isEmpty()) {
-                    card.loaded = true;
-                    card.setCells(cells);
-                    card.notifyDataChange();
-                } else {
-                    card.loaded = false;
-                }
-            }
-        };
-    }
-
-    /**
      *
      * @return An observable start loading more for a card
      */
@@ -293,38 +267,4 @@ public class CardLoadSupport {
         }
         mLoadMoreObserver.onNext(card);
     }
-
-
-    /**
-     * Combine with {@link #observeCardLoadingMore()}, use this method as success consumer to subscribe to the Observable.<br />
-     * If your request success, provide a {@link LoadMoreOp} with original card, non-empty List<BaseCell> and boolean value to indicate whether there is more.<br />
-     * Otherwise, provide a {@link LoadMoreOp} with original card, empty List<BaseCell> and boolean value to indicate whether there is more.
-     * @return A consumer to consume load more event.
-     */
-    public Consumer<LoadMoreOp> asDoLoadMoreFinishConsumer() {
-        return new Consumer<LoadMoreOp>() {
-            @Override
-            public void accept(LoadMoreOp result) throws Exception {
-                Card card = result.getArg1();
-                card.loading = false;
-                card.loaded = true;
-                List<BaseCell> cells = result.getArg2();
-                boolean hasMore = result.getArg3();
-                if (cells != null && !cells.isEmpty()) {
-                    if (card.page == sInitialPage) {
-                        card.setCells(cells);
-                    } else {
-                        card.addCells(cells);
-                    }
-                    card.page++;
-                    card.hasMore = hasMore;
-                    card.notifyDataChange();
-                } else {
-                    card.hasMore = hasMore;
-                }
-            }
-        };
-    }
-
-
 }
