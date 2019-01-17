@@ -89,6 +89,8 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
 
     private int mActionEdge = 0;
 
+    private boolean enableAnim = false;
+
     //Swipe card when scroll state is idle
     private boolean isOptMode;
 
@@ -120,7 +122,7 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
     @Override
     public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
         if ((recyclerView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE) ||
-            !isAttachedToWindow(recyclerView) || !hasAdapter(recyclerView)) {
+                !isAttachedToWindow(recyclerView) || !hasAdapter(recyclerView)) {
             return false;
         }
 
@@ -142,16 +144,16 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
         mSwipeGestureDector.onTouchEvent(motionEvent);
 
         if (motionEvent.getAction() == MotionEvent.ACTION_UP ||
-            motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
+                motionEvent.getAction() == MotionEvent.ACTION_CANCEL) {
 
             final boolean reachActionEdge = swipeType == SWIPING_HOR && (Math.abs(mDistanceX) > (mActionEdge > 0 ?
-                mActionEdge : recyclerView.getWidth() / 3));
+                    mActionEdge : recyclerView.getWidth() / 3));
 
             boolean reachTabEdge = false;
             if (mSwipeCardRef != null && mSwipeCardRef.get() != null && swipeType == SWIPING_HOR) {
                 SwipeCard swipeCard = mSwipeCardRef.get();
                 if (swipeCard.getCurrentIndex() == 0 && mDistanceX > 0
-                    || (swipeCard.getCurrentIndex() == swipeCard.getTotalPage() - 1) && mDistanceX < 0) {
+                        || (swipeCard.getCurrentIndex() == swipeCard.getTotalPage() - 1) && mDistanceX < 0) {
                     reachTabEdge = true;
                 }
             }
@@ -172,56 +174,65 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
     }
 
     private void resetViews(RecyclerView recyclerView, final int swipingType, final boolean reachActionEdge, final int direction) {
-        int contentWidth = recyclerView.getWidth();
-        AnimatorSet animatorSet = new AnimatorSet();
-        List<Animator> list = new ArrayList<>();
-        String translation = "translationX";
-        if (swipingType == SWIPING_VER) {
-            translation = "translationY";
-        }
-        for (View view : mChildList) {
-            ObjectAnimator animator;
-            if (reachActionEdge) {
-                animator = ObjectAnimator.ofFloat(view, translation, contentWidth * direction)
-                    .setDuration(ANIMATE_DURATION);
-                animator.setInterpolator(new AccelerateInterpolator());
-            } else {
-                animator = ObjectAnimator.ofFloat(view, translation, 0)
-                    .setDuration(ANIMATE_DURATION);
-                animator.setInterpolator(new DecelerateInterpolator());
+        if (enableAnim) {
+            int contentWidth = recyclerView.getWidth();
+            AnimatorSet animatorSet = new AnimatorSet();
+            List<Animator> list = new ArrayList<>();
+            String translation = "translationX";
+            if (swipingType == SWIPING_VER) {
+                translation = "translationY";
             }
-            list.add(animator);
-        }
-        animatorSet.playTogether(list);
-        animatorSet.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (swipingType == SWIPING_HOR && reachActionEdge) {
-                    if (mSwipeCardRef != null && mSwipeCardRef.get() != null) {
-                        SwipeCard swipeCard = mSwipeCardRef.get();
-                        swipeCard.switchTo(swipeCard.getCurrentIndex() - direction);
-                    }
+            for (View view : mChildList) {
+                ObjectAnimator animator;
+                if (reachActionEdge) {
+                    animator = ObjectAnimator.ofFloat(view, translation, contentWidth * direction)
+                            .setDuration(ANIMATE_DURATION);
+                    animator.setInterpolator(new AccelerateInterpolator());
+                } else {
+                    animator = ObjectAnimator.ofFloat(view, translation, 0)
+                            .setDuration(ANIMATE_DURATION);
+                    animator.setInterpolator(new DecelerateInterpolator());
                 }
-                mChildList.clear();
+                list.add(animator);
             }
+            animatorSet.playTogether(list);
+            animatorSet.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
 
-            @Override
-            public void onAnimationCancel(Animator animation) {
+                }
 
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    if (swipingType == SWIPING_HOR && reachActionEdge) {
+                        if (mSwipeCardRef != null && mSwipeCardRef.get() != null) {
+                            SwipeCard swipeCard = mSwipeCardRef.get();
+                            swipeCard.switchTo(swipeCard.getCurrentIndex() - direction);
+                        }
+                    }
+                    mChildList.clear();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+
+                }
+            });
+            animatorSet.start();
+        } else {
+            if (swipingType == SWIPING_HOR && reachActionEdge) {
+                if (mSwipeCardRef != null && mSwipeCardRef.get() != null) {
+                    SwipeCard swipeCard = mSwipeCardRef.get();
+                    swipeCard.switchTo(swipeCard.getCurrentIndex() - direction);
+                }
             }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        });
-        animatorSet.start();
-
+            mChildList.clear();
+        }
 
         if (swipingType == SWIPING_VER) {
             if (pullFromEndListener != null) {
@@ -268,9 +279,9 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
                 float translationX = child.getTranslationX();
                 float translationY = child.getTranslationY();
                 if (x >= (float) child.getLeft() + translationX
-                    && x <= (float) child.getRight() + translationX
-                    && y >= (float) child.getTop() + translationY
-                    && y <= (float) child.getBottom() + translationY) {
+                        && x <= (float) child.getRight() + translationX
+                        && y >= (float) child.getTop() + translationY
+                        && y <= (float) child.getBottom() + translationY) {
                     if (findCanScrollView(child) != null) {
                         return child;
                     }
@@ -284,7 +295,7 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
         if (v instanceof ViewGroup) {
             ViewGroup target = (ViewGroup) v;
             if ((target instanceof UltraViewPager || target instanceof RecyclerView)
-                && target.getVisibility() == View.VISIBLE) {
+                    && target.getVisibility() == View.VISIBLE) {
                 return target;
             } else {
                 for (int i = 0; i < target.getChildCount(); ++i) {
@@ -323,8 +334,8 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
             if (RecyclerView.SCROLL_STATE_IDLE == newState
-                && recyclerView != null
-                && lastMotionEvent != null) {
+                    && recyclerView != null
+                    && lastMotionEvent != null) {
                 updateCurrCard();
             }
         }
@@ -383,9 +394,9 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
                     if (Math.abs(distanceX) > Math.abs(distanceY)) {
                         swipeType = SWIPING_HOR;
                     } else if (pullFromEndListener != null
-                        && Math.abs(distanceX) < Math.abs(distanceY)
-                        && mDistanceY < 0
-                        && isReadyToPullFromEnd()) {
+                            && Math.abs(distanceX) < Math.abs(distanceY)
+                            && mDistanceY < 0
+                            && isReadyToPullFromEnd()) {
                         swipeType = SWIPING_VER;
                     } else {
                         return false;
@@ -401,7 +412,9 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
                                 mChildList.add(child);
                             }
                             final int sign = mDistanceX > 0 ? 1 : -1;
-                            child.setTranslationX((float) (sign * 10f * Math.sqrt(Math.abs(mDistanceX))));
+                            if (enableAnim) {
+                                child.setTranslationX((float) (sign * 10f * Math.sqrt(Math.abs(mDistanceX))));
+                            }
                         }
                     }
                 } else if (swipeType == SWIPING_VER && mDistanceY < 0) {
@@ -418,7 +431,9 @@ public class SwipeItemTouchListener implements RecyclerView.OnItemTouchListener 
                             } else {
                                 pullFromEndListener.onPull(mDistanceX, mDistanceY);
                             }
-                            child.setTranslationY((float) (sign * 10f * Math.sqrt(Math.abs(mDistanceY))));
+                            if (enableAnim) {
+                                child.setTranslationY((float) (sign * 10f * Math.sqrt(Math.abs(mDistanceY))));
+                            }
                         }
                     }
                 } else {

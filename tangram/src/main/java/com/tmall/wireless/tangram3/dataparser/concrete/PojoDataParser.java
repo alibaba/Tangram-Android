@@ -717,46 +717,78 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                                 @NonNull ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap) {
         BaseCell cell = null;
         String cellType = parseCellType(cellData);
-        if ((resolver.resolver().getViewClass(cellType) != null) || Utils.isCard(cellType)) {
 
-            if (Utils.isCard(cellType)) {
-                switch (cellType) {
-                    case TangramBuilder.TYPE_CONTAINER_FLOW:
-                    case TangramBuilder.TYPE_CONTAINER_1C_FLOW:
-                    case TangramBuilder.TYPE_CONTAINER_2C_FLOW:
-                    case TangramBuilder.TYPE_CONTAINER_3C_FLOW:
-                    case TangramBuilder.TYPE_CONTAINER_4C_FLOW:
-                    case TangramBuilder.TYPE_CONTAINER_5C_FLOW: {
-                        Card card = parseSingleGroup(cellData, serviceManager);
-                        parent.addChildCard(card);
-                        break;
-                    }
-                    case TangramBuilder.TYPE_CONTAINER_BANNER:
-                    case TangramBuilder.TYPE_CONTAINER_SCROLL: {
-                        Card card = parseSingleGroup(cellData, serviceManager);
-                        List<BaseCell> children = card.getCells();
-                        if (children.size() > 0) {
-                            cell = card.getCells().get(0);
-                        }
-                        break;
-                    }
+        // cellType is null, maybe is card
+        if (TextUtils.isEmpty(cellType)) {
+            cellType = parseCardType(cellData);
+        }
+
+        if (resolver.resolver().getViewClass(cellType) != null) {
+            cell = new BaseCell(cellType);
+            cell.serviceManager = serviceManager;
+            if (parent != null) {
+                cell.parent = parent;
+                cell.parentId = parent.id;
+            }
+
+            parseCell(cell, cellData);
+            if (parent != null) {
+                boolean ret = parent.addCellInternal(cell, false);
+                if (!ret && TangramBuilder.isPrintLog()) {
+                    LogUtils.w(TAG, "Parse invalid cell with data: " + cellData.toString());
                 }
-                if (cell != null) {
-                    cell.serviceManager = serviceManager;
-                    if (parent != null) {
-                        cell.parent = parent;
-                        cell.parentId = parent.id;
-                    }
-                } else {
-                    return BaseCell.NaN;
+            }
+            return cell;
+        } else if (Utils.isCard(cellType)) {
+            switch (cellType) {
+                case TangramBuilder.TYPE_CONTAINER_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_1C_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_2C_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_3C_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_4C_FLOW:
+                case TangramBuilder.TYPE_CONTAINER_5C_FLOW: {
+                    Card card = parseSingleGroup(cellData, serviceManager);
+                    parent.addChildCard(card);
+                    break;
                 }
-            } else {
-                cell = new BaseCell(cellType);
+                case TangramBuilder.TYPE_CONTAINER_BANNER:
+                case TangramBuilder.TYPE_CONTAINER_SCROLL: {
+                    Card card = parseSingleGroup(cellData, serviceManager);
+                    List<BaseCell> children = card.getCells();
+                    if (children.size() > 0) {
+                        cell = card.getCells().get(0);
+                    }
+                    break;
+                }
+            }
+            if (cell != null) {
                 cell.serviceManager = serviceManager;
                 if (parent != null) {
                     cell.parent = parent;
                     cell.parentId = parent.id;
                 }
+            } else {
+                return BaseCell.NaN;
+            }
+
+            parseCell(cell, cellData);
+            if (parent != null) {
+                boolean ret = parent.addCellInternal(cell, false);
+                if (!ret && TangramBuilder.isPrintLog()) {
+                    LogUtils.w(TAG, "Parse invalid cell with data: " + cellData.toString());
+                }
+            }
+            return cell;
+        } else if (isCustomCard(parent.stringType)) {
+            cell = parseCustomCard(cellType, parent, cellData, serviceManager, componentInfoMap);
+            if (cell != null) {
+                cell.serviceManager = serviceManager;
+                if (parent != null) {
+                    cell.parent = parent;
+                    cell.parentId = parent.id;
+                }
+            } else {
+                return BaseCell.NaN;
             }
 
             parseCell(cell, cellData);
@@ -878,6 +910,18 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
     protected String parseCellType(JSONObject json) {
         return json.getString(KEY_TYPE);
+    }
+
+    protected boolean isCustomCard(String cardType) {
+        return false;
+    }
+
+    protected BaseCell parseCustomCard(String cardType,
+                                       @Nullable Card parent,
+                                       @NonNull JSONObject cellData,
+                                       @NonNull ServiceManager serviceManager,
+                                       Map<String, ComponentInfo> componentInfoMap) {
+        return null;
     }
 
     protected void parseHeaderCell(BaseCell headerCell, Card card) {
