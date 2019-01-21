@@ -65,8 +65,6 @@ public class EventHandlerWrapper {
 
     protected final IEventHandlerReceiver eventHandlerReceiver;
 
-    protected String eventId;
-
     EventHandlerWrapper(@NonNull String type, String producer, @NonNull Object subscriber,
                         String action) {
         this.type = type;
@@ -77,8 +75,7 @@ public class EventHandlerWrapper {
         this.eventHandlerReceiver = null;
     }
 
-    public EventHandlerWrapper(String eventId, String type, IEventHandlerReceiver eventHandlerReceiver) {
-        this.eventId = eventId;
+    public EventHandlerWrapper(String type, IEventHandlerReceiver eventHandlerReceiver) {
         this.type = type;
         this.producer = null;
         this.subscriber = null;
