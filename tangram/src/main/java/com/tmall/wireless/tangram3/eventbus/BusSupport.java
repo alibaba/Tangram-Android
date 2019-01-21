@@ -196,4 +196,7 @@ public class BusSupport implements IDispatcherDelegate {
         return new EventHandlerWrapper(type, producer, subscriber, action);
     }
 
+    public ConcurrentHashMap<String, List<EventHandlerWrapper>> getSubscribers() {
+        return subscribers;
+    }
 }

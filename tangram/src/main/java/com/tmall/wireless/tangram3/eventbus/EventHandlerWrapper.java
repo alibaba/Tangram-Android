@@ -63,7 +63,7 @@ public class EventHandlerWrapper {
      */
     protected final Method handlerMethod;
 
-    protected final IEventHandlerReceiver eventHandlerReceiver;
+    public final IEventHandlerReceiver eventHandlerReceiver;
 
     EventHandlerWrapper(@NonNull String type, String producer, @NonNull Object subscriber,
                         String action) {
