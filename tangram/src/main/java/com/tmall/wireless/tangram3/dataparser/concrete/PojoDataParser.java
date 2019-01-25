@@ -723,6 +723,10 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             cellType = parseCardType(cellData);
         }
 
+        if (TextUtils.isEmpty(cellType)) {
+            return BaseCell.NaN;
+        }
+
         if (resolver.resolver().getViewClass(cellType) != null) {
             cell = new BaseCell(cellType);
             cell.serviceManager = serviceManager;
