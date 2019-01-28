@@ -24,13 +24,16 @@
 
 package com.tmall.wireless.tangram.support;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
 import android.util.Log;
+
 import com.tmall.wireless.tangram.support.HandlerTimer.TimerStatus;
 import com.tmall.wireless.tangram.support.TimerSupport.OnTickListener;
+
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -55,57 +58,57 @@ public class RxTimer implements ITimer {
 
     private Observable<Long> mIntervalObservable;
 
-    private ArrayMap<OnTickListener, Disposable> tickCache = new ArrayMap<>();
+    private ConcurrentHashMap<OnTickListener, Disposable> tickCache = new ConcurrentHashMap<>();
 
     public RxTimer(long interval) {
         this.mInterval = interval;
         this.mStatus = TimerStatus.Waiting;
         this.mIntervalObservable = Observable
-            .interval(0, this.mInterval, TimeUnit.MILLISECONDS)
-            .doOnSubscribe(new Consumer<Disposable>() {
-                @Override
-                public void accept(Disposable disposable) throws Exception {
-                    mStatus = TimerStatus.Running;
-                    Log.d("RxTimerSupportTest", "accept " + disposable + " status " + mStatus);
-                }
-            })
-            .doOnDispose(new Action() {
-                @Override
-                public void run() throws Exception {
-                    mStatus = TimerStatus.Paused;
-                    Log.d("RxTimerSupportTest", "on dispose " + " status " + mStatus);
-                }
-            })
-            .doOnTerminate(new Action() {
-                @Override
-                public void run() throws Exception {
-                    mStatus = TimerStatus.Stopped;
-                    Log.d("RxTimerSupportTest", "on terminate " + " status " + mStatus);
-                }
-            })
-            .share();
+                .interval(0, this.mInterval, TimeUnit.MILLISECONDS)
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(Disposable disposable) throws Exception {
+                        mStatus = TimerStatus.Running;
+                        Log.d("RxTimerSupportTest", "accept " + disposable + " status " + mStatus);
+                    }
+                })
+                .doOnDispose(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        mStatus = TimerStatus.Paused;
+                        Log.d("RxTimerSupportTest", "on dispose " + " status " + mStatus);
+                    }
+                })
+                .doOnTerminate(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        mStatus = TimerStatus.Stopped;
+                        Log.d("RxTimerSupportTest", "on terminate " + " status " + mStatus);
+                    }
+                })
+                .share();
     }
 
     public void register(final int interval, @NonNull final OnTickListener onTickListener, boolean intermediate) {
         Disposable disposable = this.mIntervalObservable.delaySubscription(intermediate ? 0 : interval * mInterval, TimeUnit.MILLISECONDS).skipWhile(
 
-            new Predicate<Long>() {
-                @Override
-                public boolean test(Long aLong) throws Exception {
-                    return pause;
-                }
-            }).observeOn(
-            AndroidSchedulers.mainThread()).subscribe(new Consumer<Long>() {
+                new Predicate<Long>() {
+                    @Override
+                    public boolean test(Long aLong) throws Exception {
+                        return pause;
+                    }
+                }).observeOn(
+                AndroidSchedulers.mainThread()).subscribe(new Consumer<Long>() {
 
-                @Override
-                public void accept(Long count) throws Exception {
-                    Log.d("RxTimerSupportTest", "accept " + " value " + count);
-                    if (count % interval == 0) {
-                        if (onTickListener != null) {
-                            onTickListener.onTick();
-                        }
+            @Override
+            public void accept(Long count) throws Exception {
+                Log.d("RxTimerSupportTest", "accept " + " value " + count);
+                if (count % interval == 0) {
+                    if (onTickListener != null) {
+                        onTickListener.onTick();
                     }
                 }
+            }
         });
         tickCache.put(onTickListener, disposable);
     }
@@ -148,8 +151,8 @@ public class RxTimer implements ITimer {
 
     @Override
     public void stop() {
-        for (int i = 0, size = tickCache.size(); i < size; i++) {
-            Disposable disposable = tickCache.valueAt(i);
+        for (Map.Entry<OnTickListener, Disposable> entry : tickCache.entrySet()) {
+            Disposable disposable = entry.getValue();
             disposable.dispose();
         }
         tickCache.clear();

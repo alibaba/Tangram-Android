@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
 import com.tmall.wireless.tangram.dataparser.concrete.Cell;
@@ -66,7 +65,7 @@ public abstract class SimpleClickSupport {
 
     private static final int MODIFIERS_IGNORE = Modifier.ABSTRACT | Modifier.STATIC | BRIDGE | SYNTHETIC;
 
-    private final Map<Class<?>, OnClickMethod> mOnClickMethods = new ArrayMap<>();
+    private final Map<Class<?>, OnClickMethod> mOnClickMethods = new ConcurrentHashMap<>();
 
     private boolean optimizedMode;
 

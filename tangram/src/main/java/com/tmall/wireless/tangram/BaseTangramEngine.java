@@ -28,7 +28,6 @@ import android.content.Context;
 import android.os.Build.VERSION;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ChildDrawingOrderCallback;
 import android.view.View;
@@ -54,12 +53,11 @@ import com.tmall.wireless.tangram.op.ParseComponentsOp;
 import com.tmall.wireless.tangram.op.ParseGroupsOp;
 import com.tmall.wireless.tangram.op.ParseSingleComponentOp;
 import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
-import com.tmall.wireless.tangram.op.TangramOp2;
-import com.tmall.wireless.tangram.op.TangramOp3;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
+import com.tmall.wireless.tangram.support.InternalErrorSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
@@ -67,6 +65,12 @@ import com.tmall.wireless.tangram.util.Preconditions;
 import com.tmall.wireless.tangram.util.Predicate;
 import com.tmall.wireless.vaf.framework.VafContext;
 import com.tmall.wireless.vaf.framework.ViewManager;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
@@ -74,11 +78,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * {@link O} is the type of data, {@link T} is the array type of data, {@link C} is the class of Group, {@link L} is the class of Component
@@ -90,7 +89,7 @@ import java.util.Map;
 public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
 
-    private Map<Class<?>, Object> mServices = new ArrayMap<>();
+    private ConcurrentHashMap<Class<?>, Object> mServices = new ConcurrentHashMap<>();
 
     @NonNull
     private final Context mContext;
@@ -185,6 +184,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
         if (mGroupBasicAdapter == null) {
             this.mGroupBasicAdapter = mAdapterBuilder.newAdapter(mContext, mLayoutManager, this);
             mGroupBasicAdapter.setPerformanceMonitor(mPerformanceMonitor);
+            mGroupBasicAdapter.setErrorSupport(getService(InternalErrorSupport.class));
         }
 
         if (mContentView.getRecycledViewPool() != null) {

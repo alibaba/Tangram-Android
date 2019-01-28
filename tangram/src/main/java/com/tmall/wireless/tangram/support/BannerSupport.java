@@ -26,8 +26,8 @@ package com.tmall.wireless.tangram.support;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
-import android.support.v4.util.ArrayMap;
 import com.tmall.wireless.tangram.ext.BannerListener;
 import com.tmall.wireless.tangram.support.RxBannerScrolledListener.ScrollEvent;
 import io.reactivex.Observable;
@@ -38,11 +38,11 @@ import io.reactivex.Observable;
  */
 public class BannerSupport {
 
-    private ArrayMap<String, List<BannerListener>> mSelectedListenerArrayMap = new ArrayMap<>();
+    private ConcurrentHashMap<String, List<BannerListener>> mSelectedListenerArrayMap = new ConcurrentHashMap<>();
 
-    private ArrayMap<String, List<BannerListener>> mScrolledListenerArrayMap = new ArrayMap<>();
+    private ConcurrentHashMap<String, List<BannerListener>> mScrolledListenerArrayMap = new ConcurrentHashMap<>();
 
-    private ArrayMap<String, List<BannerListener>> mScrollStateListenerArrayMap = new ArrayMap<>();
+    private ConcurrentHashMap<String, List<BannerListener>> mScrollStateListenerArrayMap = new ConcurrentHashMap<>();
 
     @Deprecated
     private List<BannerListener> listeners = new ArrayList<BannerListener>();

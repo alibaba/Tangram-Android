@@ -25,11 +25,11 @@
 package com.tmall.wireless.tangram;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 
 import android.os.Build.VERSION;
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,12 +63,12 @@ public class MVHelper {
 
     private VafContext mVafContext;
 
-    private ArrayMap<BaseCell, ArrayMap<Method, Object>> methodMap = new ArrayMap<>(128);
-    private ArrayMap<Class, Method[]> methodCacheMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, Method> postBindMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, Method> postUnBindMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, Method> cellInitedMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, String> cellFlareIdMap = new ArrayMap<>(128);
+    private ConcurrentHashMap<BaseCell, ConcurrentHashMap<Method, Object>> methodMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<Class, Method[]> methodCacheMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<BaseCell, Method> postBindMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<BaseCell, Method> postUnBindMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<BaseCell, Method> cellInitedMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<BaseCell, String> cellFlareIdMap = new ConcurrentHashMap<>(128);
 
     public MVHelper(MVResolver mvResolver) {
         this.mvResolver = mvResolver;
@@ -199,7 +199,7 @@ public class MVHelper {
             return;
         }
 
-        ArrayMap<Method, Object> paramMap = new ArrayMap<>();
+        ConcurrentHashMap<Method, Object> paramMap = new ConcurrentHashMap<>();
 
         Method[] methods;
         if (methodCacheMap.get(view.getClass()) == null) {

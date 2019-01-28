@@ -25,11 +25,11 @@
 package com.tmall.wireless.tangram.structure;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageView;
@@ -123,9 +123,9 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
      */
     public JSONObject extras = new JSONObject();
 
-    private ArrayMap<String, Object> bizParaMap = new ArrayMap<>(32);
+    private ConcurrentHashMap<String, Object> bizParaMap = new ConcurrentHashMap<>(32);
 
-    private ArrayMap<Integer, Integer> innerClickMap = new ArrayMap<>();
+    private ConcurrentHashMap<Integer, Integer> innerClickMap = new ConcurrentHashMap<>();
 
     @Nullable
     public ServiceManager serviceManager;
@@ -366,9 +366,9 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         return null;
     }
 
-    private ArrayMap<View, ClickExposureCellOp> mRxExposureEvents = new ArrayMap<>();
+    private ConcurrentHashMap<View, ClickExposureCellOp> mRxExposureEvents = new ConcurrentHashMap<>();
 
-    private ArrayMap<View, CellExposureObservable> mViewExposureObservables = new ArrayMap<>();
+    private ConcurrentHashMap<View, CellExposureObservable> mViewExposureObservables = new ConcurrentHashMap<>();
 
     /**
      * @param targetView
@@ -403,9 +403,9 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
         return exposure(targetView, rxExposureEvent);
     }
 
-    private ArrayMap<View, ClickExposureCellOp> mRxClickEvents = new ArrayMap<>();
+    private ConcurrentHashMap<View, ClickExposureCellOp> mRxClickEvents = new ConcurrentHashMap<>();
 
-    private ArrayMap<View, CellClickObservable> mViewClickObservables = new ArrayMap<>();
+    private ConcurrentHashMap<View, CellClickObservable> mViewClickObservables = new ConcurrentHashMap<>();
 
     /**
      * @param view

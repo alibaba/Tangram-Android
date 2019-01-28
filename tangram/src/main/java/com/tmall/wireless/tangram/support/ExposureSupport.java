@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.support.annotation.NonNull;
-import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
@@ -80,8 +79,8 @@ public abstract class ExposureSupport {
     private static final int MODIFIERS_IGNORE = Modifier.ABSTRACT | Modifier.STATIC | BRIDGE
             | SYNTHETIC;
 
-    private final Map<Class<?>, OnTraceMethod> mOnTraceMethods = new ArrayMap<>();
-    private final Map<Class<?>, OnTraceMethod> mOnExposureMethods = new ArrayMap<>();
+    private final Map<Class<?>, OnTraceMethod> mOnTraceMethods = new ConcurrentHashMap<>();
+    private final Map<Class<?>, OnTraceMethod> mOnExposureMethods = new ConcurrentHashMap<>();
 
     private boolean optimizedMode;
 

@@ -26,10 +26,9 @@ package com.tmall.wireless.tangram.structure.card;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
-import android.support.v4.util.SimpleArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.Range;
@@ -37,19 +36,19 @@ import com.alibaba.android.vlayout.layout.BaseLayoutHelper;
 import com.alibaba.android.vlayout.layout.GridLayoutHelper;
 import com.alibaba.android.vlayout.layout.RangeGridLayoutHelper;
 import com.alibaba.android.vlayout.layout.RangeGridLayoutHelper.GridRangeStyle;
-
-import android.view.View;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
 import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.structure.BaseCell;
-
 import com.tmall.wireless.tangram.support.CardSupport;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Card perform grid layout
@@ -102,28 +101,28 @@ public class GridCard extends Card {
         if (anchorCard == null) {
             return;
         }
-        ArrayMap<Range<Integer>, Card> newChildren = new ArrayMap<>();
+        ConcurrentHashMap<Range<Integer>, Card> newChildren = new ConcurrentHashMap<>();
         boolean startOffset = false;
-        for (int i = 0, size = mChildren.size(); i < size; i++) {
-            Range<Integer> key = mChildren.keyAt(i);
-            Card child = mChildren.valueAt(i);
+        for (Map.Entry<Range<Integer>, Card> entry : mChildren.entrySet()) {
+            Range<Integer> key = entry.getKey();
+            Card child = entry.getValue();
             if (child == anchorCard) {
                 Range<Integer> newKey = Range.create(key.getLower().intValue(),
-                    key.getUpper().intValue() + offset);
+                        key.getUpper().intValue() + offset);
                 newChildren.put(newKey, child);
                 startOffset = true;
                 continue;
             }
             if (startOffset) {
                 Range<Integer> newKey = Range.create(key.getLower().intValue() + offset,
-                    key.getUpper().intValue() + offset);
+                        key.getUpper().intValue() + offset);
                 newChildren.put(newKey, child);
             } else {
                 newChildren.put(key, child);
             }
         }
         mChildren.clear();
-        mChildren.putAll((SimpleArrayMap<? extends Range<Integer>, ? extends Card>)newChildren);
+        mChildren.putAll(newChildren);
     }
 
     @Override
@@ -193,9 +192,9 @@ public class GridCard extends Card {
     }
 
     private void convertChildLayoutHelper(@Nullable RangeGridLayoutHelper gridHelper, GridCard parentCard) {
-        for (int i = 0, size = parentCard.getChildren().size(); i < size; i++) {
-            Range<Integer> range = parentCard.getChildren().keyAt(i);
-            Card child = parentCard.getChildren().valueAt(i);
+        for (Map.Entry<Range<Integer>, Card> entry : parentCard.getChildren().entrySet()) {
+            Range<Integer> range = entry.getKey();
+            Card child = entry.getValue();
             Style style = child.style;
             if (style instanceof GridStyle && child instanceof GridCard) {
                 final GridStyle gridStyle = (GridStyle) style;
@@ -228,9 +227,9 @@ public class GridCard extends Card {
 
                 rangeStyle.setBgColor(style.bgColor);
                 rangeStyle.setMargin(style.margin[Style.MARGIN_LEFT_INDEX], style.margin[Style.MARGIN_TOP_INDEX],
-                    style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
+                        style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
                 rangeStyle.setPadding(style.padding[Style.MARGIN_LEFT_INDEX], style.padding[Style.MARGIN_TOP_INDEX],
-                    style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
+                        style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
                 if (!TextUtils.isEmpty(style.bgImgUrl)) {
                     if (serviceManager != null && serviceManager.getService(CardSupport.class) != null) {
                         final CardSupport support = serviceManager.getService(CardSupport.class);
