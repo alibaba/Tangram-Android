@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
 
 /**
  * Created by longerian on 16/4/29.
- * <p>
+ *
  * Used to wrap an event subscriber.
  */
 public class EventHandlerWrapper {
@@ -63,28 +63,13 @@ public class EventHandlerWrapper {
      */
     protected final Method handlerMethod;
 
-    protected final IEventHandlerReceiver eventHandlerReceiver;
-
-    protected String eventId;
-
     EventHandlerWrapper(@NonNull String type, String producer, @NonNull Object subscriber,
-                        String action) {
+            String action) {
         this.type = type;
         this.producer = producer;
         this.subscriber = subscriber;
         this.action = action;
         this.handlerMethod = ReflectedActionFinder.findMethodByName(action, subscriber);
-        this.eventHandlerReceiver = null;
-    }
-
-    public EventHandlerWrapper(String eventId, String type, IEventHandlerReceiver eventHandlerReceiver) {
-        this.eventId = eventId;
-        this.type = type;
-        this.producer = null;
-        this.subscriber = null;
-        this.action = null;
-        this.handlerMethod = null;
-        this.eventHandlerReceiver = eventHandlerReceiver;
     }
 
     final protected void handleEvent(@NonNull Event event) {
@@ -96,8 +81,6 @@ public class EventHandlerWrapper {
             } catch (InvocationTargetException e) {
                 e.printStackTrace();
             }
-        } else if (eventHandlerReceiver != null) {
-            eventHandlerReceiver.handleEvent(event);
         }
     }
 

@@ -245,8 +245,6 @@ public abstract class Card extends ComponentLifecycle {
         loadParams = data.optJSONObject(KEY_API_LOAD_PARAMS);
         loaded = data.optBoolean(KEY_LOADED, false);
 
-        resolver.renderManager().parseComponentInfo(data);
-
         maxChildren = data.optInt(KEY_MAX_CHILDREN, maxChildren);
         // parsing header
         if (isParseCell) {
@@ -352,13 +350,30 @@ public abstract class Card extends ComponentLifecycle {
             } else {
                 //support virtual view at layout
                 BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
-                // if cell type not register and has component info, register it!
-                if (!componentBinderResolver.has(cellType) && resolver.renderManager().getComponentInfo(cellType) != null) {
-                    componentBinderResolver.register(cellType, new BaseCellBinder<>(cellType, resolver));
+
+                //if exist template need update, just do it
+                TemplateUpdateSupport templateUpdateSupport = serviceManager.getService(TemplateUpdateSupport.class);
+                if (templateUpdateSupport != null) {
+                    if (cellData.has(TemplateInfo.KEY_TEMPLATE_INFO)) {
+                        JSONObject templateInfoJson = cellData.optJSONObject(TemplateInfo.KEY_TEMPLATE_INFO);
+
+                        MVHelper mvHelper = serviceManager.getService(MVHelper.class);
+                        int currVersion = mvHelper.getVafContext().getViewManager().getViewVersion(cellType);
+                        int newVersion = templateInfoJson.optInt(TemplateInfo.KEY_TEMPLATE_VERSION);
+
+                        if (newVersion > currVersion) {
+                            TemplateInfo templateInfo = new TemplateInfo();
+                            templateInfo.setType(cellType);
+                            templateInfo.setBinary(templateInfoJson.optString(TemplateInfo.KEY_TEMPLATE_BINARY_BASE64));
+                            templateInfo.setVersion(newVersion);
+
+                            templateUpdateSupport.onUpdate(templateInfo);
+                        }
+                    }
                 }
+
                 if (componentBinderResolver.has(cellType)) {
                     cell = new BaseCell(cellType);
-                    cell.componentInfo = resolver.renderManager().getComponentInfo(cellType);
                     cell.serviceManager = serviceManager;
                     if (parent != null) {
                         cell.parent = parent;

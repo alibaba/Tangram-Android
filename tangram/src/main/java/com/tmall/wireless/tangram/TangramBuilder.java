@@ -25,7 +25,6 @@
 package com.tmall.wireless.tangram;
 
 import com.alibaba.android.vlayout.extend.PerformanceMonitor;
-import com.tmall.wireless.tangram.core.protocol.ElementRenderService;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
@@ -71,11 +70,14 @@ import com.tmall.wireless.tangram.view.LinearScrollView;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.view.View;
 import android.widget.ImageView;
+import com.tmall.wireless.vaf.framework.VafContext;
+import com.tmall.wireless.vaf.framework.ViewManager;
 
 /**
+ *
+ *
  * Created by longerian on 17/1/16.
  */
 
@@ -257,20 +259,19 @@ public class TangramBuilder {
 
     /**
      * init global Tangram environment.
-     *
-     * @param context          the app context
+     * @param context the app context
      * @param innerImageSetter an ImagerSetter to load image, see {@link ImageUtils}
-     * @param imageClazz       a custom ImageView class, used to construct an imageView instance.
+     * @param imageClazz a custom ImageView class, used to construct an imageView instance.
      */
     public static void init(@NonNull final Context context, IInnerImageSetter innerImageSetter,
-                            Class<? extends ImageView> imageClazz) {
+        Class<? extends ImageView> imageClazz) {
         if (sInitialized) {
             return;
         }
         //noinspection ConstantConditions
         Preconditions.checkArgument(context != null, "context should not be null");
         Preconditions
-                .checkArgument(innerImageSetter != null, "innerImageSetter should not be null");
+            .checkArgument(innerImageSetter != null, "innerImageSetter should not be null");
         Preconditions.checkArgument(imageClazz != null, "imageClazz should not be null");
         TangramViewMetrics.initWith(context.getApplicationContext());
         ImageUtils.sImageClass = imageClazz;
@@ -280,19 +281,18 @@ public class TangramBuilder {
 
     /**
      * regiser the framework default cell and card.
-     *
      * @param registry
      */
     public static void installDefaultRegistry(@NonNull final DefaultResolverRegistry registry) {
-        /*
-         * register built-in cards & mCells
-         */
+            /*
+             * register built-in cards & mCells
+             */
         MVHelper mvHelper = new MVHelper(new MVResolver());
         registry.setMVHelper(mvHelper);
 
         // built-in mCells
         registry.registerCell(TYPE_EXTENDED_VIEW_COMPACT, Card.PlaceholderCell.class,
-                SimpleEmptyView.class);
+            SimpleEmptyView.class);
         registry.registerCell(TYPE_EMPTY_VIEW_COMPACT, BaseCell.class, SimpleEmptyView.class);
         //registry.registerCell(TYPE_SIMPLE_IMAGE_COMPACT, Cell.class, SimpleImgView.class);
         registry.registerCell(TYPE_CAROUSEL_CELL_COMPACT, BannerView.class);
@@ -347,7 +347,6 @@ public class TangramBuilder {
 
     /**
      * init a {@link TangramEngine} builder with build-in resource inited, such as registering build-in card and cell. Users use this builder to regiser custom card and cell, then call {@link InnerBuilder#build()} to create a {@link TangramEngine} instance.
-     *
      * @param context activity context
      * @return a {@link TangramEngine} builder
      */
@@ -382,8 +381,6 @@ public class TangramBuilder {
 
         private DataParser mDataParser;
 
-        private ArrayMap<String, ElementRenderService> renderServiceMap;
-
         protected InnerBuilder(@NonNull final Context context, DefaultResolverRegistry registry) {
             this.mContext = context;
             this.mDefaultResolverRegistry = registry;
@@ -395,7 +392,6 @@ public class TangramBuilder {
 
         /**
          * register cell with custom model class and view class
-         *
          * @param type
          * @param cellClz
          * @param viewClz
@@ -403,13 +399,12 @@ public class TangramBuilder {
          */
         @Deprecated
         public <V extends View> void registerCell(int type,
-                                                  @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
+            @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
             mDefaultResolverRegistry.registerCell(String.valueOf(type), cellClz, viewClz);
         }
 
         /**
          * register cell with custom model class and view creator
-         *
          * @param type
          * @param cellClz
          * @param viewHolderCreator
@@ -417,14 +412,13 @@ public class TangramBuilder {
          */
         @Deprecated
         public <V extends View> void registerCell(int type,
-                                                  @NonNull Class<? extends BaseCell> cellClz,
-                                                  @NonNull ViewHolderCreator viewHolderCreator) {
+            @NonNull Class<? extends BaseCell> cellClz,
+            @NonNull ViewHolderCreator viewHolderCreator) {
             mDefaultResolverRegistry.registerCell(String.valueOf(type), cellClz, viewHolderCreator);
         }
 
         /**
          * register cell with custom view class, the model of cell is provided with default type
-         *
          * @param type
          * @param viewClz
          * @param <V>
@@ -436,7 +430,6 @@ public class TangramBuilder {
 
         /**
          * register card with type and card class
-         *
          * @param type
          * @param cardClz
          */
@@ -446,13 +439,13 @@ public class TangramBuilder {
         }
 
         public <V extends View> void registerCell(String type,
-                                                  @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
+            @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
             mDefaultResolverRegistry.registerCell(type, cellClz, viewClz);
         }
 
         public <V extends View> void registerCell(String type,
-                                                  @NonNull Class<? extends BaseCell> cellClz,
-                                                  @NonNull ViewHolderCreator viewHolderCreator) {
+            @NonNull Class<? extends BaseCell> cellClz,
+            @NonNull ViewHolderCreator viewHolderCreator) {
             mDefaultResolverRegistry.registerCell(type, cellClz, viewHolderCreator);
         }
 
@@ -465,19 +458,16 @@ public class TangramBuilder {
         }
 
         /**
-         * Now do noting, just exist for compatibility.
          * register item render by virtual view
-         *
          * @param type
          */
-        @Deprecated
         public <V extends View> void registerVirtualView(String type) {
+            mDefaultResolverRegistry.registerVirtualView(type);
         }
 
         /**
          * set a custom {@link IAdapterBuilder} to build adapter, the default is {@link PojoAdapterBuilder} which
          * would create a {@link com.tmall.wireless.tangram.dataparser.concrete.PojoGroupBasicAdapter}
-         *
          * @param builder custom IadapterBuilder
          */
         public void setAdapterBuilder(@NonNull IAdapterBuilder builder) {
@@ -487,7 +477,6 @@ public class TangramBuilder {
 
         /**
          * set a custom {@link PerformanceMonitor} to record performance of critical phase, such as creating view, binding view, unbind view, measuring view, layout view.
-         *
          * @param performanceMonitor
          */
         public void setPerformanceMonitor(@Nullable PerformanceMonitor performanceMonitor) {
@@ -496,7 +485,6 @@ public class TangramBuilder {
 
         /**
          * set an custom {@link DataParser}, the default is {@link PojoDataParser}
-         *
          * @param dataParser
          */
         public void setDataParser(@NonNull DataParser dataParser) {
@@ -512,48 +500,39 @@ public class TangramBuilder {
             }
         }
 
-        public void registerRenderService(ElementRenderService renderService) {
-            if (renderServiceMap == null) {
-                renderServiceMap = new ArrayMap<>(5);
-            } else if (renderServiceMap.containsKey(renderService.getSDKBizName())) {
-                throw new IllegalArgumentException("Can not register duplicated render service.");
-            }
-            renderServiceMap.put(renderService.getSDKBizName(), renderService);
-        }
-
         /**
          * @return a {@link TangramBuilder} instance to bind {@link android.support.v7.widget.RecyclerView}, data.
          */
         public TangramEngine build() {
 
             TangramEngine tangramEngine =
-                    new TangramEngine(mContext, mDataParser, mPojoAdapterBuilder);
+                new TangramEngine(mContext, mDataParser, mPojoAdapterBuilder);
 
             tangramEngine.setPerformanceMonitor(mPerformanceMonitor);
             // register service with default services
             tangramEngine.register(MVHelper.class, mMVHelper);
             tangramEngine
-                    .register(CardResolver.class, mDefaultResolverRegistry.mDefaultCardResolver);
+                .register(CardResolver.class, mDefaultResolverRegistry.mDefaultCardResolver);
             tangramEngine.register(BaseCellBinderResolver.class,
-                    mDefaultResolverRegistry.mDefaultCellBinderResolver);
+                mDefaultResolverRegistry.mDefaultCellBinderResolver);
             tangramEngine.register(BaseCardBinderResolver.class,
-                    mDefaultResolverRegistry.mDefaultCardBinderResolver);
+                mDefaultResolverRegistry.mDefaultCardBinderResolver);
 
             // add other features service
             tangramEngine.register(TimerSupport.class, new TimerSupport());
             tangramEngine.register(BusSupport.class, new BusSupport());
 
-            // add renderService
-            if (renderServiceMap != null) {
-                for (ElementRenderService renderService : renderServiceMap.values()) {
-                    mMVHelper.renderManager().addRenderService(renderService);
-                    renderService.init(tangramEngine);
-                }
-            }
+            // add virtual view context
+            VafContext mVafContext = new VafContext(mContext.getApplicationContext());
+            ViewManager mViewManager = mVafContext.getViewManager();
+            mViewManager.init(mContext.getApplicationContext());
+            tangramEngine.register(ViewManager.class, mViewManager);
+            tangramEngine.register(VafContext.class, mVafContext);
+            mMVHelper.setVafContext(mVafContext);
 
             mMVResolver.setServiceManager(tangramEngine);
 
-            if (callback != null) {
+            if(callback != null){
                 callback.onBuild(tangramEngine);
             }
             return tangramEngine;
@@ -561,7 +540,7 @@ public class TangramBuilder {
 
         BuildCallback callback = null;
 
-        public void setBuildCallback(BuildCallback callback) {
+        public void setBuildCallback(BuildCallback callback){
             this.callback = callback;
         }
 

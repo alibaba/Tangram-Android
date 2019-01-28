@@ -124,7 +124,6 @@ public class TangramDataParserActivity extends Activity {
                 new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TextView.class));
         builder.registerCell(199,SingleImageView.class);
         builder.registerVirtualView("vvtest");
-        builder.registerRenderService(new VirtualViewRenderService());
         //Step 4: new engine
         engine = builder.build();
         engine.setVirtualViewTemplate(VVTEST.BIN);

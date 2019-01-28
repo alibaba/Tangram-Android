@@ -294,7 +294,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
                     "Couldn't found component match certain type: " + cellType, infoMap);
         }
 
-        BinderViewHolder binderViewHolder = createViewHolder(binder, mContext, parent, cellType);
+        BinderViewHolder binderViewHolder = createViewHolder(binder, mContext, parent);
         if (mPerformanceMonitor != null) {
             mPerformanceMonitor.recordEnd(PHASE_CREATE, cellType);
         }
@@ -303,7 +303,7 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
 
     public abstract <V extends View> BinderViewHolder<C, V> createViewHolder(
-            @NonNull final ControlBinder<C, V> binder, @NonNull final Context context, final ViewGroup parent, final String cellType);
+            @NonNull final ControlBinder<C, V> binder, @NonNull final Context context, final ViewGroup parent);
 
 
     @Override

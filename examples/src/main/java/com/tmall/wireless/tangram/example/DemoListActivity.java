@@ -59,10 +59,6 @@ public class DemoListActivity extends ListActivity {
         parse.put("name", "基本Tangram");
         parse.put("class", TangramActivity.class.getName());
         list.add(parse);
-        HashMap<String, String> newTangram = new HashMap<String, String>();
-        newTangram.put("name", "Tangram 3.0");
-        newTangram.put("class", Tangram3Activity.class.getName());
-        list.add(newTangram);
         HashMap<String, String> api = new HashMap<String, String>();
         api.put("name", "响应式Tangram");
         api.put("class", RxTangramActivity.class.getName());
@@ -71,13 +67,17 @@ public class DemoListActivity extends ListActivity {
         bizItems.put("name", "自定义数据解析");
         bizItems.put("class", TangramDataParserActivity.class.getName());
         list.add(bizItems);
+//        HashMap<String, String> tangram3Items = new HashMap<String, String>();
+//        tangram3Items.put("name", "Tangram 3.0 (beta)");
+//        tangram3Items.put("class", Tangram3Activity.class.getName());
+//        list.add(tangram3Items);
         ListAdapter listAdapter = new SimpleAdapter(this, list, android.R.layout.simple_list_item_1, new String[]{"name"}, new int[]{android.R.id.text1});
         setListAdapter(listAdapter);
     }
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        Map<String, String> item = (Map<String, String>) l.getItemAtPosition(position);
+        Map<String, String> item = (Map<String, String>)l.getItemAtPosition(position);
         String className = item.get("class");
         if (className != null) {
             Intent intent = new Intent();

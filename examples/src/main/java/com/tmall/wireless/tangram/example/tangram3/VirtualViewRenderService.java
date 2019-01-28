@@ -1,4 +1,4 @@
-package com.tmall.wireless.tangram.example;
+package com.tmall.wireless.tangram.example.tangram3;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
-import com.tmall.wireless.tangram.TangramEngine;
-import com.tmall.wireless.tangram.core.protocol.ElementRenderService;
-import com.tmall.wireless.tangram.dataparser.concrete.ComponentInfo;
+import com.tmall.wireless.tangram3.TangramEngine;
+import com.tmall.wireless.tangram3.core.protocol.ElementRenderService;
+import com.tmall.wireless.tangram3.dataparser.concrete.ComponentInfo;
 import com.tmall.wireless.tangram.example.data.DEBUG;
 import com.tmall.wireless.tangram.example.data.VVTEST;
 import com.tmall.wireless.vaf.framework.VafContext;
@@ -22,9 +22,7 @@ import com.tmall.wireless.vaf.virtualview.core.ViewBase;
 import com.tmall.wireless.vaf.virtualview.event.EventData;
 import com.tmall.wireless.vaf.virtualview.event.EventManager;
 import com.tmall.wireless.vaf.virtualview.view.image.ImageBase;
-
-import org.json.JSONObject;
-
+import com.alibaba.fastjson.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 

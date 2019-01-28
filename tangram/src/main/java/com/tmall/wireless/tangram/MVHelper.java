@@ -25,25 +25,26 @@
 package com.tmall.wireless.tangram;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 
 import android.os.Build.VERSION;
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.tmall.wireless.tangram.core.protocol.ElementRenderService;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
-import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.CellRender;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
 import com.tmall.wireless.tangram.support.CellSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.util.BDE;
-
+import com.tmall.wireless.vaf.framework.VafContext;
+import com.tmall.wireless.vaf.virtualview.core.IContainer;
+import com.tmall.wireless.vaf.virtualview.core.ViewBase;
+import com.tmall.wireless.vaf.virtualview.event.EventData;
+import com.tmall.wireless.vaf.virtualview.event.EventManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -60,25 +61,28 @@ public class MVHelper {
 
     private MVResolver mvResolver;
 
-    private ComponentRenderManager renderManager;
+    private VafContext mVafContext;
 
-    private ArrayMap<BaseCell, ArrayMap<Method, Object>> methodMap = new ArrayMap<>(128);
-    private ArrayMap<Class, Method[]> methodCacheMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, Method> postBindMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, Method> postUnBindMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, Method> cellInitedMap = new ArrayMap<>(128);
+    private ConcurrentHashMap<BaseCell, ConcurrentHashMap<Method, Object>> methodMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<Class, Method[]> methodCacheMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<BaseCell, Method> postBindMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<BaseCell, Method> postUnBindMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<BaseCell, Method> cellInitedMap = new ConcurrentHashMap<>(128);
 
     public MVHelper(MVResolver mvResolver) {
         this.mvResolver = mvResolver;
-        renderManager = new ComponentRenderManager();
     }
 
     public MVResolver resolver() {
         return mvResolver;
     }
 
-    public ComponentRenderManager renderManager() {
-        return renderManager;
+    public VafContext getVafContext() {
+        return mVafContext;
+    }
+
+    public void setVafContext(VafContext vafContext) {
+        mVafContext = vafContext;
     }
 
     public void parseCell(BaseCell cell, JSONObject json) {
@@ -97,16 +101,13 @@ public class MVHelper {
     }
 
     public boolean isValid(BaseCell cell, ServiceManager serviceManager) {
-        boolean ret = cell.isValid();
         if (serviceManager != null) {
-            BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
-            ret = ret && (componentBinderResolver.has(cell.stringType) || cell.componentInfo != null && renderManager.getRenderService(cell.componentInfo.getType()) != null);
             CellSupport cellSupport = serviceManager.getService(CellSupport.class);
             if (cellSupport != null) {
-                ret = cellSupport.isValid(cell) && ret;
+                return cellSupport.isValid(cell) && cell.isValid();
             }
         }
-        return ret;
+        return cell.isValid();
     }
 
     public void mountView(BaseCell cell, View view) {
@@ -121,13 +122,21 @@ public class MVHelper {
                     cellSupport.bindView(cell, view);
                 }
             }
-            boolean renderServiceSuccess = renderManager.mountView(cell, view);
-            if (!renderServiceSuccess) {
+            if (view instanceof IContainer) {
+                ViewBase vb = ((IContainer)view).getVirtualView();
+                vb.setVData(cell.extras);
+                if (vb.supportExposure()) {
+                    VafContext context = cell.serviceManager.getService(VafContext.class);
+                    context.getEventManager().emitEvent(
+                        EventManager.TYPE_Exposure, EventData.obtainData(context, vb));
+                }
+                renderStyle(cell, view);
+            } else {
                 loadMethod(cell, view);
                 initView(cell, view);
                 renderView(cell, view);
+                renderStyle(cell, view);
             }
-            renderStyle(cell, view);
             if (mvResolver.isCompatibleType(cell.stringType)) {
                 mvResolver.getCellClass(cell.stringType).cast(cell).bindView(view);
             }
@@ -150,7 +159,10 @@ public class MVHelper {
     }
 
     public void unMountView(BaseCell cell, View view) {
-        renderManager.unmountView(cell, view);
+        if (view instanceof IContainer) {
+            ViewBase vb = ((IContainer)view).getVirtualView();
+            vb.reset();
+        }
         if (cell.serviceManager != null) {
             if (cell.serviceManager.supportRx()) {
                 cell.emitNext(BDE.UNBIND);
@@ -176,7 +188,7 @@ public class MVHelper {
             return;
         }
 
-        ArrayMap<Method, Object> paramMap = new ArrayMap<>();
+        ConcurrentHashMap<Method, Object> paramMap = new ConcurrentHashMap<>();
 
         Method[] methods;
         if (methodCacheMap.get(view.getClass()) == null) {
@@ -192,7 +204,7 @@ public class MVHelper {
             paramClazz = method.getParameterTypes();
 
             if (!method.isAnnotationPresent(CellRender.class) ||
-                    paramClazz == null || paramClazz.length != 1) {
+                paramClazz == null || paramClazz.length != 1) {
                 continue;
             }
 

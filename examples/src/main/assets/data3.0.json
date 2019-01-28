@@ -9,6 +9,7 @@
     "componentInfo": [
       {
         "name": "vvtest",
+        "id": "vvtest",
         "type": "VirtualView",
         "version": "1",
         "url": ""
@@ -19,7 +20,7 @@
         "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
         "arrowImgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
         "title": "rs标题1",
-        "type": "dxTest"
+        "type": "vvtest"
       },
       {
         "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",

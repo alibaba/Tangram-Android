@@ -55,7 +55,6 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      * Register an event subscriber which is wrapped by {@link EventHandlerWrapper}
-     *
      * @param eventHandler event subscriber wrapper
      */
     public synchronized void register(@NonNull EventHandlerWrapper eventHandler) {
@@ -70,7 +69,6 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      * Unregister an event subscriber
-     *
      * @param eventHandler event subscriber wrapper
      */
     public synchronized void unregister(@NonNull EventHandlerWrapper eventHandler) {
@@ -93,7 +91,6 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      * Post an event to the bus, called by event sender
-     *
      * @param event TangramOp1 object
      * @return Return true if the event is successfully enqueued into the event queue.
      */
@@ -103,7 +100,6 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      * Post a list of events to the bus, called by event sender
-     *
      * @param eventList TangramOp1 object list
      * @return Return true if the events are successfully enqueued into the event queue.
      */
@@ -113,7 +109,6 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      * Dispatch event to a subscriber, you should not call this method directly.
-     *
      * @param event TangramOp1 object
      */
     @Override
@@ -124,15 +119,10 @@ public class BusSupport implements IDispatcherDelegate {
             EventHandlerWrapper handler = null;
             for (int i = 0, size = eventHandlers.size(); i < size; i++) {
                 handler = eventHandlers.get(i);
-                if (handler.eventHandlerReceiver != null) {
-                    if (!TextUtils.isEmpty(handler.eventId) && handler.eventId.equals(event.eventId)) {
-                        handler.handleEvent(event);
-                    }
-                } else {
-                    if (!TextUtils.isEmpty(handler.producer) && handler.producer.equals(event.sourceId)
-                            || TextUtils.isEmpty(handler.producer)) {
-                        handler.handleEvent(event);
-                    }
+                if (!TextUtils.isEmpty(handler.producer) && handler.producer.equals(event.sourceId)) {
+                    handler.handleEvent(event);
+                } else if (TextUtils.isEmpty(handler.producer)) {
+                    handler.handleEvent(event);
                 }
             }
         }
@@ -147,17 +137,18 @@ public class BusSupport implements IDispatcherDelegate {
     }
 
     /**
-     * @param type         TangramOp1 type to identify an event.
-     * @param sourceId     TangramOp1 sender's unique id. If sourceId is empty, the event would be dispatched to any
-     *                     subscribers which is registered to receive events with 'type'. Otherwise, the event would be
-     *                     dispatched to any subscribers which is registered to receive events with 'type' and this 'sourceId'.
-     * @param args         TangramOp1 args, may be null.
+     *
+     * @param type TangramOp1 type to identify an event.
+     * @param sourceId TangramOp1 sender's unique id. If sourceId is empty, the event would be dispatched to any
+     *                 subscribers which is registered to receive events with 'type'. Otherwise, the event would be
+     *                 dispatched to any subscribers which is registered to receive events with 'type' and this 'sourceId'.
+     * @param args TangramOp1 args, may be null.
      * @param eventContext TangramOp1 context, see {@link EventContext}, may by null.
      * @return An event object from recycler pool. It is suggested to use this method to obtain an event object. The
      * returned object's field is filled provided params.
      */
     public static Event obtainEvent(String type, String sourceId,
-                                    ArrayMap<String, String> args, EventContext eventContext) {
+            ArrayMap<String, String> args, EventContext eventContext) {
         Event event = EventPool.sharedInstance().acquire();
         event.type = type;
         event.sourceId = sourceId;
@@ -168,21 +159,19 @@ public class BusSupport implements IDispatcherDelegate {
 
     /**
      * See {@link EventHandlerWrapper}
-     *
-     * @param type       The event type subcriber is interested.
-     * @param producer   The event source id subscriber is interested.
+     * @param type The event type subcriber is interested.
+     * @param producer The event source id subscriber is interested.
      * @param subscriber Original subscriber object.
-     * @param action     The name of callback method with parameter 'TangramOp1'. If empty, the subscribe must provide a handler method named 'execute'. See {@link ReflectedActionFinder}
+     * @param action The name of callback method with parameter 'TangramOp1'. If empty, the subscribe must provide a handler method named 'execute'. See {@link ReflectedActionFinder}
      * @return An EventHandlerWrapper wrapping a subscriber and used to registered into event bus.
      */
     public static EventHandlerWrapper wrapEventHandler(@NonNull String type, String producer, @NonNull Object subscriber,
-                                                       String action) {
+            String action) {
         return new EventHandlerWrapper(type, producer, subscriber, action);
     }
 
     /**
      * This performs the same feature as {@link #wrapEventHandler(String, String, Object, String)}, just parse the params from jsonObject.
-     *
      * @param subscriber Original subscriber object
      * @param jsonObject Json params
      * @return An EventHandlerWrapper wrapping a subscriber and used to registered into event bus.

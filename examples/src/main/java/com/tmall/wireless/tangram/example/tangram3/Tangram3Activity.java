@@ -90,7 +90,7 @@ public class Tangram3Activity extends Activity {
         builder.registerCell("Debug", TestBlockView.class);
         builder.registerCell("singleImgView", TestImageView.class);
 
-        builder.registerRenderService(new VirtualViewRenderService3());
+        builder.registerRenderService(new VirtualViewRenderService());
         //Step 4: new engine
         engine = builder.build();
 

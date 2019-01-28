@@ -78,6 +78,9 @@ public class BannerViewPager extends ViewPager implements UltraViewPagerAdapter.
     }
 
     protected void onMeasurePage(int widthMeasureSpec, int heightMeasureSpec) {
+        if (pagerAdapter == null){
+            return;
+        }
         View child = pagerAdapter.getViewAtPosition(getCurrentItem());
         if (child == null) {
             child = getChildAt(0);

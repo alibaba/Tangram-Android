@@ -66,6 +66,7 @@ import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.Predicate;
+import com.tmall.wireless.vaf.virtualview.core.ViewCache;
 
 import io.reactivex.functions.Consumer;
 
@@ -871,7 +872,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
             int position = mGroupBasicAdapter.getPositionByItem(cell);
             if (position >= 0) {
                 try {
-                    cell.extras.put("_flag_invalidate_", true);
+                    cell.extras.put(ViewCache.Item.FLAG_INVALIDATE, true);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

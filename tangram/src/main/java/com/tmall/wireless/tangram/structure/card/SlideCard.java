@@ -34,7 +34,6 @@ import com.tmall.wireless.tangram.structure.BaseCell;
 import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArrayMap;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;

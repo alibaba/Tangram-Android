@@ -28,7 +28,6 @@ import android.content.Context;
 import android.os.Build.VERSION;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ChildDrawingOrderCallback;
 import android.view.View;
@@ -44,15 +43,18 @@ import com.tmall.wireless.tangram.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
+import com.tmall.wireless.tangram.dataparser.concrete.BaseCardBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinder;
 import com.tmall.wireless.tangram.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
+import com.tmall.wireless.tangram.dataparser.concrete.CardResolver;
 import com.tmall.wireless.tangram.eventbus.BusSupport;
 import com.tmall.wireless.tangram.op.ParseComponentsOp;
 import com.tmall.wireless.tangram.op.ParseGroupsOp;
 import com.tmall.wireless.tangram.op.ParseSingleComponentOp;
 import com.tmall.wireless.tangram.op.ParseSingleGroupOp;
 import com.tmall.wireless.tangram.structure.BaseCell;
+import com.tmall.wireless.tangram.structure.card.VVCard;
 import com.tmall.wireless.tangram.support.BannerSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
 import com.tmall.wireless.tangram.support.InternalErrorSupport;
@@ -61,11 +63,13 @@ import com.tmall.wireless.tangram.support.TimerSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
 import com.tmall.wireless.tangram.util.Predicate;
+import com.tmall.wireless.vaf.framework.VafContext;
+import com.tmall.wireless.vaf.framework.ViewManager;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -85,7 +89,7 @@ import io.reactivex.schedulers.Schedulers;
 public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
 
-    private Map<Class<?>, Object> mServices = new ArrayMap<>();
+    private ConcurrentHashMap<Class<?>, Object> mServices = new ConcurrentHashMap<>();
 
     @NonNull
     private final Context mContext;
@@ -105,8 +109,8 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     private boolean isSupportRx;
 
     public BaseTangramEngine(@NonNull final Context context,
-                             @NonNull final DataParser<O, T, C, L> dataParser,
-                             @NonNull final IAdapterBuilder<C, L> adapterBuilder) {
+        @NonNull final DataParser<O, T, C, L> dataParser,
+        @NonNull final IAdapterBuilder<C, L> adapterBuilder) {
         //noinspection ConstantConditions
         Preconditions.checkArgument(context != null, "context is null");
         this.mContext = context;
@@ -155,7 +159,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Add a custom performance monitor to record performance
-     *
      * @param performanceMonitor
      */
     public void setPerformanceMonitor(
@@ -165,7 +168,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Bind a recyclerView to Tangram. After calling this, {@link GroupBasicAdapter}, {@link VirtualLayoutManager} are auto binded.
-     *
      * @param view A plain recyclerView with no adapter or layoutManager binded.
      */
     public void bindView(@NonNull final RecyclerView view) {
@@ -210,35 +212,41 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
-     * Now do noting, just exist for compatibility.
      * set compiled binary data of virtual views.* @param data
-     */
-    @Deprecated
+     * */
     public int setVirtualViewTemplate(byte[] data) {
-        return 0;
+        ViewManager viewManager = getService(ViewManager.class);
+        return viewManager.loadBinBufferSync(data);
     }
 
     /**
-     * Now do nothing, just exist for compatibility.
      * set compiled binary data after engine has been setup, used when load template data dynamically
-     *
      * @param type
      * @param data
      */
-    @Deprecated
     public void registerVirtualViewTemplate(String type, byte[] data) {
+        BaseCellBinderResolver baseCellBinderResolver = getService(BaseCellBinderResolver.class);
+        BaseCardBinderResolver baseCardBinderResolver = getService(BaseCardBinderResolver.class);
+        if (baseCellBinderResolver != null && baseCardBinderResolver != null) {
+            CardResolver cardResolver = baseCardBinderResolver.getDelegate();
+            MVHelper mMVHelper = getService(MVHelper.class);
+            if (cardResolver != null && mMVHelper != null) {
+                baseCellBinderResolver.register(type, new BaseCellBinder(type, mMVHelper));
+                cardResolver.register(type, VVCard.class);
+                setVirtualViewTemplate(data);
+            }
+        }
     }
 
     /**
      * register cell after engine has been created
-     *
      * @param type
      * @param cellClz
      * @param viewClz
      * @param <V>
      */
     public <V extends View> void registerCell(String type,
-                                              @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
+        @NonNull Class<? extends BaseCell> cellClz, @NonNull Class<V> viewClz) {
         registerCell(type, viewClz);
         MVHelper mMVHelper = getService(MVHelper.class);
         if (mMVHelper != null && mMVHelper.resolver() != null) {
@@ -248,7 +256,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * register cell after engine has been created
-     *
      * @param type
      * @param viewClz
      * @param <V>
@@ -263,7 +270,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     }
 
-    /**
+	/**
      * Call this when your activity is ready to destory to clear inner resource.
      */
     public void destroy() {
@@ -294,15 +301,14 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
         if (bannerSupport != null) {
             bannerSupport.destroy();
         }
-        MVHelper mvHelper = getService(MVHelper.class);
-        if (mvHelper != null) {
-            mvHelper.renderManager().destroyRenderService();
+        VafContext vafContext = getService(VafContext.class);
+        if (vafContext != null) {
+            vafContext.onDestroy();
         }
     }
 
     /**
      * Append original data with type {@link T} to Tangram. It cause full screen item's rebinding, be careful.
-     *
      * @param data Original data with type {@link T}.
      */
     @Deprecated
@@ -314,9 +320,8 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Insert original data to Tangram at target position. It cause full screen item's rebinding, be careful.
-     *
      * @param position Target insert position.
-     * @param data     Original data with type {@link T}.
+     * @param data Original data with type {@link T}.
      */
     @Deprecated
     public void insertData(int position, @Nullable T data) {
@@ -327,9 +332,8 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Replace original data to Tangram at target position. It cause full screen item's rebinding, be careful.
-     *
      * @param position Target insert position.
-     * @param data     Original data with type {@link T}.
+     * @param data Original data with type {@link T}.
      */
     @Deprecated
     public void replaceData(int position, @Nullable T data) {
@@ -340,7 +344,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Set original data list with type {@link T} in Tangram.
-     *
      * @param data Original data with type {@link T}.
      */
     public void setData(@Nullable T data) {
@@ -352,16 +355,13 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Set parsed data list with type {@link C} in Tangram
-     *
      * @param data Parsed data list.
      */
     public void setData(@Nullable List<C> data) {
         Preconditions.checkState(mGroupBasicAdapter != null, "Must call bindView() first");
         MVHelper mvHelper = (MVHelper) mServices.get(MVHelper.class);
-        if (mvHelper != null) {
+        if (mvHelper != null)
             mvHelper.reset();
-            mvHelper.renderManager().onDownloadTemplate();
-        }
         this.mGroupBasicAdapter.setData(data);
     }
 
@@ -385,7 +385,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Make engine as a consumer to accept origin data from user
-     *
      * @return A consumer will call {@link BaseTangramEngine#setData(Object)}
      * @since 3.0.0
      */
@@ -400,7 +399,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Make engine as a consumer to accept parsed data from user
-     *
      * @return A consumer will call {@link BaseTangramEngine#setData(List)}
      * @since 3.0.0
      */
@@ -415,7 +413,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Append parsed data list with type {@link C} in Tangram. It cause full screen item's rebinding, be careful.
-     *
      * @param data Parsed data list.
      */
     @Deprecated
@@ -426,9 +423,8 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Insert parsed data to Tangram at target position. It cause full screen item's rebinding, be careful.
-     *
      * @param position Target insert position.
-     * @param data     Parsed data list.
+     * @param data Parsed data list.
      */
     @Deprecated
     public void insertData(int position, @Nullable List<C> data) {
@@ -438,9 +434,8 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Replace original data to Tangram at target position. It cause full screen item's rebinding, be careful.
-     *
      * @param position Target replace position.
-     * @param data     Parsed data list.
+     * @param data Parsed data list.
      */
     @Deprecated
     public void replaceData(int position, @Nullable List<C> data) {
@@ -450,7 +445,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Remove a card at target card position. It cause full screen item's rebinding, be careful.
-     *
      * @param position the position of card in group
      */
     @Deprecated
@@ -461,7 +455,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Remove the target card from list. It cause full screen item's rebinding, be careful.
-     *
      * @param data Target card
      */
     @Deprecated
@@ -471,6 +464,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @param card
      * @return card ragne of given instance
      */
@@ -481,7 +475,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Get card range by id
-     *
      * @param id card id
      * @return range instance
      */
@@ -491,6 +484,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @param position cell's adapter position
      * @return the card index of given cell's position
      */
@@ -500,6 +494,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @param cell cell object
      * @return the card index of given cell object
      */
@@ -509,6 +504,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @param id card id
      * @return card instance
      */
@@ -518,6 +514,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @param type cell's type
      * @return last appearance position
      */
@@ -527,6 +524,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @param type cell's type
      * @return first appearance position
      */
@@ -537,7 +535,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Parse original data with type {@link T} into model data list with type {@link C}
-     *
      * @param data Original data.
      * @return Parsed data list.
      */
@@ -547,7 +544,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Parse original data with type {@link T} into model data list with type {@link L}
-     *
      * @param data Original data.
      * @return Parsed data list.
      */
@@ -557,8 +553,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Parse original data with type {@link T} into model data list with type {@link L}
-     *
-     * @param data   Original data.
+     * @param data Original data.
      * @param parent the parent group to hold the parsed list.
      * @return Parsed data list.
      * @since 3.0.0
@@ -569,7 +564,6 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Parse original data with type {@link O} into model data with type {@link C}
-     *
      * @param data Original data.
      * @return Parsed data.
      * @since 3.0.0
@@ -580,9 +574,8 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
 
     /**
      * Parse original data with type {@link O} into model data with type {@link L}
-     *
      * @param parent the parent group to hold parsed object.
-     * @param data   Original data.
+     * @param data Original data.
      * @return Parsed data.
      * @since 3.0.0
      */
@@ -591,6 +584,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @return
      * @since 3.0.0
      */
@@ -600,6 +594,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @return
      * @since 3.0.0
      */
@@ -609,6 +604,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @return
      * @since 3.0.0
      */
@@ -618,6 +614,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
     }
 
     /**
+     *
      * @return
      * @since 3.0.0
      */
@@ -719,7 +716,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
             return low;
         }
 
-        void quickSort(int[] unsortedZIndex, int[] unsortedViewIndex, int low, int high) {
+        void quickSort(int[] unsortedZIndex, int[] unsortedViewIndex, int low, int high){
             int loc = 0;
             if (low < high) {
                 loc = partition(unsortedZIndex, unsortedViewIndex, low, high);
@@ -754,7 +751,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
             for (int j = 0; j < childCount; j++) {
                 View child = mContentView.getChildAt(j);
                 if (child != null) {
-                    VirtualLayoutManager.LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
+                    VirtualLayoutManager.LayoutParams layoutParams = (LayoutParams)child.getLayoutParams();
                     zIndex[j] = layoutParams.zIndex;
                 } else {
                     zIndex[j] = 0;
@@ -767,7 +764,7 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
             int result = viewIndex[i];
             clearIndex(zIndex);
             clearIndex(viewIndex);
-            return result;
+            return  result;
         }
     }
 

@@ -51,8 +51,6 @@ public class Event {
      */
     public EventContext eventContext;
 
-    public String eventId;
-
     public Event() {
         args = new ArrayMap<>();
     }
