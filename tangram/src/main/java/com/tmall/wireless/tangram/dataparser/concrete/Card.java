@@ -31,18 +31,15 @@ import com.alibaba.android.vlayout.layout.FixAreaLayoutHelper;
 import com.alibaba.android.vlayout.layout.MarginLayoutHelper;
 
 import android.support.v4.util.ArrayMap;
-
 import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.TangramBuilder;
 import com.tmall.wireless.tangram.core.service.ServiceManager;
 import com.tmall.wireless.tangram.structure.BaseCell;
-import com.tmall.wireless.tangram.structure.TemplateInfo;
 import com.tmall.wireless.tangram.structure.card.BannerCard;
 import com.tmall.wireless.tangram.structure.card.LinearScrollCard;
 import com.tmall.wireless.tangram.support.CardSupport;
 import com.tmall.wireless.tangram.support.ExposureSupport;
-import com.tmall.wireless.tangram.support.TemplateUpdateSupport;
 import com.tmall.wireless.tangram.util.ImageUtils;
 import com.tmall.wireless.tangram.util.LogUtils;
 import com.tmall.wireless.tangram.util.Preconditions;
@@ -274,7 +271,7 @@ public abstract class Card extends ComponentLifecycle {
     }
 
     public static BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,
-                                      @NonNull ServiceManager serviceManager, boolean appended) {
+        @NonNull ServiceManager serviceManager, boolean appended) {
         if (cellData != null) {
             BaseCell cell = null;
             String cellType = cellData.optString(Card.KEY_TYPE);
@@ -350,28 +347,6 @@ public abstract class Card extends ComponentLifecycle {
             } else {
                 //support virtual view at layout
                 BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
-
-                //if exist template need update, just do it
-                TemplateUpdateSupport templateUpdateSupport = serviceManager.getService(TemplateUpdateSupport.class);
-                if (templateUpdateSupport != null) {
-                    if (cellData.has(TemplateInfo.KEY_TEMPLATE_INFO)) {
-                        JSONObject templateInfoJson = cellData.optJSONObject(TemplateInfo.KEY_TEMPLATE_INFO);
-
-                        MVHelper mvHelper = serviceManager.getService(MVHelper.class);
-                        int currVersion = mvHelper.getVafContext().getViewManager().getViewVersion(cellType);
-                        int newVersion = templateInfoJson.optInt(TemplateInfo.KEY_TEMPLATE_VERSION);
-
-                        if (newVersion > currVersion) {
-                            TemplateInfo templateInfo = new TemplateInfo();
-                            templateInfo.setType(cellType);
-                            templateInfo.setBinary(templateInfoJson.optString(TemplateInfo.KEY_TEMPLATE_BINARY_BASE64));
-                            templateInfo.setVersion(newVersion);
-
-                            templateUpdateSupport.onUpdate(templateInfo);
-                        }
-                    }
-                }
-
                 if (componentBinderResolver.has(cellType)) {
                     cell = new BaseCell(cellType);
                     cell.serviceManager = serviceManager;
@@ -415,7 +390,7 @@ public abstract class Card extends ComponentLifecycle {
      */
     private LayoutHelper mLayoutHelper = null;
 
-    public LayoutHelper getExistLayoutHelper() {
+    public LayoutHelper getExistLayoutHelper(){
         return mLayoutHelper;
     }
 
@@ -500,9 +475,9 @@ public abstract class Card extends ComponentLifecycle {
 
             if (helper instanceof MarginLayoutHelper) {
                 ((MarginLayoutHelper) helper).setMargin(style.margin[Style.MARGIN_LEFT_INDEX], style.margin[Style.MARGIN_TOP_INDEX],
-                        style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
+                    style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
                 ((MarginLayoutHelper) helper).setPadding(style.padding[Style.MARGIN_LEFT_INDEX], style.padding[Style.MARGIN_TOP_INDEX],
-                        style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
+                    style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
             }
         }
 
@@ -845,7 +820,7 @@ public abstract class Card extends ComponentLifecycle {
         if (TangramBuilder.isPrintLog()) {
             if (mPendingCells.size() > 0 && mInQueueCells.size() > 0) {
                 Preconditions.checkState(mPendingCells.get(0).position >= mInQueueCells.get(mInQueueCells.size() - 1).position
-                        , "Items in pendingQueue must have large position than Items in queue");
+                    , "Items in pendingQueue must have large position than Items in queue");
             }
         }
     }
@@ -979,7 +954,7 @@ public abstract class Card extends ComponentLifecycle {
 
     public boolean requirePlaceholderCell() {
         return mPlaceholderRequired && mPlaceholderCell != null && !TextUtils.isEmpty(load)
-                && (mCells.size() == 0 || (mCells.size() == 1 && mCells.contains(mPlaceholderCell)));
+            && (mCells.size() == 0 || (mCells.size() == 1 && mCells.contains(mPlaceholderCell)));
     }
 
     private MVHelper getMVHelper() {
@@ -1063,7 +1038,7 @@ public abstract class Card extends ComponentLifecycle {
         return null;
     }
 
-    public ArrayMap<Range<Integer>, Card> getChildrenCards() {
+    public ArrayMap<Range<Integer>, Card> getChildrenCards(){
         return mChildren;
     }
 

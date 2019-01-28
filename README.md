@@ -17,10 +17,6 @@
 + [Virtualview-iOS](https://github.com/alibaba/VirtualView-iOS)
 + [LazyScrollView](https://github.com/alibaba/lazyscrollview)
 
-### Server
-
-+ [TAC](https://github.com/alibaba/tac)
-
 Tangram is a modular UI solution for building native page dynamically including Tangram for Android, Tangram for iOS and even backend CMS. This project provides the sdk on Android which is based on [vlayout](https://github.com/alibaba/vlayout) and [UltraViewPager](https://github.com/alibaba/UltraViewPager).
 
 # Features

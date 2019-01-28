@@ -63,12 +63,11 @@ TangramBuilder.InnerBuilder builder = TangramBuilder.newInnerBuilder(TangramActi
 
 一般情况下，内置卡片的类型已经满足大部分场景了，业务方主要是注册一下自定义组件。注册组件有3种方式：
 
-+ 注册绑定组件类型和自定义```View```，比如```builder.registerCell("testView", TestView.class);```。意思是类型为1的组件渲染时会被绑定到```TestView```的实例上，这种方式注册的组件使用通用的组件模型```BaseCell```。
++ 注册绑定组件类型和自定义```View```，比如```builder.registerCell(1, TestView.class);```。意思是类型为1的组件渲染时会被绑定到```TestView```的实例上，这种方式注册的组件使用通用的组件模型```BaseCell```。
 + 注册绑定组件类型、自定义 model、自定义```View```，比如```builder.registerCell(1, TestCell.class, TestView.class);```。意思是类型为1的组件使用自定义的组件模型```TestCell```，它应当继承于```BaseCell```，在渲染时会被绑定到```TestView```的实例上。
 + 注册绑定组件类型、自定义model、自定义```ViewHolder```，比如```builder.registerCell(1, TestCell.class, new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TestView.class));```。意思是类型为1的组件使用自定义的组件模型```TestCell```，它应当继承于```BaseCell```，在渲染时以```R.layout.item_holder```为布局创建类型为```TestView ```的 view，并绑定到类型为```TestViewHolder```的 viewHolder 上，组件数据被绑定到定到```TestView```的实例上。
 
-所有的组件注册推荐使用 string 作为 type，便于理解及追溯。
-一般情况下，使用前两种方式注册组件即可。至于组件开发规范，请参考[组件文档](http://tangram.pingguohe.net/docs/android/develop-component)。
+一般情况下，使用前两种方式注册组件即可。至于组件开发规范，请参考[组件文档]()。
 
 ## 5.生成```TangramEngine```实例
 
