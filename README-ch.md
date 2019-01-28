@@ -20,6 +20,7 @@
 Tangram是一套动态化构建 Native 页面的框架，它包含 Tangram Android、Tangram iOS，管理后台等一些列基础设施。本工程是 Tangram Android 的sdk 项目地址，底层依赖于[vlayout](https://github.com/alibaba/vlayout) 和 [UltraViewPager](https://github.com/alibaba/UltraViewPager)。
 
 # 特点
+清注意勿使用tangram3 package下的类！Tangram3.0 正在开发中，为保持兼容，保留了原tangram的package，并新增了tangram3的package，tangram3正在密集开发中，可能会有频繁的接口调整，不推荐用于线上正式App开发！
 
 - Android iOS 双平台支持，iOS 版本参考开源库 [Tangram-iOS](https://github.com/alibaba/Tangram-iOS)。
 - 通过 json 创建页面视图，并提供了默认的解析器。
