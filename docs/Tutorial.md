@@ -63,12 +63,11 @@ When the builder object created, default cards and cells supported by Tangram is
 
 The default cards provided by framework meets the most UI situation, while cells need be provided by Tangram users.  There's three ways to register a custom:
 
-+ bind a cell's type to a custom view class using ```builder.registerCell("testView", TestView.class);```, which means a cell's data with type 1 will be binded to an instance of type ```TestView```. Registering in this way, the cell use general model class ```BaseCell```.
++ bind a cell's type to a custom view class using ```builder.registerCell(1, TestView.class);```, which means a cell's data with type 1 will be binded to an instance of type ```TestView```. Registering in this way, the cell use general model class ```BaseCell```.
 + bind a cell's type to a custom model class and custom view class using ```builder.registerCell(1, TestCell.class, TestView.class);```, which means a cell with type 1 will use custom model class ```TestCell``` which should be extended from ```BaseCell``` and its data will be binded to an instance of ```TestView``` during rendering.
 + bind a cell's type to a custom class and custom viewholder class using ```builder.registerCell(1, TestCell.class, new ViewHolderCreator<>(R.layout.item_holder, TestViewHolder.class, TestView.class));```, which means a cell with type 1 will use custom model class ```TestCell``` which should be extended from ```BaseCell``` and its data will be binded to a view instance created by ```ViewHolderCreator ```. The view creator inflates the view from ```R.layout.item_holder``` and binds it to the ```TestViewHolder``` instance.
 
-We recommend to use string as type to register component.
-The most common way to regiser custom cell is the former two. As to developping a custom cell, please read [document](http://tangram.pingguohe.net/docs/android/develop-component) here.
+The most common way to regiser custom cell is the former two. As to developping a custom cell, please read [document]() here.
 
 ## 5.Create ```TangramEngine``` instance
 

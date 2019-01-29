@@ -24,9 +24,6 @@
 
 package com.tmall.wireless.tangram.view;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -51,6 +48,9 @@ import com.tmall.wireless.tangram.dataparser.concrete.Style;
 import com.tmall.wireless.tangram.structure.BaseCell;
 import com.tmall.wireless.tangram.structure.cell.LinearScrollCell;
 import com.tmall.wireless.tangram.structure.view.ITangramViewLifeCycle;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -148,7 +148,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
 
                     int cellCount = lSCell.cells.size();
                     int viewIndex = (int) view.getTag(R.id.TANGRAM_LINEAR_SCROLL_POS);
-                    int rowCount = (int)(lSCell.cells.size() * 1.0f / lSCell.maxRows + 0.5f);
+                    int rowCount = (int) (lSCell.cells.size() * 1.0f / lSCell.maxRows + 0.5f);
 
                     boolean isLastCellInRow = false;
                     if ((viewIndex + 1) % rowCount == 0) {
@@ -185,7 +185,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         if (lSCell.cells != null && lSCell.cells.size() > 0) {
             int maxRowCount = lSCell.cells.size();
             if (lSCell.maxRows > 1) {
-                maxRowCount  = (int)(maxRowCount * 1.0f / lSCell.maxRows + 0.5f);
+                maxRowCount = (int) (maxRowCount * 1.0f / lSCell.maxRows + 0.5f);
             }
 
             starts = new float[maxRowCount];
@@ -222,7 +222,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                 lp.height = (int) (lSCell.pageHeight * lSCell.maxRows + 0.5f);
             }
             if (lSCell.maxRows > 1 && lSCell.vGap > 0) {
-                lp.height += (int)((lSCell.maxRows - 1) * lSCell.vGap + 0.5f);
+                lp.height += (int) ((lSCell.maxRows - 1) * lSCell.vGap + 0.5f);
             }
         }
         recyclerView.setLayoutParams(lp);
@@ -266,10 +266,11 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
 
     /**
      * Set indicator measure
+     *
      * @param indicator indicator view
-     * @param width indicator width
-     * @param height indicator height
-     * @param margin indicator top margin
+     * @param width     indicator width
+     * @param height    indicator height
+     * @param margin    indicator top margin
      */
     private void setIndicatorMeasure(View indicator, int width, int height, int margin) {
         if (indicator != null) {
@@ -349,7 +350,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                 header.setId(R.id.TANGRAM_BANNER_HEADER_ID);
                 //为了解决在 item 复用过程中，itemView 的 layoutParams 复用造成 layout 错误,这里要提供一个新的 layoutParams。
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
                 lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
                 lp.bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];
@@ -366,7 +367,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                 footer.setId(R.id.TANGRAM_BANNER_FOOTER_ID);
                 //为了解决在 item 复用过程中，itemView 的 layoutParams 复用造成 layout 错误,这里要提供一个新的 layoutParams。
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
                 lp.topMargin = cell.style.margin[Style.MARGIN_TOP_INDEX];
                 lp.leftMargin = cell.style.margin[Style.MARGIN_LEFT_INDEX];
                 lp.bottomMargin = cell.style.margin[Style.MARGIN_BOTTOM_INDEX];

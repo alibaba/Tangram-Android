@@ -36,7 +36,6 @@ import com.tmall.wireless.tangram.util.Utils;
 
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,6 +71,9 @@ public class MVResolver {
 
     private ConcurrentHashMap<View, BaseCell> vmMap = new ConcurrentHashMap<>(128);
 
+    @Deprecated
+    private ConcurrentHashMap<String, View> idViewMap = new ConcurrentHashMap<>(128);
+
     private ServiceManager mServiceManager;
 
     public void setServiceManager(ServiceManager serviceManager) {
@@ -94,30 +96,29 @@ public class MVResolver {
         return typeCellMap.get(type);
     }
 
-    public void register(BaseCell cell, View view) {
+    public void register(String cellId, BaseCell cell, View view) {
         mvMap.put(cell, view);
         vmMap.put(view, cell);
+
+        idViewMap.put(cellId, view);
     }
 
     public void setCards(List<Card> list) {
-        synchronized (idCardMap) {
-            for (Card card : list) {
-                if (!TextUtils.isEmpty(card.id)) {
-                    idCardMap.put(card.id, card);
-                }
+        for (Card card : list) {
+            if (!TextUtils.isEmpty(card.id)) {
+                idCardMap.put(card.id, card);
             }
         }
     }
 
     public Card findCardById(String id) {
-        synchronized (idCardMap) {
-            return idCardMap.get(id);
-        }
+        return idCardMap.get(id);
     }
 
     public void reset() {
         mvMap.clear();
         vmMap.clear();
+        idViewMap.clear();
     }
 
     public View getView(BaseCell cell) {
@@ -126,7 +127,7 @@ public class MVResolver {
 
     @Deprecated
     public View getView(String uniqueId) {
-        return null;
+        return idViewMap.get(uniqueId);
     }
 
     public BaseCell getCell(View view) {

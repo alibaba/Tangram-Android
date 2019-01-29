@@ -22,44 +22,12 @@
  * SOFTWARE.
  */
 
-package com.tmall.wireless.tangram.structure;
+package com.tmall.wireless.tangram3.util;
 
-import android.util.Base64;
+/**
+ * Created by villadora on 15/11/17.
+ */
+public interface Predicate<T> {
 
-public class TemplateInfo {
-    public static final String KEY_TEMPLATE_INFO = "templateInfo";
-
-    public static final String KEY_TEMPLATE_BINARY_BASE64 = "binary";
-
-    public static final String KEY_TEMPLATE_VERSION = "version";
-
-    private String type;
-
-    private byte[] binary;
-
-    private int version;
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public byte[] getBinary() {
-        return binary;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
-
-    public void setBinary(String binary) {
-        this.binary = Base64.decode(binary, Base64.DEFAULT);
-    }
+    boolean isMatch(T data);
 }

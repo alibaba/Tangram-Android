@@ -68,6 +68,7 @@ public class MVHelper {
     private ConcurrentHashMap<BaseCell, Method> postBindMap = new ConcurrentHashMap<>(128);
     private ConcurrentHashMap<BaseCell, Method> postUnBindMap = new ConcurrentHashMap<>(128);
     private ConcurrentHashMap<BaseCell, Method> cellInitedMap = new ConcurrentHashMap<>(128);
+    private ConcurrentHashMap<BaseCell, String> cellFlareIdMap = new ConcurrentHashMap<>(128);
 
     public MVHelper(MVResolver mvResolver) {
         this.mvResolver = mvResolver;
@@ -97,6 +98,7 @@ public class MVHelper {
         postBindMap.clear();
         postUnBindMap.clear();
         cellInitedMap.clear();
+        cellFlareIdMap.clear();
         mvResolver.reset();
     }
 
@@ -112,7 +114,7 @@ public class MVHelper {
 
     public void mountView(BaseCell cell, View view) {
         try {
-            mvResolver.register(cell, view);
+            mvResolver.register(getCellUniqueId(cell), cell, view);
             if (cell.serviceManager != null) {
                 if (cell.serviceManager.supportRx()) {
                     cell.emitNext(BDE.BIND);
@@ -156,6 +158,15 @@ public class MVHelper {
                 }
             }
         }
+    }
+
+    public String getCellUniqueId(BaseCell cell) {
+        String flareId = cellFlareIdMap.get(cell);
+        if (flareId == null) {
+            flareId = String.format("%s_%s", cell.parent == null ? "null" : cell.parent.id, cell.pos);
+            cellFlareIdMap.put(cell, flareId);
+        }
+        return flareId;
     }
 
     public void unMountView(BaseCell cell, View view) {

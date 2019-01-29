@@ -41,7 +41,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.View;
-
 import com.tmall.wireless.tangram.dataparser.DataParser;
 import com.tmall.wireless.tangram.dataparser.IAdapterBuilder;
 import com.tmall.wireless.tangram.dataparser.concrete.Card;
@@ -67,16 +66,14 @@ import com.tmall.wireless.tangram.support.SimpleClickSupport;
 import com.tmall.wireless.tangram.support.async.CardLoadSupport;
 import com.tmall.wireless.tangram.util.Predicate;
 import com.tmall.wireless.vaf.virtualview.core.ViewCache;
-
 import io.reactivex.functions.Consumer;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
  * Created by villadora on 15/8/24.
- * <p>
+ *
  * The core of Tangram used to access data, bind view, register service.
  */
 public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card, BaseCell> implements Engine {
@@ -84,8 +81,8 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
     private static final int NO_SWIPE = -1;
 
     public TangramEngine(@NonNull Context context,
-                         @NonNull DataParser<JSONObject, JSONArray, Card, BaseCell> dataParser,
-                         @NonNull IAdapterBuilder<Card, BaseCell> adapterBuilder) {
+        @NonNull DataParser<JSONObject, JSONArray, Card, BaseCell> dataParser,
+        @NonNull IAdapterBuilder<Card, BaseCell> adapterBuilder) {
         super(context, dataParser, adapterBuilder);
         this.register(DataParser.class, dataParser);
     }
@@ -127,7 +124,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
         }
 
         view.addOnItemTouchListener(mSwipeItemTouchListener);
-        view.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        view.setOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
@@ -146,14 +143,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     public void setNoScrolling(boolean noScrolling) {
         getLayoutManager().setNoScrolling(noScrolling);
-    }
-
-    public void setCanScrollVertically(boolean canScrollVertically) {
-        getLayoutManager().setCanScrollVertically(canScrollVertically);
-    }
-
-    public void setCanScrollHorizontally(boolean canScrollHorizontally) {
-        getLayoutManager().setCanScrollHorizontally(canScrollHorizontally);
     }
 
     public void setEnableOverlapMargin(boolean enable) {
@@ -272,6 +261,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
     }
 
     /**
+     *
      * @param enable True to auto trigger loading data for card whose's position in within 0 to {{@link #mPreLoadNumber}}.
      */
     public void setEnableLoadFirstPageCard(boolean enable) {
@@ -338,7 +328,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
             @Override
             public boolean isMatch(Card data) {
                 return data.loadMore && data.hasMore && !data.loading
-                        && !TextUtils.isEmpty(data.load);
+                    && !TextUtils.isEmpty(data.load);
             }
         });
 
@@ -361,6 +351,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
     }
 
     /**
+     *
      * @param id Target cell's id. Can not be null
      * @return
      * @since 3.0.0
@@ -560,9 +551,8 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * A high performance method to insert cells. TODO handle nested card
-     *
      * @param insertPosition the position to be inserted.
-     * @param data           new cell data
+     * @param data new cell data
      * @since 2.1.0
      */
     public void insertWith(int insertPosition, BaseCell data) {
@@ -572,9 +562,8 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * A high performance method to insert cells. Do not allowed to insert to an empty Tangram. TODO handle nested card
-     *
      * @param insertPosition the position to be inserted
-     * @param list           new cell data list
+     * @param list new cell data list
      * @since 2.1.0
      */
     public void insertWith(int insertPosition, List<BaseCell> list) {
@@ -609,7 +598,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * @param insertIdx the index to be inserted
-     * @param group     a group of data
+     * @param group a group of data
      * @since 2.1.0
      */
     public void insertBatchWith(int insertIdx, Card group) {
@@ -618,7 +607,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * @param insertIdx the index to be inserted
-     * @param groups    a group list
+     * @param groups a group list
      * @since 2.1.0
      */
     public void insertBatchWith(int insertIdx, List<Card> groups) {
@@ -650,7 +639,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * NOTE new API, use this to replace {@link BaseTangramEngine#appendData(List)} and {@link BaseTangramEngine#appendData(Object)}
-     *
      * @param groups new groups to be append at tail.
      * @since 2.1.0
      */
@@ -662,7 +650,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Remove cell at target position. TODO handle nested card
-     *
      * @param position
      * @since 2.1.0
      */
@@ -677,7 +664,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Remove target cell. TODO handle nested card, cell in staggered, cell in onePlusN
-     *
      * @param data
      * @since 2.1.0
      */
@@ -723,7 +709,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Remove all cells in a card with target index
-     *
      * @param removeIdx target card's index
      * @since 2.1.0
      */
@@ -738,7 +723,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Remove all cells in a card.
-     *
      * @param group
      * @since 2.1.0
      */
@@ -775,7 +759,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Replace cell one by one.
-     *
      * @param oldOne
      * @param newOne
      * @since 2.1.0
@@ -795,7 +778,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Replace parent card's children. Cells' size should be equal with parent's children size.
-     *
      * @param parent
      * @param cells
      * @since 2.1.0
@@ -836,7 +818,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Replace card one by one. New one's children size should be equal with old one's children size.
-     *
      * @param oldOne
      * @param newOne
      * @since 2.1.0
@@ -863,7 +844,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Update a view's UI by its cell's data, you should change cell's data first.
-     *
      * @param cell
      * @since 3.0.0
      */
@@ -932,7 +912,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Make engine as a consumer to accept data to append at the end of list
-     *
      * @return
      * @since 3.0.0
      */
@@ -947,7 +926,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Make engine as a consumer to accept data to append at the end of list
-     *
      * @return
      * @since 3.0.0
      */
@@ -1046,7 +1024,6 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray, Card
 
     /**
      * Make engine as a consumer to accept cell'data change
-     *
      * @return
      * @since 3.0.0
      */

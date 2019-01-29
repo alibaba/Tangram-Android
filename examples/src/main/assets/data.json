@@ -1,11 +1,6 @@
 [
   {
-    "type": "container-scroll",
-    "style": {
-      "pageWidth": 200,
-      "hGap": 100,
-      "pageHeight": 100
-    },
+    "type": "container-oneColumn",
     "items": [
       {
         "imgUrl": "https://gw.alicdn.com/tfs/TB1vqF.PpXXXXaRaXXXXXXXXXXX-110-72.png",
@@ -82,12 +77,12 @@
     },
     "items": [
       {
-        "bizId": "item1",
+        "bizId":"item1",
         "type": 110,
         "msg": "info1"
       },
       {
-        "bizId": "item2",
+        "bizId":"item2",
         "type": 110,
         "msg": "info2"
       }
@@ -112,37 +107,37 @@
     },
     "items": [
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info1",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info2",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info3",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info4",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info5",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info6",
         "style": {
         }
@@ -171,37 +166,37 @@
         },
         "items": [
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info1",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info2",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info3",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info4",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info5",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info6",
             "style": {
             }
@@ -232,37 +227,37 @@
         },
         "items": [
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info1",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info2",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info3",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info4",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info5",
             "style": {
             }
           },
           {
-            "type": "testView",
+            "type": 1,
             "msg": "info6",
             "style": {
             }
@@ -276,18 +271,8 @@
     "style": {
       "hGap": "15",
       "vGap": "15",
-      "margin": [
-        null,
-        null,
-        null,
-        null
-      ],
-      "padding": [
-        "15",
-        "15",
-        "15",
-        "15"
-      ]
+      "margin": [null, null, null, null],
+      "padding": ["15", "15", "15", "15"]
     },
     "type": "container-waterfall",
     "items": [
@@ -340,11 +325,11 @@
     },
     "items": [
       {
-        "type": "singleImgView",
+        "type": 10,
         "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png"
       },
       {
-        "type": "singleImgView",
+        "type": 10,
         "imgUrl": "https://gw.alicdn.com/tfs/TB1pdJFQpXXXXbUXpXXXXXXXXXX-750-243.png"
       }
     ]
@@ -353,12 +338,15 @@
     "type": "container-sticky",
     "style": {
       "sticky": "start"
+
     },
     "items": [
       {
-        "type": "testView",
+        "type": 1,
         "msg": "sticky",
         "style": {
+          "height": 80
+
         }
       }
     ]
@@ -381,37 +369,37 @@
     },
     "items": [
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info11",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info12",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info13",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info14",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info15",
         "style": {
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "msg": "info16",
         "style": {
         }
@@ -474,16 +462,16 @@
     },
     "items": [
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       }
     ]
   },
@@ -491,20 +479,20 @@
     "type": "container-threeColumn",
     "items": [
       {
-        "type": "testView",
+        "type": 1,
         "msg": "block",
         "style": {
           "display": "block"
         }
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       }
     ]
   },
@@ -512,16 +500,16 @@
     "type": "container-fourColumn",
     "items": [
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       }
     ]
   },
@@ -533,7 +521,7 @@
     },
     "items": [
       {
-        "type": "testView",
+        "type": 1,
         "style": {
           "height": 120
         },
@@ -546,7 +534,7 @@
     "id": "dividerShow",
     "items": [
       {
-        "type": "testView",
+        "type": 1,
         "msg": "I am a divider"
       }
     ]
@@ -561,16 +549,16 @@
     },
     "items": [
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       }
     ]
   },
@@ -583,7 +571,7 @@
     },
     "items": [
       {
-        "type": "testView",
+        "type": 1,
         "style": {
           "margin": [
             4,
@@ -594,7 +582,7 @@
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "style": {
           "margin": [
             0,
@@ -605,7 +593,7 @@
         }
       },
       {
-        "type": "testView"
+        "type": 1
       }
     ]
   },
@@ -615,10 +603,10 @@
     },
     "items": [
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       }
     ]
   },
@@ -626,7 +614,7 @@
     "type": "container-oneColumn",
     "items": [
       {
-        "type": "testView"
+        "type": 1
       }
     ]
   },
@@ -655,40 +643,40 @@
     },
     "items": [
       {
-        "type": "testView",
+        "type": 1,
         "style": {
           "colspan": 2
         }
       },
       {
-        "type": "testView",
+        "type": 1,
         "style": {
           "colspan": 2
         }
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       },
       {
-        "type": "testView"
+        "type": 1
       }
     ]
   },

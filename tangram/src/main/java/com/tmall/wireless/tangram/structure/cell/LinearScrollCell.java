@@ -108,6 +108,7 @@ public class LinearScrollCell extends BaseCell {
     public int bgColor = Color.TRANSPARENT;
     public int scrollMarginLeft;
     public int scrollMarginRight;
+
     public double hGap;
     public double vGap;
     public double indicatorMargin;
