@@ -219,6 +219,11 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
         return viewManager.loadBinBufferSync(data);
     }
 
+    public void setVirtualViewTemplateAsync(String type, byte[] data) {
+        ViewManager viewManager = getService(ViewManager.class);
+        viewManager.loadBinBufferAsync(type, data);
+    }
+
     /**
      * set compiled binary data after engine has been setup, used when load template data dynamically
      * @param type
@@ -234,6 +239,20 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
                 baseCellBinderResolver.register(type, new BaseCellBinder(type, mMVHelper));
                 cardResolver.register(type, VVCard.class);
                 setVirtualViewTemplate(data);
+            }
+        }
+    }
+
+    public void registerVirtualViewTemplateAsync(String type, byte[] data) {
+        BaseCellBinderResolver baseCellBinderResolver = getService(BaseCellBinderResolver.class);
+        BaseCardBinderResolver baseCardBinderResolver = getService(BaseCardBinderResolver.class);
+        if (baseCellBinderResolver != null && baseCardBinderResolver != null) {
+            CardResolver cardResolver = baseCardBinderResolver.getDelegate();
+            MVHelper mMVHelper = getService(MVHelper.class);
+            if (cardResolver != null && mMVHelper != null) {
+                baseCellBinderResolver.register(type, new BaseCellBinder(type, mMVHelper));
+                cardResolver.register(type, VVCard.class);
+                setVirtualViewTemplateAsync(type, data);
             }
         }
     }
