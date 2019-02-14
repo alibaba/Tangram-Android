@@ -46,8 +46,8 @@ public class BannerCard extends Card {
         if (cells == null || cells.isEmpty()) {
             super.setCells(null);
         } else {
-            super.setCells(Collections.<BaseCell>singletonList(cell));
             cell.setData(cells);
+            super.setCells(Collections.<BaseCell>singletonList(cell));
         }
 
         notifyDataChange();

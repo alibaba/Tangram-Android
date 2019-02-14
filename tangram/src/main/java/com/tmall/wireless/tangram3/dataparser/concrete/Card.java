@@ -104,6 +104,11 @@ public abstract class Card extends ComponentLifecycle {
     public boolean loadMore = false;
 
     /**
+     * api params of loading more data
+     */
+    public JSONObject loadParams;
+
+    /**
      * indicate if loading data now
      */
     public boolean loading = false;

@@ -60,8 +60,6 @@ import com.tmall.wireless.tangram3.support.BannerSupport;
 import com.tmall.wireless.tangram3.util.ImageUtils;
 import com.tmall.wireless.tangram3.util.Utils;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -309,8 +307,9 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (bannerCell.mCells.size() <= bannerCell.mInfiniteMinCount) {
             setInfiniteLoop(false);
         } else {
-            setInfiniteLoop(bannerCell.mInfinite);
+//            setInfiniteLoop(bannerCell.mInfinite);
         }
+        mUltraViewPager.setRatio(1);
         setIndicatorGravity(getIndicatorGravity(bannerCell.mIndicatorGravity));
         setIndicatorPos(bannerCell.mIndicatorPos);
         int indicatorGap = bannerCell.mIndicatorGap;
@@ -715,7 +714,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     private void bindHeaderView(BaseCell cell) {
-        if (cell.isValid()) {
+        if (cell != null && cell.isValid()) {
             View header = getHeaderViewFromRecycler(cell);
             if (header != null) {
                 ViewGroup.LayoutParams lp = header.getLayoutParams();
@@ -733,7 +732,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     private void bindFooterView(BaseCell cell) {
-        if (cell.isValid()) {
+        if (cell != null && cell.isValid()) {
             View footer = getFooterViewFromRecycler(cell);
             if (footer != null) {
                 ViewGroup.LayoutParams lp = footer.getLayoutParams();

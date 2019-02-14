@@ -69,6 +69,7 @@ import static com.alibaba.android.vlayout.layout.FixLayoutHelper.TOP_RIGHT;
 import static com.alibaba.android.vlayout.layout.ScrollFixLayoutHelper.SHOW_ALWAYS;
 import static com.alibaba.android.vlayout.layout.ScrollFixLayoutHelper.SHOW_ON_ENTER;
 import static com.alibaba.android.vlayout.layout.ScrollFixLayoutHelper.SHOW_ON_LEAVE;
+import static com.tmall.wireless.tangram3.TangramBuilder.TYPE_CAROUSEL_CELL_COMPACT;
 
 /**
  * DataParser parse JSONArray into Card/Cell
@@ -96,6 +97,8 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
     public static final String KEY_TYPE_REUSEID = "reuseId";
 
     public static final String KEY_POSITION = "position";
+
+    public static final String KEY_API_LOAD_PARAMS = "loadParams";
 
     /**
      * Use {@link #KEY_BACKGROUND_COLOR} instead
@@ -219,36 +222,41 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         if (data == null) {
             return new ArrayList<>();
         }
-
-        checkCardResolverAndMVHelper(serviceManager);
-        final int size = data.size();
-        final List<Card> result = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            JSONObject cardData = data.getJSONObject(i);
-            final Card card = parseSingleGroup(cardData, serviceManager);
-            if (card instanceof IDelegateCard) {
-                List<Card> cards = ((IDelegateCard) card).getCards(new CardResolver() {
-                    @Override
-                    public Card create(String type) {
-                        Card c = cardResolver.create(type);
-                        c.serviceManager = serviceManager;
-                        c.id = card.id;
-                        c.setStringType(type);
-                        c.rowId = card.rowId;
-                        return c;
+        try {
+            checkCardResolverAndMVHelper(serviceManager);
+            final int size = data.size();
+            final List<Card> result = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                JSONObject cardData = data.getJSONObject(i);
+                final Card card = parseSingleGroup(cardData, serviceManager);
+                if (card instanceof IDelegateCard) {
+                    List<Card> cards = ((IDelegateCard) card).getCards(new CardResolver() {
+                        @Override
+                        public Card create(String type) {
+                            Card c = cardResolver.create(type);
+                            c.serviceManager = serviceManager;
+                            c.id = card.id;
+                            c.setStringType(type);
+                            c.rowId = card.rowId;
+                            return c;
+                        }
+                    });
+                    for (Card c : cards) {
+                        if (c.isValid()) {
+                            result.add(c);
+                        }
                     }
-                });
-                for (Card c : cards) {
-                    if (c.isValid()) {
-                        result.add(c);
-                    }
+                } else {
+                    result.add(card);
                 }
-            } else {
-                result.add(card);
             }
+
+            mvHelper.resolver().setCards(result);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        mvHelper.resolver().setCards(result);
-        return result;
+        return null;
     }
 
     @NonNull
@@ -297,6 +305,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             card.serviceManager = serviceManager;
             card.extras = data;
             card.stringType = cardType;
+            card.loadParams = data.getJSONObject(KEY_API_LOAD_PARAMS);
 
             Map<String, ComponentInfo> infoMap = parseComponentInfo(data);
 
@@ -346,19 +355,17 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     card.style = style;
                 } else if (card instanceof BannerCard) {
                     BannerCard bannerCard = (BannerCard) card;
-                    if (bannerCard.cell == null)
+                    if (bannerCard.cell == null) {
                         bannerCard.cell = new BannerCell();
+                        bannerCard.cell.serviceManager = serviceManager;
+                    }
 
-                    JSONObject obj = new JSONObject();
                     try {
-                        obj.put("type", TangramBuilder.TYPE_CAROUSEL_CELL);
-                        obj.put("bizId", bannerCard.id);
-
-                        parseSingleComponent(obj, bannerCard, serviceManager, infoMap);
+                        bannerCard.cell.stringType = TYPE_CAROUSEL_CELL_COMPACT;
 
                         if (!bannerCard.getCells().isEmpty()) {
                             bannerCard.cell.mCells.addAll(bannerCard.getCells());
-                            bannerCard.setCells(Collections.<BaseCell>singletonList(bannerCard.cell));
+                            bannerCard.setCells(bannerCard.getCells());
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -520,16 +527,13 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     card.style = fixStyle;
                 } else if (card instanceof LinearScrollCard) {
                     LinearScrollCard linearScrollCard = (LinearScrollCard) card;
-                    JSONObject obj = new JSONObject();
                     try {
-                        obj.put("type", TangramBuilder.TYPE_LINEAR_SCROLL_CELL);
-                        obj.put("bizId", linearScrollCard.id);
-
-                        parseSingleComponent(obj, linearScrollCard, serviceManager, infoMap);
+                        linearScrollCard.cell.stringType = TangramBuilder.TYPE_LINEAR_SCROLL_CELL_COMPACT;
+                        linearScrollCard.cell.serviceManager = serviceManager;
 
                         if (!linearScrollCard.getCells().isEmpty()) {
                             linearScrollCard.cell.cells.addAll(linearScrollCard.getCells());
-                            linearScrollCard.setCells(Collections.<BaseCell>singletonList(linearScrollCard.cell));
+                            linearScrollCard.setCells(linearScrollCard.getCells());
                         }
                     } catch (Exception e) {
                         linearScrollCard.setCells(null);
@@ -567,7 +571,11 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                         maxRows = LinearScrollCell.DEFAULT_MAX_ROWS;
                     }
                     linearScrollCard.cell.maxRows = maxRows;
-                    linearScrollCard.cell.maxCols = styleJson.getIntValue(LinearScrollCell.KEY_MAX_COLS);
+                    try {
+                        linearScrollCard.cell.maxCols = Integer.parseInt(styleJson.getString(LinearScrollCell.KEY_MAX_COLS));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
                     Style style = new Style();
                     parseStyle(style, styleJson);
@@ -592,6 +600,8 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     parseStyle(style, styleJson);
                     card.style = style;
                 }
+            } else {
+                card.style = new Style();
             }
 
             if (card.isValid()) {
@@ -615,6 +625,14 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         }
 
         checkCardResolverAndMVHelper(serviceManager);
+
+        String cellType = parseCellType(data);
+        if (mvHelper.renderManager().getComponentInfoMap().containsKey(cellType)) {
+            if (componentInfoMap == null) {
+                componentInfoMap = new HashMap<>();
+            }
+            componentInfoMap.put(cellType, mvHelper.renderManager().getComponentInfoMap().get(cellType));
+        }
 
         BaseCell cell = createCell(parent, mvHelper, data, serviceManager, componentInfoMap);
 
@@ -727,23 +745,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             return BaseCell.NaN;
         }
 
-        if (resolver.resolver().getViewClass(cellType) != null) {
-            cell = new BaseCell(cellType);
-            cell.serviceManager = serviceManager;
-            if (parent != null) {
-                cell.parent = parent;
-                cell.parentId = parent.id;
-            }
-
-            parseCell(cell, cellData);
-            if (parent != null) {
-                boolean ret = parent.addCellInternal(cell, false);
-                if (!ret && TangramBuilder.isPrintLog()) {
-                    LogUtils.w(TAG, "Parse invalid cell with data: " + cellData.toString());
-                }
-            }
-            return cell;
-        } else if (Utils.isCard(cellType)) {
+        if (Utils.isCard(cellType)) {
             switch (cellType) {
                 case TangramBuilder.TYPE_CONTAINER_FLOW:
                 case TangramBuilder.TYPE_CONTAINER_1C_FLOW:
@@ -773,6 +775,22 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                 }
             } else {
                 return BaseCell.NaN;
+            }
+
+            parseCell(cell, cellData);
+            if (parent != null) {
+                boolean ret = parent.addCellInternal(cell, false);
+                if (!ret && TangramBuilder.isPrintLog()) {
+                    LogUtils.w(TAG, "Parse invalid cell with data: " + cellData.toString());
+                }
+            }
+            return cell;
+        } else if (resolver.resolver().getViewClass(cellType) != null) {
+            cell = new BaseCell(cellType);
+            cell.serviceManager = serviceManager;
+            if (parent != null) {
+                cell.parent = parent;
+                cell.parentId = parent.id;
             }
 
             parseCell(cell, cellData);
