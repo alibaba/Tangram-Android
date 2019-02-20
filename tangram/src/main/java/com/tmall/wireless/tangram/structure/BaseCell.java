@@ -156,10 +156,6 @@ public class BaseCell<V extends View> extends ComponentLifecycle implements View
 
     public void setStringType(String type) {
         stringType = type;
-        try {
-            this.type = Integer.parseInt(type);
-        } catch (NumberFormatException e) {
-        }
     }
 
     public void addBizParam(String key, Object value) {
