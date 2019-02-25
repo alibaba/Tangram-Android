@@ -24,13 +24,22 @@
 
 package com.tmall.wireless.tangram.dataparser.concrete;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Log;
+import android.util.SparseArray;
+import android.util.SparseBooleanArray;
+import android.view.View;
+import android.view.ViewPropertyAnimator;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.Range;
 import com.alibaba.android.vlayout.layout.BaseLayoutHelper;
 import com.alibaba.android.vlayout.layout.FixAreaLayoutHelper;
 import com.alibaba.android.vlayout.layout.MarginLayoutHelper;
-
-import android.support.v4.util.ArrayMap;
 import com.tmall.wireless.tangram.Engine;
 import com.tmall.wireless.tangram.MVHelper;
 import com.tmall.wireless.tangram.TangramBuilder;
@@ -48,17 +57,6 @@ import com.tmall.wireless.tangram.util.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.util.Log;
-import android.util.SparseArray;
-import android.util.SparseBooleanArray;
-import android.view.View;
-import android.view.ViewPropertyAnimator;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -272,7 +270,7 @@ public abstract class Card extends ComponentLifecycle {
     }
 
     public static BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,
-        @NonNull ServiceManager serviceManager, boolean appended) {
+                                      @NonNull ServiceManager serviceManager, boolean appended) {
         if (cellData != null) {
             BaseCell cell = null;
             String cellType = cellData.optString(Card.KEY_TYPE);
@@ -391,7 +389,7 @@ public abstract class Card extends ComponentLifecycle {
      */
     private LayoutHelper mLayoutHelper = null;
 
-    public LayoutHelper getExistLayoutHelper(){
+    public LayoutHelper getExistLayoutHelper() {
         return mLayoutHelper;
     }
 
@@ -476,9 +474,9 @@ public abstract class Card extends ComponentLifecycle {
 
             if (helper instanceof MarginLayoutHelper) {
                 ((MarginLayoutHelper) helper).setMargin(style.margin[Style.MARGIN_LEFT_INDEX], style.margin[Style.MARGIN_TOP_INDEX],
-                    style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
+                        style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
                 ((MarginLayoutHelper) helper).setPadding(style.padding[Style.MARGIN_LEFT_INDEX], style.padding[Style.MARGIN_TOP_INDEX],
-                    style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
+                        style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
             }
         }
 
@@ -556,7 +554,7 @@ public abstract class Card extends ComponentLifecycle {
     }
 
     @NonNull
-    public ArrayMap<Range<Integer>, Card> getChildren() {
+    public Map<Range<Integer>, Card> getChildren() {
         return mChildren;
     }
 
@@ -821,7 +819,7 @@ public abstract class Card extends ComponentLifecycle {
         if (TangramBuilder.isPrintLog()) {
             if (mPendingCells.size() > 0 && mInQueueCells.size() > 0) {
                 Preconditions.checkState(mPendingCells.get(0).position >= mInQueueCells.get(mInQueueCells.size() - 1).position
-                    , "Items in pendingQueue must have large position than Items in queue");
+                        , "Items in pendingQueue must have large position than Items in queue");
             }
         }
     }
@@ -955,7 +953,7 @@ public abstract class Card extends ComponentLifecycle {
 
     public boolean requirePlaceholderCell() {
         return mPlaceholderRequired && mPlaceholderCell != null && !TextUtils.isEmpty(load)
-            && (mCells.size() == 0 || (mCells.size() == 1 && mCells.contains(mPlaceholderCell)));
+                && (mCells.size() == 0 || (mCells.size() == 1 && mCells.contains(mPlaceholderCell)));
     }
 
     private MVHelper getMVHelper() {
@@ -1030,7 +1028,7 @@ public abstract class Card extends ComponentLifecycle {
     public Card findChildCardById(String id) {
         if (!mChildren.isEmpty()) {
             for (int i = 0, size = mChildren.size(); i < size; i++) {
-                Card card = mChildren.valueAt(i);
+                Card card = mChildren.get(i);
                 if (card != null && card.id.equals(id)) {
                     return card;
                 }
@@ -1039,7 +1037,7 @@ public abstract class Card extends ComponentLifecycle {
         return null;
     }
 
-    public ArrayMap<Range<Integer>, Card> getChildrenCards(){
+    public Map<Range<Integer>, Card> getChildrenCards() {
         return mChildren;
     }
 
