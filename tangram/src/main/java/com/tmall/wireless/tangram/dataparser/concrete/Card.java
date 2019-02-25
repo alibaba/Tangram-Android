@@ -63,6 +63,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,7 @@ public abstract class Card extends ComponentLifecycle {
     protected BaseCell mFooter;
 
     @NonNull
-    protected ArrayMap<Range<Integer>, Card> mChildren = new ArrayMap<>();
+    protected Map<Range<Integer>, Card> mChildren = new HashMap<>();
 
     @NonNull
     protected List<BaseCell> mCells = new ArrayList<>();

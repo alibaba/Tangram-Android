@@ -31,8 +31,6 @@ import com.alibaba.android.vlayout.layout.StickyLayoutHelper;
 import com.tmall.wireless.tangram3.dataparser.concrete.Card;
 import com.tmall.wireless.tangram3.dataparser.concrete.Style;
 
-import org.json.JSONObject;
-
 /**
  * Created by villadora on 15/8/26.
  */
@@ -46,6 +44,10 @@ public class StickyCard extends Card {
             helper = (StickyLayoutHelper) oldHelper;
         } else {
             helper = new StickyLayoutHelper(true);
+        }
+
+        if (serviceManager != null) {
+            helper.setStickyListener(serviceManager.getService(StickyLayoutHelper.StickyListener.class));
         }
 
         if (style != null)
