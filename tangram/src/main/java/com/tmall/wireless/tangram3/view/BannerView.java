@@ -307,9 +307,8 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         if (bannerCell.mCells.size() <= bannerCell.mInfiniteMinCount) {
             setInfiniteLoop(false);
         } else {
-//            setInfiniteLoop(bannerCell.mInfinite);
+            setInfiniteLoop(bannerCell.mInfinite);
         }
-        mUltraViewPager.setRatio(1);
         setIndicatorGravity(getIndicatorGravity(bannerCell.mIndicatorGravity));
         setIndicatorPos(bannerCell.mIndicatorPos);
         int indicatorGap = bannerCell.mIndicatorGap;

@@ -338,7 +338,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
     }
 
     private void bindHeaderView(BaseCell cell) {
-        if (cell.isValid()) {
+        if (cell != null && cell.isValid()) {
             View header = getViewFromRecycler(cell);
             if (header != null) {
                 header.setId(R.id.TANGRAM_BANNER_HEADER_ID);
@@ -355,7 +355,7 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
     }
 
     private void bindFooterView(BaseCell cell) {
-        if (cell.isValid()) {
+        if (cell != null && cell.isValid()) {
             View footer = getViewFromRecycler(cell);
             if (footer != null) {
                 footer.setId(R.id.TANGRAM_BANNER_FOOTER_ID);

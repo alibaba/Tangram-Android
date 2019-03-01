@@ -211,4 +211,21 @@ public class Utils {
         }
     }
 
+    public static Float getJsonFloatValue(JSONObject json, String key) {
+        Float tmp = json.getFloat(key);
+        if (tmp == null) {
+            return Float.NaN;
+        } else {
+            return tmp;
+        }
+    }
+
+    public static Double getJsonDoubleValue(JSONObject json, String key) {
+        Double tmp = json.getDouble(key);
+        if (tmp == null) {
+            return Double.NaN;
+        } else {
+            return tmp;
+        }
+    }
 }

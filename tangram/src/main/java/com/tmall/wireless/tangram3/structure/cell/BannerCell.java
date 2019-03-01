@@ -198,8 +198,8 @@ public class BannerCell extends BaseCell {
         this.mBgColor = bgColor;
     }
 
-    public void setPageWidth(double pageWidth) {
-        this.pageWidth = (float) pageWidth;
+    public void setPageWidth(float pageWidth) {
+        this.pageWidth = pageWidth;
     }
 
     public void sethGap(int hGap) {

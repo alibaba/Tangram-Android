@@ -28,6 +28,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.fastjson.JSONArray;
@@ -57,7 +58,6 @@ import com.tmall.wireless.tangram3.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -343,7 +343,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
                     for (BaseCell cell : card.mCells) {
                         if (cell.style.extras != null) {
-                            int colSpan = cell.style.extras.getIntValue("colSpan");
+                            int colSpan = cell.style.extras.getIntValue("colspan");
                             if (colSpan == 0) {
                                 colSpan = 1;
                             }
@@ -386,9 +386,9 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     bannerCard.cell.setIndicatorGap(Style.parseSize(styleJson.getString(ATTR_INDICATOR_GAP), 0));
                     bannerCard.cell.setIndicatorMargin(Style.parseSize(styleJson.getString(ATTR_INDICATOR_MARGIN), 0));
                     bannerCard.cell.setIndicatorHeight(Style.parseSize(styleJson.getString(ATTR_INDICATOR_HEIGHT), 0));
-                    bannerCard.cell.setPageWidth(styleJson.getDoubleValue(ATTR_PAGE_WIDTH));
+                    bannerCard.cell.setPageWidth(Utils.getJsonFloatValue(styleJson, ATTR_PAGE_WIDTH));
                     bannerCard.cell.sethGap(Style.parseSize(styleJson.getString(ATTR_HGAP), 0));
-                    bannerCard.cell.itemRatio = styleJson.getDoubleValue(ATTR_ITEM_RATIO);
+                    bannerCard.cell.itemRatio = Utils.getJsonDoubleValue(styleJson, ATTR_ITEM_RATIO);
                     bannerCard.cell.itemMargin[0] = Style.parseSize(styleJson.getString(ATTR_ITEM_MARGIN_LEFT), 0);
                     bannerCard.cell.itemMargin[1] = Style.parseSize(styleJson.getString(ATTR_ITEM_MARGIN_RIGHT), 0);
                     Style style = new Style();
@@ -572,7 +572,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     }
                     linearScrollCard.cell.maxRows = maxRows;
                     try {
-                        linearScrollCard.cell.maxCols = Integer.parseInt(styleJson.getString(LinearScrollCell.KEY_MAX_COLS));
+                        linearScrollCard.cell.maxCols = (int) styleJson.getDoubleValue(LinearScrollCell.KEY_MAX_COLS);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -684,11 +684,18 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             style.bgImgUrl = backgroundImage;
         }
 
-        style.aspectRatio = data.getFloatValue(KEY_ASPECT_RATIO);
+        Float aspectRatio = data.getFloat(KEY_ASPECT_RATIO);
+        if (aspectRatio == null) {
+            style.aspectRatio = Float.NaN;
+        } else {
+            style.aspectRatio = aspectRatio;
+        }
 
         Float ratio = data.getFloat(KEY_RATIO);
         if (ratio != null) {
             style.aspectRatio = ratio;
+        } else {
+            style.aspectRatio = Float.NaN;
         }
 
         style.zIndex = data.getIntValue(KEY_ZINDEX);
@@ -824,6 +831,9 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         } else {
             BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
             // if cell type not register and has component info, register it!
+            if (TangramBuilder.isPrintLog()) {
+                LogUtils.e("PojoDataParser", "createCell status: cellType=" + cellType + ", componentInfoMap=" + (componentInfoMap == null ? "null" : componentInfoMap.toString()));
+            }
             if (!componentBinderResolver.has(cellType) && componentInfoMap != null && componentInfoMap.containsKey(cellType)) {
                 componentBinderResolver.register(cellType, new BaseCellBinder<>(cellType, resolver));
             }
