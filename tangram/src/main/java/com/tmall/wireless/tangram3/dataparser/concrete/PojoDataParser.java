@@ -292,12 +292,19 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
         checkCardResolverAndMVHelper(serviceManager);
 
-        final String cardType = parseCardType(data);
+        String cardType = parseCardType(data);
         if (!TextUtils.isEmpty(cardType)) {
             Card card = cardResolver.create(cardType);
             if (card == null) {
                 card = new WrapCellCard();
-                card.setStringType(TangramBuilder.TYPE_CONTAINER_1C_FLOW);
+                cardType = TangramBuilder.TYPE_CONTAINER_1C_FLOW;
+
+                JSONObject wrapCardJson = new JSONObject();
+                wrapCardJson.put("type", TangramBuilder.TYPE_CONTAINER_1C_FLOW);
+                JSONArray itemArray = new JSONArray();
+                itemArray.add(data);
+                wrapCardJson.put("items", itemArray);
+                data = wrapCardJson;
             }
 
             card.dataParser = this;
