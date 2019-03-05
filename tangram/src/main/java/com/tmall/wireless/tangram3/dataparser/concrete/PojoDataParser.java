@@ -28,7 +28,6 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.fastjson.JSONArray;
@@ -702,8 +701,9 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
         style.slidable = data.getBooleanValue(KEY_SLIDABLE);
 
-        JSONArray marginArray = data.getJSONArray(KEY_MARGIN);
-        if (marginArray != null) {
+        Object marginObj = data.get(KEY_MARGIN);
+        if (marginObj instanceof JSONArray) {
+            JSONArray marginArray = (JSONArray) marginObj;
             int size = Math.min(style.margin.length, marginArray.size());
             for (int i = 0; i < size; i++) {
                 style.margin[i] = style.parseSize(marginArray.getString(i), 0);
@@ -712,15 +712,16 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             if (size > 0) {
                 Arrays.fill(style.margin, size, style.margin.length, style.margin[size - 1]);
             }
-        } else {
-            String marginString = data.getString(KEY_MARGIN);
+        } else if (marginObj instanceof String) {
+            String marginString = (String) marginObj;
             if (!TextUtils.isEmpty(marginString)) {
                 style.setMargin(marginString);
             }
         }
 
-        JSONArray paddingArray = data.getJSONArray(KEY_PADDING);
-        if (paddingArray != null) {
+        Object paddingObj = data.get(KEY_PADDING);
+        if (paddingObj instanceof JSONArray) {
+            JSONArray paddingArray = (JSONArray) paddingObj;
             int size = Math.min(style.padding.length, paddingArray.size());
             for (int i = 0; i < size; i++) {
                 style.padding[i] = style.parseSize(paddingArray.getString(i), 0);
@@ -729,8 +730,8 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             if (size > 0) {
                 Arrays.fill(style.padding, size, style.padding.length, style.padding[size - 1]);
             }
-        } else {
-            String paddingString = data.getString(KEY_PADDING);
+        } else if (paddingObj instanceof String) {
+            String paddingString = (String) paddingObj;
             if (!TextUtils.isEmpty(paddingString)) {
                 style.setPadding(paddingString);
             }

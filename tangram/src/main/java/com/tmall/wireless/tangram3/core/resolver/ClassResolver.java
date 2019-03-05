@@ -27,6 +27,7 @@ package com.tmall.wireless.tangram3.core.resolver;
 import android.util.Log;
 
 import com.tmall.wireless.tangram3.TangramBuilder;
+import com.tmall.wireless.tangram3.util.LogUtils;
 
 /**
  * Resolver based on class types, its' methods are not thread-safe.
@@ -51,15 +52,8 @@ public abstract class ClassResolver<T> extends BaseResolver<Class<? extends T>, 
                     Log.e(TAG, e.getMessage(), e);
             }
         } else if (TangramBuilder.isPrintLog()) {
-            throw new TypeNotFoundException("Can not find type: " + type + " in ClassResolver");
+            LogUtils.e("ClassResolver", "Can not find type: " + type + " in ClassResolver");
         }
         return null;
-    }
-
-
-    static final class TypeNotFoundException extends RuntimeException {
-        TypeNotFoundException(String message) {
-            super(message);
-        }
     }
 }
