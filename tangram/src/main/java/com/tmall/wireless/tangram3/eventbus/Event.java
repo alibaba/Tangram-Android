@@ -26,6 +26,8 @@ package com.tmall.wireless.tangram3.eventbus;
 
 import android.support.v4.util.ArrayMap;
 
+import java.util.Map;
+
 /**
  * Created by longerian on 16/4/26.
  */
@@ -44,7 +46,7 @@ public class Event {
     /**
      * TangramOp1 args
      */
-    public ArrayMap<String, String> args;
+    public Map<String, String> args;
 
     /**
      * Context
@@ -57,6 +59,7 @@ public class Event {
 
     /**
      * Append arg to map
+     *
      * @param key
      * @param value
      */

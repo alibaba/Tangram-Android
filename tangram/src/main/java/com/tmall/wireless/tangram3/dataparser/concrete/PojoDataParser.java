@@ -320,10 +320,10 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             JSONObject styleJson = data.getJSONObject(KEY_STYLE);
 
             // parse specific style
-            if (styleJson != null) {
-                if (card instanceof GridCard) {
-                    GridCard gridCard = (GridCard) card;
-                    GridCard.GridStyle style = new GridCard.GridStyle();
+            if (card instanceof GridCard) {
+                GridCard gridCard = (GridCard) card;
+                GridCard.GridStyle style = new GridCard.GridStyle();
+                if (styleJson != null) {
                     parseStyle(style, styleJson);
 
                     style.column = styleJson.getIntValue(KEY_COLUMN);
@@ -356,28 +356,31 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                             cell.colSpan = colSpan;
                         }
                     }
+                }
 
-                    card = gridCard;
-                    card.style = style;
-                } else if (card instanceof BannerCard) {
-                    BannerCard bannerCard = (BannerCard) card;
-                    if (bannerCard.cell == null) {
-                        bannerCard.cell = new BannerCell();
-                        bannerCard.cell.serviceManager = serviceManager;
+                card = gridCard;
+                card.style = style;
+            } else if (card instanceof BannerCard) {
+                BannerCard bannerCard = (BannerCard) card;
+                if (bannerCard.cell == null) {
+                    bannerCard.cell = new BannerCell();
+                    bannerCard.cell.serviceManager = serviceManager;
+                }
+
+                try {
+                    bannerCard.cell.stringType = TYPE_CAROUSEL_CELL_COMPACT;
+
+                    if (!bannerCard.getCells().isEmpty()) {
+                        bannerCard.cell.mCells.addAll(bannerCard.getCells());
+                        bannerCard.setCells(bannerCard.getCells());
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    bannerCard.setCells(null);
+                }
 
-                    try {
-                        bannerCard.cell.stringType = TYPE_CAROUSEL_CELL_COMPACT;
-
-                        if (!bannerCard.getCells().isEmpty()) {
-                            bannerCard.cell.mCells.addAll(bannerCard.getCells());
-                            bannerCard.setCells(bannerCard.getCells());
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        bannerCard.setCells(null);
-                    }
-
+                Style style = new Style();
+                if (styleJson != null) {
                     bannerCard.cell.setIndicatorRadius(Style.parseSize(styleJson.getString(ATTR_INDICATOR_RADIUS), 0));
                     bannerCard.cell.setIndicatorColor(Style.parseColor(styleJson.getString(ATTR_INDICATOR_COLOR), Color.TRANSPARENT));
                     bannerCard.cell.setIndicatorDefaultColor(Style.parseColor(styleJson.getString(ATTR_INDICATOR_DEFAULT_INDICATOR_COLOR), Color.TRANSPARENT));
@@ -397,14 +400,15 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     bannerCard.cell.itemRatio = Utils.getJsonDoubleValue(styleJson, ATTR_ITEM_RATIO);
                     bannerCard.cell.itemMargin[0] = Style.parseSize(styleJson.getString(ATTR_ITEM_MARGIN_LEFT), 0);
                     bannerCard.cell.itemMargin[1] = Style.parseSize(styleJson.getString(ATTR_ITEM_MARGIN_RIGHT), 0);
-                    Style style = new Style();
                     parseStyle(style, styleJson);
-                    card.style = style;
-                    bannerCard.cell.setRatio(style.aspectRatio);
-                    bannerCard.cell.margin = style.margin;
-                    bannerCard.cell.height = style.height;
-                } else if (card instanceof OnePlusNCard) {
-                    ColumnStyle style = new ColumnStyle();
+                }
+                card.style = style;
+                bannerCard.cell.setRatio(style.aspectRatio);
+                bannerCard.cell.margin = style.margin;
+                bannerCard.cell.height = style.height;
+            } else if (card instanceof OnePlusNCard) {
+                ColumnStyle style = new ColumnStyle();
+                if (styleJson != null) {
                     parseStyle(style, styleJson);
 
                     JSONArray jsonCols = styleJson.getJSONArray(KEY_COLS);
@@ -426,10 +430,12 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     } else {
                         style.rows = new float[0];
                     }
-                    card.style = style;
-                } else if (card instanceof FixLinearScrollCard) {
-                    FixLinearScrollCard fixLinearScrollCard = (FixLinearScrollCard) card;
-                    FixCard.FixStyle fixStyle = new FixCard.FixStyle();
+                }
+                card.style = style;
+            } else if (card instanceof FixLinearScrollCard) {
+                FixLinearScrollCard fixLinearScrollCard = (FixLinearScrollCard) card;
+                FixCard.FixStyle fixStyle = new FixCard.FixStyle();
+                if (styleJson != null) {
                     parseStyle(fixStyle, styleJson);
                     String showTypeStr = styleJson.getString(KEY_SHOW_TYPE);
                     if (TextUtils.isEmpty(showTypeStr)) {
@@ -472,22 +478,28 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
                     fixStyle.x = Style.parseSize(styleJson.getString(KEY_X), 0);
                     fixStyle.y = Style.parseSize(styleJson.getString(KEY_Y), 0);
-                    fixLinearScrollCard.mFixStyle = fixStyle;
-                } else if (card instanceof StickyEndCard) {
-                    StickyCard.StickyStyle stickyStyle = new StickyCard.StickyStyle(false);
+                }
+                fixLinearScrollCard.mFixStyle = fixStyle;
+            } else if (card instanceof StickyEndCard) {
+                StickyCard.StickyStyle stickyStyle = new StickyCard.StickyStyle(false);
+                if (styleJson != null) {
                     stickyStyle.offset = Style.parseSize(styleJson.getString("offset"), 0);
-                    card.style = stickyStyle;
-                } else if (card instanceof StickyCard) {
-                    StickyCard.StickyStyle stickyStyle = new StickyCard.StickyStyle(true);
+                }
+                card.style = stickyStyle;
+            } else if (card instanceof StickyCard) {
+                StickyCard.StickyStyle stickyStyle = new StickyCard.StickyStyle(true);
+                if (styleJson != null) {
                     String sticky = styleJson.getString(KEY_STICKY);
                     if (TextUtils.isEmpty(sticky)) {
                         sticky = stickyStyle.stickyStart ? STICKY_START : STICKY_END;
                     }
                     stickyStyle.stickyStart = STICKY_START.equalsIgnoreCase(sticky);
                     stickyStyle.offset = Style.parseSize(styleJson.getString("offset"), 0);
-                    card.style = stickyStyle;
-                } else if (card instanceof FixCard) {
-                    FixCard.FixStyle fixStyle = new FixCard.FixStyle();
+                }
+                card.style = stickyStyle;
+            } else if (card instanceof FixCard) {
+                FixCard.FixStyle fixStyle = new FixCard.FixStyle();
+                if (styleJson != null) {
                     parseStyle(fixStyle, styleJson);
                     String showTypeStr = styleJson.getString(KEY_SHOW_TYPE);
                     if (TextUtils.isEmpty(showTypeStr)) {
@@ -530,21 +542,24 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
                     fixStyle.x = Style.parseSize(styleJson.getString(KEY_X), 0);
                     fixStyle.y = Style.parseSize(styleJson.getString(KEY_Y), 0);
-                    card.style = fixStyle;
-                } else if (card instanceof LinearScrollCard) {
-                    LinearScrollCard linearScrollCard = (LinearScrollCard) card;
-                    try {
-                        linearScrollCard.cell.stringType = TangramBuilder.TYPE_LINEAR_SCROLL_CELL_COMPACT;
-                        linearScrollCard.cell.serviceManager = serviceManager;
+                }
+                card.style = fixStyle;
+            } else if (card instanceof LinearScrollCard) {
+                LinearScrollCard linearScrollCard = (LinearScrollCard) card;
+                try {
+                    linearScrollCard.cell.stringType = TangramBuilder.TYPE_LINEAR_SCROLL_CELL_COMPACT;
+                    linearScrollCard.cell.serviceManager = serviceManager;
 
-                        if (!linearScrollCard.getCells().isEmpty()) {
-                            linearScrollCard.cell.cells.addAll(linearScrollCard.getCells());
-                            linearScrollCard.setCells(linearScrollCard.getCells());
-                        }
-                    } catch (Exception e) {
-                        linearScrollCard.setCells(null);
+                    if (!linearScrollCard.getCells().isEmpty()) {
+                        linearScrollCard.cell.cells.addAll(linearScrollCard.getCells());
+                        linearScrollCard.setCells(linearScrollCard.getCells());
                     }
+                } catch (Exception e) {
+                    linearScrollCard.setCells(null);
+                }
 
+                Style style = new Style();
+                if (styleJson != null) {
                     linearScrollCard.cell.pageWidth = Style.parseSize(styleJson.getString(LinearScrollCell.KEY_PAGE_WIDTH), 0);
                     linearScrollCard.cell.pageHeight = Style.parseSize(styleJson.getString(LinearScrollCell.KEY_PAGE_HEIGHT), 0);
                     linearScrollCard.cell.defaultIndicatorColor = Style.parseColor(styleJson.getString(LinearScrollCell.KEY_DEFAULT_INDICATOR_COLOR),
@@ -582,14 +597,15 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-
-                    Style style = new Style();
                     parseStyle(style, styleJson);
-                    linearScrollCard.style = style;
-                    card = linearScrollCard;
-                } else if (card instanceof StaggeredCard) {
-                    StaggeredCard staggeredCard = (StaggeredCard) card;
-                    StaggeredCard.StaggeredStyle style = new StaggeredCard.StaggeredStyle();
+                }
+
+                linearScrollCard.style = style;
+                card = linearScrollCard;
+            } else if (card instanceof StaggeredCard) {
+                StaggeredCard staggeredCard = (StaggeredCard) card;
+                StaggeredCard.StaggeredStyle style = new StaggeredCard.StaggeredStyle();
+                if (styleJson != null) {
                     parseStyle(style, styleJson);
                     Integer column = styleJson.getInteger(KEY_COLUMN);
                     if (column == null) {
@@ -599,15 +615,14 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
                     style.hGap = Style.parseSize(styleJson.getString(KEY_H_GAP), 0);
                     style.vGap = Style.parseSize(styleJson.getString(KEY_V_GAP), 0);
-
-                    staggeredCard.style = style;
-                } else {
-                    Style style = new Style();
-                    parseStyle(style, styleJson);
-                    card.style = style;
                 }
+                staggeredCard.style = style;
+            } else if (isCustomCard(card.stringType)) {
+                parseCustomCard(card, data, serviceManager, infoMap);
             } else {
-                card.style = new Style();
+                Style style = new Style();
+                parseStyle(style, styleJson);
+                card.style = style;
             }
 
             if (card.isValid()) {
@@ -816,26 +831,6 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                 }
             }
             return cell;
-        } else if (isCustomCard(parent.stringType)) {
-            cell = parseCustomCard(cellType, parent, cellData, serviceManager, componentInfoMap);
-            if (cell != null) {
-                cell.serviceManager = serviceManager;
-                if (parent != null) {
-                    cell.parent = parent;
-                    cell.parentId = parent.id;
-                }
-            } else {
-                return BaseCell.NaN;
-            }
-
-            parseCell(cell, cellData);
-            if (parent != null) {
-                boolean ret = parent.addCellInternal(cell, false);
-                if (!ret && TangramBuilder.isPrintLog()) {
-                    LogUtils.w(TAG, "Parse invalid cell with data: " + cellData.toString());
-                }
-            }
-            return cell;
         } else {
             BaseCellBinderResolver componentBinderResolver = serviceManager.getService(BaseCellBinderResolver.class);
             // if cell type not register and has component info, register it!
@@ -956,12 +951,10 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         return false;
     }
 
-    protected BaseCell parseCustomCard(String cardType,
-                                       @Nullable Card parent,
-                                       @NonNull JSONObject cellData,
-                                       @NonNull ServiceManager serviceManager,
-                                       Map<String, ComponentInfo> componentInfoMap) {
-        return null;
+    protected void parseCustomCard(Card card,
+                                   @NonNull JSONObject cellData,
+                                   @NonNull ServiceManager serviceManager,
+                                   Map<String, ComponentInfo> componentInfoMap) {
     }
 
     protected void parseHeaderCell(BaseCell headerCell, Card card) {
