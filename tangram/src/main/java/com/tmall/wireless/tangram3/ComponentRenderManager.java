@@ -12,15 +12,17 @@ import com.tmall.wireless.tangram3.dataparser.concrete.ComponentInfo;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ComponentRenderManager {
 
-    private ArrayMap<String, ElementRenderService> renderServiceMap = new ArrayMap<>(5);
+    private Map<String, ElementRenderService> renderServiceMap = new HashMap<>(5);
 
-    private ArrayMap<String, ComponentInfo> componentInfoMap = new ArrayMap<>(128);
+    private Map<String, ComponentInfo> componentInfoMap = new HashMap<>(128);
 
     public ElementRenderService getRenderService(String sdkName) {
         return renderServiceMap.get(sdkName);
@@ -138,7 +140,7 @@ public class ComponentRenderManager {
         return componentInfoMap.get(id);
     }
 
-    public ArrayMap<String, ComponentInfo> getComponentInfoMap() {
+    public Map<String, ComponentInfo> getComponentInfoMap() {
         return componentInfoMap;
     }
 }
