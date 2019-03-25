@@ -587,6 +587,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     linearScrollCard.cell.scrollMarginRight = Style.parseSize(styleJson.getString(LinearScrollCell.KEY_SCROLL_MARGIN_RIGHT), 0);
                     linearScrollCard.cell.hGap = Style.parseSize(styleJson.getString(LinearScrollCell.KEY_HGAP), 0);
                     linearScrollCard.cell.vGap = Style.parseSize(styleJson.getString(LinearScrollCell.KEY_VGAP), 0);
+                    linearScrollCard.cell.nativeBackgroundImage = styleJson.getString(LinearScrollCell.KEY_NATIVE_BG_IMAGE);
                     Integer maxRows = styleJson.getInteger(LinearScrollCell.KEY_MAX_ROWS);
                     if (maxRows == null) {
                         maxRows = LinearScrollCell.DEFAULT_MAX_ROWS;

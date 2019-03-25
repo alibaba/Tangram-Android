@@ -39,15 +39,19 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.tmall.wireless.tangram.core.R;
+import com.tmall.wireless.tangram3.TangramEngine;
 import com.tmall.wireless.tangram3.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram3.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram3.dataparser.concrete.Style;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 import com.tmall.wireless.tangram3.structure.cell.LinearScrollCell;
 import com.tmall.wireless.tangram3.structure.view.ITangramViewLifeCycle;
+import com.tmall.wireless.tangram3.util.ImageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +60,7 @@ import java.util.List;
 /**
  * Created by Kunlun on 9/17/16.
  */
-public class LinearScrollView extends LinearLayout implements ITangramViewLifeCycle {
+public class LinearScrollView extends RelativeLayout implements ITangramViewLifeCycle {
     private RecyclerView recyclerView;
     private GridLayoutManager layoutManager;
     private View indicator, indicatorContainer;
@@ -71,6 +75,8 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
     private List<BinderViewHolder> mViewHolders = new ArrayList<BinderViewHolder>();
 
     private RecyclerView.ItemDecoration itemDecoration;
+
+    private View backgroundView;
 
     private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -104,8 +110,6 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
     }
 
     private void init() {
-        setGravity(Gravity.CENTER_HORIZONTAL);
-        setOrientation(VERTICAL);
         inflate(getContext(), R.layout.tangram_linearscrollview, this);
         setClickable(true);
         recyclerView = (RecyclerView) findViewById(R.id.tangram_linearscrollview_container);
@@ -129,6 +133,10 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
                 layoutManager.setSpanCount(1);
             }
             totalDistanceOfIndicator = (float) (this.lSCell.defaultIndicatorWidth - this.lSCell.indicatorWidth);
+            if (backgroundView == null) {
+                backgroundView = ((TangramEngine) cell.serviceManager).getLayoutManager().generateLayoutView();
+                addView(backgroundView, 0, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            }
         }
     }
 
@@ -238,6 +246,12 @@ public class LinearScrollView extends LinearLayout implements ITangramViewLifeCy
         recyclerView.addOnScrollListener(onScrollListener);
 
         setBackgroundColor(lSCell.bgColor);
+
+        if (backgroundView != null) {
+            if (backgroundView instanceof ImageView) {
+                ImageUtils.doLoadImageUrl((ImageView) backgroundView, lSCell.nativeBackgroundImage);
+            }
+        }
 
         if (lSCell.retainScrollState && starts != null) {
             GridLayoutManager lm = (GridLayoutManager) recyclerView.getLayoutManager();

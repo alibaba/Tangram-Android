@@ -38,8 +38,10 @@
 
     <FrameLayout
         android:id="@+id/tangram_linearscrollview_indicator_container"
+        android:layout_below="@id/tangram_linearscrollview_container"
         android:layout_width="60dp"
         android:layout_height="3dp"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
         android:background="@drawable/tangram_linearscrollview_indicator_bg">
 
@@ -47,6 +49,7 @@
             android:id="@+id/tangram_linearscrollview_indicator"
             android:layout_width="26dp"
             android:layout_height="3dp"
+            android:layout_centerHorizontal="true"
             android:background="@drawable/tangram_linearscrollview_indicator" />
     </FrameLayout>
 </merge>

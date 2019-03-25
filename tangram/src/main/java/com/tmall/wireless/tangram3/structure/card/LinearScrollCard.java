@@ -51,7 +51,6 @@ public class LinearScrollCard extends Card {
             cell.setCells(cells);
             super.setCells(Collections.<BaseCell>singletonList(cell));
         }
-        notifyDataChange();
     }
 
     @Nullable

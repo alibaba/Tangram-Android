@@ -58,6 +58,8 @@ public class LinearScrollCell extends BaseCell {
      */
     public static final String KEY_INDICATOR_COLOR = "indicatorColor";
 
+    public static final String KEY_NATIVE_BG_IMAGE = "nativeBackgroundImage";
+
     /**
      * measure
      */
@@ -111,6 +113,7 @@ public class LinearScrollCell extends BaseCell {
     public double hGap;
     public double vGap;
     public double indicatorMargin;
+    public String nativeBackgroundImage;
 
     // current distance that responding recycler view has scrolled.
     public int currentDistance = 0;
