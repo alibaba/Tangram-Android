@@ -55,6 +55,9 @@ public class BinderViewHolder<C, V extends View> extends RecyclerView.ViewHolder
      * @param data
      */
     public void bind(C data) {
+        if (itemView == null || controller == null) {
+            return;
+        }
         this.controller.mountView(data, itemView);
         this.data = data;
     }
@@ -63,6 +66,9 @@ public class BinderViewHolder<C, V extends View> extends RecyclerView.ViewHolder
      * unbind the data, make the view re-usable
      */
     public void unbind() {
+        if (itemView == null || controller == null) {
+            return;
+        }
         if (data != null) {
             this.controller.unmountView(data, itemView);
         }

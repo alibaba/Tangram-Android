@@ -33,6 +33,7 @@ import android.util.Pair;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Space;
 
 import com.alibaba.android.vlayout.LayoutHelper;
 import com.alibaba.android.vlayout.Range;
@@ -41,6 +42,7 @@ import com.tmall.wireless.tangram3.MVHelper;
 import com.tmall.wireless.tangram3.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram3.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram3.core.protocol.ControlBinder;
+import com.tmall.wireless.tangram3.core.protocol.ViewCreator;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 import com.tmall.wireless.tangram3.support.CellSupport;
 import com.tmall.wireless.tangram3.support.PageDetectorSupport;
@@ -115,7 +117,12 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     public <V extends View> BinderViewHolder<BaseCell, V> createViewHolder(@NonNull ControlBinder<BaseCell, V> binder,
                                                                            @NonNull Context context, ViewGroup parent,
                                                                            String cellType) {
-        V view = binder.createView(context, parent, mMvHelper.renderManager().getComponentInfo(cellType));
+        V view;
+        if (binder != null) {
+            view = binder.createView(context, parent, mMvHelper.renderManager().getComponentInfo(cellType));
+        } else {
+            view = (V) new Space(context);
+        }
         return new BinderViewHolder<>(view, binder);
     }
 
