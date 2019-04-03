@@ -28,6 +28,7 @@ import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
 import com.alibaba.fastjson.JSONArray;
@@ -51,6 +52,7 @@ import com.tmall.wireless.tangram3.structure.card.WrapCellCard;
 import com.tmall.wireless.tangram3.structure.cell.BannerCell;
 import com.tmall.wireless.tangram3.structure.cell.LinearScrollCell;
 import com.tmall.wireless.tangram3.structure.style.ColumnStyle;
+import com.tmall.wireless.tangram3.support.InternalErrorSupport;
 import com.tmall.wireless.tangram3.util.LogUtils;
 import com.tmall.wireless.tangram3.util.Preconditions;
 import com.tmall.wireless.tangram3.util.Utils;
@@ -215,6 +217,8 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
 
     protected MVHelper mvHelper;
 
+    private InternalErrorSupport errorSupport;
+
     @NonNull
     @Override
     public List<Card> parseGroup(@Nullable JSONArray data, @NonNull final ServiceManager serviceManager) {
@@ -253,6 +257,13 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             mvHelper.resolver().setCards(result);
             return result;
         } catch (Exception e) {
+            if (errorSupport == null) {
+                errorSupport = serviceManager.getService(InternalErrorSupport.class);
+            }
+            HashMap<String, Object> params = new HashMap<>();
+            params.put("exception", Log.getStackTraceString(e));
+            errorSupport.onError(InternalErrorSupport.ERROR_PARSE_CARDS_ERROR,
+                    "Parse group error.", params);
             e.printStackTrace();
         }
         return null;
@@ -375,6 +386,13 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                         bannerCard.setCells(bannerCard.getCells());
                     }
                 } catch (Exception e) {
+                    if (errorSupport == null) {
+                        errorSupport = serviceManager.getService(InternalErrorSupport.class);
+                    }
+                    HashMap<String, Object> params = new HashMap<>();
+                    params.put("exception", Log.getStackTraceString(e));
+                    errorSupport.onError(InternalErrorSupport.ERROR_PARSE_CARDS_ERROR,
+                            "Parse banner card error.", params);
                     e.printStackTrace();
                     bannerCard.setCells(null);
                 }
@@ -555,6 +573,14 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                         linearScrollCard.setCells(linearScrollCard.getCells());
                     }
                 } catch (Exception e) {
+                    if (errorSupport == null) {
+                        errorSupport = serviceManager.getService(InternalErrorSupport.class);
+                    }
+                    HashMap<String, Object> params = new HashMap<>();
+                    params.put("exception", Log.getStackTraceString(e));
+                    errorSupport.onError(InternalErrorSupport.ERROR_PARSE_CARDS_ERROR,
+                            "Parse linear scroll card error.", params);
+                    e.printStackTrace();
                     linearScrollCard.setCells(null);
                 }
 
@@ -596,6 +622,13 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     try {
                         linearScrollCard.cell.maxCols = (int) styleJson.getDoubleValue(LinearScrollCell.KEY_MAX_COLS);
                     } catch (Exception e) {
+                        if (errorSupport == null) {
+                            errorSupport = serviceManager.getService(InternalErrorSupport.class);
+                        }
+                        HashMap<String, Object> params = new HashMap<>();
+                        params.put("exception", Log.getStackTraceString(e));
+                        errorSupport.onError(InternalErrorSupport.ERROR_PARSE_CARDS_ERROR,
+                                "Parse linear scroll card max cols error.", params);
                         e.printStackTrace();
                     }
                     parseStyle(style, styleJson);
