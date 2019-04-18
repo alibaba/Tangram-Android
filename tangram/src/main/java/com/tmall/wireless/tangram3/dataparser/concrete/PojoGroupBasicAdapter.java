@@ -573,7 +573,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                         Pair<Range<Integer>, Card> pair = mCards.get(i);
                         int start = pair.first.getLower();
                         int end = pair.first.getUpper();
-                        if (end < index) {
+                        if (end <= index) {
                             //do nothing
                             newCards.add(pair);
                         } else if (start <= index && index < end) {
@@ -623,7 +623,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                         Pair<Range<Integer>, Card> pair = mCards.get(i);
                         int start = pair.first.getLower();
                         int end = pair.first.getUpper();
-                        if (end < index) {
+                        if (end <= index) {
                             //do nothing
                             newCards.add(pair);
                         } else if (start <= index && index < end) {
