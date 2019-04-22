@@ -795,7 +795,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         return style;
     }
 
-    private BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,
+    protected BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,
                                 @NonNull ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap) {
         BaseCell cell = null;
         String cellType = parseCellType(cellData);
@@ -1013,7 +1013,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         }
     }
 
-    private void checkCardResolverAndMVHelper(ServiceManager serviceManager) {
+    protected void checkCardResolverAndMVHelper(ServiceManager serviceManager) {
         if (cardResolver == null) {
             cardResolver = serviceManager.getService(CardResolver.class);
             Preconditions.checkState(cardResolver != null, "Must register CardResolver into ServiceManager first");
