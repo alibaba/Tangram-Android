@@ -410,7 +410,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     bannerCard.cell.setIndicatorNor(styleJson.getString(ATTR_INDICATOR_NORMAL));
                     bannerCard.cell.setIndicatorGravity(styleJson.getString(ATTR_INDICATOR_GRA));
                     bannerCard.cell.setIndicatorPos(styleJson.getString(ATTR_INDICATOR_POS));
-                    bannerCard.cell.setIndicatorGap(Style.parseSize(styleJson.getString(ATTR_INDICATOR_GAP), 0));
+                    bannerCard.cell.setIndicatorGap(Style.parseSize(styleJson.getString(ATTR_INDICATOR_GAP), Style.dp2px(6)));
                     bannerCard.cell.setIndicatorMargin(Style.parseSize(styleJson.getString(ATTR_INDICATOR_MARGIN), 0));
                     bannerCard.cell.setIndicatorHeight(Style.parseSize(styleJson.getString(ATTR_INDICATOR_HEIGHT), 0));
                     bannerCard.cell.setPageWidth(Utils.getJsonFloatValue(styleJson, ATTR_PAGE_WIDTH));
@@ -599,6 +599,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
                     linearScrollCard.cell.indicatorWidth = Style.parseSize(styleJson.getString(LinearScrollCell.KEY_INDICATOR_WIDTH), LinearScrollCell.DEFAULT_INDICATOR_WIDTH);
                     linearScrollCard.cell.defaultIndicatorWidth = Style.parseSize(styleJson.getString(LinearScrollCell.KEY_DEFAULT_INDICATOR_WIDTH), LinearScrollCell.DEFAULT_DEFAULT_INDICATOR_WIDTH);
                     linearScrollCard.cell.indicatorMargin = Style.parseSize(styleJson.getString(LinearScrollCell.KEY_INDICATOR_MARGIN), LinearScrollCell.DEFAULT_INDICATOR_MARGIN);
+                    linearScrollCard.cell.indicatorRadius = Style.parseSize(styleJson.getString(LinearScrollCell.KEY_INDICATOR_RADIUS), LinearScrollCell.DEFAULT_INDICATOR_RADIUS);
                     if (styleJson.containsKey(LinearScrollCell.KEY_FOOTER_TYPE)) {
                         linearScrollCard.cell.footerType = styleJson.getString(LinearScrollCell.KEY_FOOTER_TYPE);
                     }

@@ -182,7 +182,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
     }
 
     public void setIndicatorGap(int gap) {
-        if (gap > 0) {
+        if (gap >= 0) {
             this.mIndicatorGap = gap;
         }
     }
@@ -312,7 +312,7 @@ public class BannerView extends ViewGroup implements ViewPager.OnPageChangeListe
         setIndicatorGravity(getIndicatorGravity(bannerCell.mIndicatorGravity));
         setIndicatorPos(bannerCell.mIndicatorPos);
         int indicatorGap = bannerCell.mIndicatorGap;
-        if (indicatorGap <= 0) {
+        if (indicatorGap < 0) {
             indicatorGap = mIndicatorGap;
         }
         setIndicatorGap(indicatorGap);

@@ -67,6 +67,7 @@ public class LinearScrollCell extends BaseCell {
     public static final String KEY_INDICATOR_WIDTH = "indicatorWidth";
     public static final String KEY_DEFAULT_INDICATOR_WIDTH = "defaultIndicatorWidth";
     public static final String KEY_INDICATOR_MARGIN = "indicatorMargin";
+    public static final String KEY_INDICATOR_RADIUS = "indicatorRadius";
 
     public static final String KEY_HAS_INDICATOR = "hasIndicator";
     public static final String KEY_FOOTER_TYPE = "footerType";
@@ -86,6 +87,7 @@ public class LinearScrollCell extends BaseCell {
     public static final int DEFAULT_DEFAULT_INDICATOR_WIDTH = Style.parseSize("80rp", 0);
     public static final int DEFAULT_INDICATOR_HEIGHT = Style.parseSize("4rp", 0);
     public static final int DEFAULT_INDICATOR_MARGIN = Style.parseSize("14rp", 0);
+    public static final int DEFAULT_INDICATOR_RADIUS = Style.parseSize("1.5dp", 0);
 
     public static final String KEY_HGAP = "hGap";
     public static final String KEY_VGAP = "vGap";
@@ -101,6 +103,7 @@ public class LinearScrollCell extends BaseCell {
     public int indicatorColor = DEFAULT_INDICATOR_COLOR;
     public double indicatorWidth = Double.NaN;
     public double indicatorHeight = Double.NaN;
+    public double indicatorRadius = Double.NaN;
     public double defaultIndicatorWidth = Double.NaN;
     public boolean hasIndicator = true;
     public String footerType;

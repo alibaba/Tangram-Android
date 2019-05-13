@@ -28,7 +28,10 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.Shape;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -235,9 +238,9 @@ public class LinearScrollView extends RelativeLayout implements ITangramViewLife
             setViewColor(indicator, lSCell.indicatorColor);
             setViewColor(indicatorContainer, lSCell.defaultIndicatorColor);
             setIndicatorMeasure(indicator, (int) Math.round(lSCell.indicatorWidth),
-                    (int) Math.round(lSCell.indicatorHeight), 0);
+                    (int) Math.round(lSCell.indicatorHeight), 0, lSCell.indicatorRadius);
             setIndicatorMeasure(indicatorContainer, (int) Math.round(lSCell.defaultIndicatorWidth),
-                    (int) Math.round(lSCell.indicatorHeight), (int) Math.round(lSCell.indicatorMargin));
+                    (int) Math.round(lSCell.indicatorHeight), (int) Math.round(lSCell.indicatorMargin), lSCell.indicatorRadius);
             indicatorContainer.setVisibility(VISIBLE);
         } else {
             indicatorContainer.setVisibility(GONE);
@@ -280,7 +283,7 @@ public class LinearScrollView extends RelativeLayout implements ITangramViewLife
      * @param height    indicator height
      * @param margin    indicator top margin
      */
-    private void setIndicatorMeasure(View indicator, int width, int height, int margin) {
+    private void setIndicatorMeasure(View indicator, int width, int height, int margin, double radius) {
         if (indicator != null) {
             ViewGroup.LayoutParams layoutParams = indicator.getLayoutParams();
             layoutParams.width = width;
@@ -296,6 +299,12 @@ public class LinearScrollView extends RelativeLayout implements ITangramViewLife
                 }
             }
             indicator.setLayoutParams(layoutParams);
+
+            Drawable drawable = indicator.getBackground();
+            if (drawable instanceof GradientDrawable) {
+                GradientDrawable gradientDrawable = (GradientDrawable)drawable;
+                gradientDrawable.setCornerRadius((float)radius);
+            }
         }
     }
 
