@@ -17,12 +17,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ComponentRenderManager {
 
     private Map<String, ElementRenderService> renderServiceMap = new HashMap<>(5);
 
-    private Map<String, ComponentInfo> componentInfoMap = new HashMap<>(128);
+    private Map<String, ComponentInfo> componentInfoMap = new ConcurrentHashMap<>(128);
 
     public ElementRenderService getRenderService(String sdkName) {
         return renderServiceMap.get(sdkName);

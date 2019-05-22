@@ -42,7 +42,6 @@ import com.tmall.wireless.tangram3.MVHelper;
 import com.tmall.wireless.tangram3.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram3.core.adapter.GroupBasicAdapter;
 import com.tmall.wireless.tangram3.core.protocol.ControlBinder;
-import com.tmall.wireless.tangram3.core.protocol.ViewCreator;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 import com.tmall.wireless.tangram3.support.CellSupport;
 import com.tmall.wireless.tangram3.support.PageDetectorSupport;
@@ -185,7 +184,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
             }
         }
 
-        if (!mStrKeys.containsKey(stringType)) {
+        if (!mStrKeys.containsKey(stringType) && mLayoutManager.getRecyclerView().getRecycledViewPool() != null) {
             int newType = mTypeId.getAndIncrement();
             mStrKeys.put(stringType, newType);
             mId2Types.put(newType, item.stringType);
