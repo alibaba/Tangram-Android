@@ -183,6 +183,12 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 stringType = renderType;
             }
         }
+
+        if (!mStrKeys.containsKey(stringType)) {
+            int newType = mTypeId.getAndIncrement();
+            mStrKeys.put(stringType, newType);
+            mId2Types.put(newType, item.stringType);
+        }
         return mStrKeys.get(stringType);
     }
 
