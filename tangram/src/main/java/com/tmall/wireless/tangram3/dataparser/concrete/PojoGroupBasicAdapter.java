@@ -183,13 +183,6 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                 stringType = renderType;
             }
         }
-
-        if (!mStrKeys.containsKey(stringType) && mLayoutManager.getRecyclerView().getRecycledViewPool() != null) {
-            int newType = mTypeId.getAndIncrement();
-            mStrKeys.put(stringType, newType);
-            mId2Types.put(newType, item.stringType);
-            mLayoutManager.getRecyclerView().getRecycledViewPool().setMaxRecycledViews(newType, 20);
-        }
         return mStrKeys.get(stringType);
     }
 
