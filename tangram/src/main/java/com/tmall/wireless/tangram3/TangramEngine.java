@@ -646,7 +646,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray> impl
      * @param position
      * @since 2.1.0
      */
-    protected void removeBy(int position) {
+    public void removeBy(int position) {
         if (mGroupBasicAdapter != null) {
             if (position < mGroupBasicAdapter.getItemCount() && position >= 0) {
                 BaseCell removeCell = mGroupBasicAdapter.getItemByPosition(position);
@@ -661,7 +661,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray> impl
      * @param data
      * @since 2.1.0
      */
-    protected void removeBy(BaseCell data) {
+    public void removeBy(BaseCell data) {
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (data != null && mGroupBasicAdapter != null && layoutManager != null) {
             int removePosition = mGroupBasicAdapter.getPositionByItem(data);
@@ -707,7 +707,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray> impl
      * @param removeIdx target card's index
      * @since 2.1.0
      */
-    protected void removeBatchBy(int removeIdx) {
+    public void removeBatchBy(int removeIdx) {
         if (mGroupBasicAdapter != null) {
             Pair<Range<Integer>, Card> cardPair = mGroupBasicAdapter.getCardRange(removeIdx);
             if (cardPair != null) {
@@ -722,7 +722,7 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray> impl
      * @param group
      * @since 2.1.0
      */
-    protected void removeBatchBy(Card group) {
+    public void removeBatchBy(Card group) {
         VirtualLayoutManager layoutManager = getLayoutManager();
         if (group != null && mGroupBasicAdapter != null && layoutManager != null) {
             int cardIdx = mGroupBasicAdapter.findCardIdxForCard(group);
@@ -854,6 +854,18 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray> impl
                 cell.extras.put("_flag_invalidate_", true);
                 mGroupBasicAdapter.notifyItemChanged(position);
             }
+        }
+
+    }
+
+    public void updateCard(Card card) {
+        if (card != null && mGroupBasicAdapter != null) {
+            Range<Integer> cardRange = mGroupBasicAdapter.getCardRange(card);
+            for (int i = cardRange.getLower(); i < cardRange.getUpper(); i++) {
+                BaseCell cell = mGroupBasicAdapter.getItemByPosition(i);
+                cell.extras.put("_flag_invalidate_", true);
+            }
+            mGroupBasicAdapter.notifyItemRangeChanged(cardRange.getLower(), cardRange.getUpper());
         }
 
     }
