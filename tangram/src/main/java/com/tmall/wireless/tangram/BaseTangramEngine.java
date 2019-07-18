@@ -663,6 +663,10 @@ public class BaseTangramEngine<O, T, C, L> implements ServiceManager {
         return type.cast(service);
     }
 
+    public ConcurrentHashMap<Class<?>, Object> getmServices() {
+        return mServices;
+    }
+
     public void setSupportRx(boolean supportRx) {
         isSupportRx = supportRx;
         TimerSupport timerSupport = getService(TimerSupport.class);
