@@ -26,11 +26,11 @@ package com.tmall.wireless.tangram3;
 
 import android.os.Build.VERSION;
 import android.support.v4.util.ArrayMap;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
+import com.tmall.wireless.tangram.core.R;
 import com.tmall.wireless.tangram3.core.service.ServiceManager;
 import com.tmall.wireless.tangram3.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram3.structure.BaseCell;
@@ -38,9 +38,6 @@ import com.tmall.wireless.tangram3.structure.view.ITangramViewLifeCycle;
 import com.tmall.wireless.tangram3.support.CellSupport;
 import com.tmall.wireless.tangram3.support.ExposureSupport;
 import com.tmall.wireless.tangram3.util.BDE;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 
@@ -54,6 +51,10 @@ import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_TOP_IN
  */
 public class MVHelper {
     private static final String TAG = "Tangram-MVHelper";
+
+    public static final String DEFAULT_ENGINE_TAG = "default_tag";
+
+    private String engineTag = DEFAULT_ENGINE_TAG;
 
     private MVResolver mvResolver;
 
@@ -102,6 +103,9 @@ public class MVHelper {
     public void mountView(BaseCell cell, View view) {
         try {
             mvResolver.register(cell, view);
+            if (view.getTag(R.id.TANGRAM_ENGINE_TAG) == null) {
+                view.setTag(R.id.TANGRAM_ENGINE_TAG, engineTag);
+            }
             if (cell.serviceManager != null) {
                 if (cell.serviceManager.supportRx()) {
                     cell.emitNext(BDE.BIND);
@@ -275,5 +279,13 @@ public class MVHelper {
                 }
             }
         }
+    }
+
+    public String getEngineTag() {
+        return engineTag;
+    }
+
+    public void setEngineTag(String engineTag) {
+        this.engineTag = engineTag;
     }
 }

@@ -32,4 +32,5 @@
     <item name="tk_banner" type="id" />
     <item name="TANGRAM_BANNER_INDICATOR_POS" type="id"/>
     <item name="TANGRAM_LINEAR_SCROLL_POS" type="id"/>
+    <item name="TANGRAM_ENGINE_TAG" type="id" />
 </resources>

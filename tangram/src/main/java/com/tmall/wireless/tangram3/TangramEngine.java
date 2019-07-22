@@ -869,4 +869,26 @@ public class TangramEngine extends BaseTangramEngine<JSONObject, JSONArray> impl
         }
 
     }
+
+
+    public String getEngineTag() {
+        MVHelper mvHelper = getService(MVHelper.class);
+        if (mvHelper != null) {
+            return mvHelper.getEngineTag();
+        }
+        return null;
+    }
+
+    /**
+     * shoud call before setData, the tag would be set to each view in this engine,
+     * witch id is R.id.TANGRAM_ENGINE_TAG.
+     *
+     * @param engineTag an id to judge view from witch engine
+     */
+    public void setEngineTag(String engineTag) {
+        MVHelper mvHelper = getService(MVHelper.class);
+        if (mvHelper != null) {
+            mvHelper.setEngineTag(engineTag);
+        }
+    }
 }
