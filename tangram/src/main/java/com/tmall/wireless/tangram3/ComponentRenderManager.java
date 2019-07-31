@@ -1,7 +1,6 @@
 package com.tmall.wireless.tangram3;
 
 import android.content.Context;
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -143,5 +142,20 @@ public class ComponentRenderManager {
 
     public Map<String, ComponentInfo> getComponentInfoMap() {
         return componentInfoMap;
+    }
+
+    public ComponentInfo supplementComponentInfo(String cellType) {
+        ComponentInfo componentInfo = null;
+        if (componentInfoMap.containsKey(cellType)) {
+            componentInfo = componentInfoMap.get(cellType);
+        } else {
+            for (ElementRenderService renderService : renderServiceMap.values()) {
+                componentInfo = renderService.supplementComponentInfo(cellType);
+                if (componentInfo != null) {
+                    break;
+                }
+            }
+        }
+        return componentInfo;
     }
 }

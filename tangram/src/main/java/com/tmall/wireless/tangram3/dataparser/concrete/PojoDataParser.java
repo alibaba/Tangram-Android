@@ -683,11 +683,12 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
         checkCardResolverAndMVHelper(serviceManager);
 
         String cellType = parseCellType(data);
-        if (mvHelper.renderManager().getComponentInfoMap().containsKey(cellType)) {
-            if (componentInfoMap == null) {
-                componentInfoMap = new HashMap<>();
-            }
-            componentInfoMap.put(cellType, mvHelper.renderManager().getComponentInfoMap().get(cellType));
+        if (componentInfoMap == null) {
+            componentInfoMap = new HashMap<>();
+        }
+        ComponentInfo componentInfo = mvHelper.renderManager().supplementComponentInfo(cellType);
+        if (componentInfo != null) {
+            componentInfoMap.put(cellType, componentInfo);
         }
 
         BaseCell cell = createCell(parent, mvHelper, data, serviceManager, componentInfoMap);
@@ -797,7 +798,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
     }
 
     protected BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,
-                                @NonNull ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap) {
+                                  @NonNull ServiceManager serviceManager, Map<String, ComponentInfo> componentInfoMap) {
         BaseCell cell = null;
         String cellType = parseCellType(cellData);
 

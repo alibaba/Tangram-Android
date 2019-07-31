@@ -67,10 +67,10 @@ public class DemoListActivity extends ListActivity {
         bizItems.put("name", "自定义数据解析");
         bizItems.put("class", TangramDataParserActivity.class.getName());
         list.add(bizItems);
-//        HashMap<String, String> tangram3Items = new HashMap<String, String>();
-//        tangram3Items.put("name", "Tangram 3.0 (beta)");
-//        tangram3Items.put("class", Tangram3Activity.class.getName());
-//        list.add(tangram3Items);
+        HashMap<String, String> tangram3Items = new HashMap<String, String>();
+        tangram3Items.put("name", "Tangram 3.0 (beta)");
+        tangram3Items.put("class", Tangram3Activity.class.getName());
+        list.add(tangram3Items);
         ListAdapter listAdapter = new SimpleAdapter(this, list, android.R.layout.simple_list_item_1, new String[]{"name"}, new int[]{android.R.id.text1});
         setListAdapter(listAdapter);
     }
