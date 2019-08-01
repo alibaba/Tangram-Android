@@ -26,7 +26,6 @@ package com.tmall.wireless.tangram3.structure;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageView;
@@ -44,6 +43,7 @@ import com.tmall.wireless.tangram3.util.IInnerImageSetter;
 import com.tmall.wireless.tangram3.util.ImageUtils;
 import com.tmall.wireless.tangram3.util.LifeCycleProviderImpl;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -124,9 +124,9 @@ public class BaseCell extends ComponentLifecycle implements View.OnClickListener
 
     public int colSpan = 1;
 
-    private ArrayMap<String, Object> userParams;
+    private Map<String, Object> userParams;
 
-    private ArrayMap<Integer, Integer> innerClickMap = new ArrayMap<>();
+    private Map<Integer, Integer> innerClickMap = new HashMap<>();
 
     @Nullable
     public ServiceManager serviceManager;
@@ -150,7 +150,7 @@ public class BaseCell extends ComponentLifecycle implements View.OnClickListener
 
     public void addUserParam(String key, Object value) {
         if (userParams == null) {
-            userParams = new ArrayMap<>(32);
+            userParams = new HashMap<>(32);
         }
         userParams.put(key, value);
     }

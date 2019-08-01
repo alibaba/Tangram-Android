@@ -24,7 +24,6 @@
 
 package com.tmall.wireless.tangram3;
 
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -33,20 +32,21 @@ import com.tmall.wireless.tangram3.structure.BaseCell;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mikeafc on 16/4/26.
  */
 public class MVResolver {
-    private ArrayMap<String, Class<? extends View>> typeViewMap = new ArrayMap<>(64);
+    private Map<String, Class<? extends View>> typeViewMap = new HashMap<>(64);
 
-    private ArrayMap<String, Class<? extends BaseCell>> typeCellMap = new ArrayMap(64);
+    private Map<String, Class<? extends BaseCell>> typeCellMap = new HashMap(64);
 
-    private HashMap<String, Card> idCardMap = new HashMap<>();
+    private Map<String, Card> idCardMap = new HashMap<>();
 
-    private ArrayMap<BaseCell, View> mvMap = new ArrayMap<>(128);
+    private Map<BaseCell, View> mvMap = new HashMap<>(128);
 
-    private ArrayMap<View, BaseCell> vmMap = new ArrayMap<>(128);
+    private Map<View, BaseCell> vmMap = new HashMap<>(128);
 
     public void register(String type, Class<? extends View> viewClazz) {
         typeViewMap.put(type, viewClazz);

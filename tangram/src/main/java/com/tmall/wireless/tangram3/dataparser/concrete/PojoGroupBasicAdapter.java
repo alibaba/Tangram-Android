@@ -27,7 +27,6 @@ package com.tmall.wireless.tangram3.dataparser.concrete;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.util.SparseArray;
@@ -48,6 +47,7 @@ import com.tmall.wireless.tangram3.support.PageDetectorSupport;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +63,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
 
     private AtomicInteger mTypeId = new AtomicInteger(0);
 
-    private final Map<String, Integer> mStrKeys = new ArrayMap<>(64);
+    private final Map<String, Integer> mStrKeys = new HashMap<>(64);
 
     private MVHelper mMvHelper;
 
@@ -246,7 +246,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
     }
 
 
-    private final Map<String, Card> mIdCardCache = new ArrayMap<>(64);
+    private final Map<String, Card> mIdCardCache = new HashMap<>(64);
 
     @NonNull
     @Override

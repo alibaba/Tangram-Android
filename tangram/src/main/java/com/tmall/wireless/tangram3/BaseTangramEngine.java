@@ -28,7 +28,6 @@ import android.content.Context;
 import android.os.Build.VERSION;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.ChildDrawingOrderCallback;
 import android.view.View;
@@ -60,6 +59,7 @@ import com.tmall.wireless.tangram3.util.Preconditions;
 import com.tmall.wireless.tangram3.util.Predicate;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +74,7 @@ import java.util.Map;
 public class BaseTangramEngine<O, T> implements ServiceManager {
 
 
-    private Map<Class<?>, Object> mServices = new ArrayMap<>();
+    private Map<Class<?>, Object> mServices = new HashMap<>();
 
     @NonNull
     private final Context mContext;

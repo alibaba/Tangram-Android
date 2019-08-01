@@ -24,7 +24,6 @@
 
 package com.tmall.wireless.tangram3.support;
 
-import android.support.v4.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
 
@@ -35,6 +34,7 @@ import com.tmall.wireless.tangram3.util.LogUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,7 +67,7 @@ public abstract class SimpleClickSupport {
 
     private static final int MODIFIERS_IGNORE = Modifier.ABSTRACT | Modifier.STATIC | BRIDGE | SYNTHETIC;
 
-    private final Map<Class<?>, OnClickMethod> mOnClickMethods = new ArrayMap<>();
+    private final Map<Class<?>, OnClickMethod> mOnClickMethods = new HashMap<>();
 
     private boolean optimizedMode;
 

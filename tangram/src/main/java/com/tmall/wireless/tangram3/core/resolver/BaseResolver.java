@@ -24,16 +24,17 @@
 
 package com.tmall.wireless.tangram3.core.resolver;
 
-import android.support.v4.util.ArrayMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by villadora on 15/8/23.
  */
 public abstract class BaseResolver<T, O> implements Resolver<T, O> {
 
-    protected ArrayMap<T, String> mMap = new ArrayMap<>(64);
+    protected Map<T, String> mMap = new HashMap<>(64);
 
-    protected ArrayMap<String, T> mSparseArray = new ArrayMap<>(64);
+    protected Map<String, T> mSparseArray = new HashMap<>(64);
 
     @Override
     public int size() {

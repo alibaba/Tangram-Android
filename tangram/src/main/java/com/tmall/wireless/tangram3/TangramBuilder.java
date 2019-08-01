@@ -27,7 +27,6 @@ package com.tmall.wireless.tangram3;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.util.ArrayMap;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -74,6 +73,9 @@ import com.tmall.wireless.tangram3.util.Preconditions;
 import com.tmall.wireless.tangram3.util.TangramViewMetrics;
 import com.tmall.wireless.tangram3.view.BannerView;
 import com.tmall.wireless.tangram3.view.LinearScrollView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by longerian on 17/1/16.
@@ -376,7 +378,7 @@ public class TangramBuilder {
 
         private DataParser mDataParser;
 
-        private ArrayMap<String, ElementRenderService> renderServiceMap;
+        private Map<String, ElementRenderService> renderServiceMap;
 
         protected InnerBuilder(@NonNull final Context context, DefaultResolverRegistry registry) {
             this.mContext = context;
@@ -458,7 +460,7 @@ public class TangramBuilder {
 
         public void registerRenderService(ElementRenderService renderService) {
             if (renderServiceMap == null) {
-                renderServiceMap = new ArrayMap<>(5);
+                renderServiceMap = new HashMap<>(5);
             } else if (renderServiceMap.containsKey(renderService.getSDKBizName())) {
                 throw new IllegalArgumentException("Can not register duplicated render service.");
             }

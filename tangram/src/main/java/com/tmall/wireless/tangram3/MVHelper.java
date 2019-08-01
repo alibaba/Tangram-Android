@@ -25,7 +25,6 @@
 package com.tmall.wireless.tangram3;
 
 import android.os.Build.VERSION;
-import android.support.v4.util.ArrayMap;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -40,6 +39,8 @@ import com.tmall.wireless.tangram3.support.ExposureSupport;
 import com.tmall.wireless.tangram3.util.BDE;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_BOTTOM_INDEX;
 import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_LEFT_INDEX;
@@ -60,9 +61,9 @@ public class MVHelper {
 
     private ComponentRenderManager renderManager;
 
-    private ArrayMap<BaseCell, Method> postBindMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, Method> postUnBindMap = new ArrayMap<>(128);
-    private ArrayMap<BaseCell, Method> cellInitedMap = new ArrayMap<>(128);
+    private Map<BaseCell, Method> postBindMap = new HashMap<>(128);
+    private Map<BaseCell, Method> postUnBindMap = new HashMap<>(128);
+    private Map<BaseCell, Method> cellInitedMap = new HashMap<>(128);
 
     public MVHelper(MVResolver mvResolver) {
         this.mvResolver = mvResolver;
