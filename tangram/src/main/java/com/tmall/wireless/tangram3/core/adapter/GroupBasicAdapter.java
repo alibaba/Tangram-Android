@@ -538,8 +538,24 @@ public abstract class GroupBasicAdapter<L, C> extends VirtualLayoutAdapter<Binde
 
         boolean changed = cards.addAll(inserted, groups);
 
-        if (changed)
-            setData(cards);
+        if (changed) {
+            createSnapshot();
+
+            mCards.clear();
+            mData.clear();
+
+
+            if (cards != null && cards.size() != 0) {
+                mCards.ensureCapacity(cards.size());
+                setLayoutHelpers(transformCards(cards, mData, mCards));
+            } else {
+                setLayoutHelpers(Collections.<LayoutHelper>emptyList());
+            }
+
+            diffWithSnapshot();
+
+            notifyItemRangeInserted(inserted, groups.size());
+        }
     }
 
     /**

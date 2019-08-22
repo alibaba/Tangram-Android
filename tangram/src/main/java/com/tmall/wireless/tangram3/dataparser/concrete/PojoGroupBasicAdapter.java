@@ -394,7 +394,7 @@ public class PojoGroupBasicAdapter extends GroupBasicAdapter<Card, BaseCell> {
                     Pair<Range<Integer>, Card> pair = mCards.get(i);
                     int start = pair.first.getLower();
                     int end = pair.first.getUpper();
-                    if (end < removePosition) {
+                    if (end <= removePosition) {
                         //do nothing
                         newCards.add(pair);
                     } else if (start <= removePosition && removePosition < end) {
