@@ -125,7 +125,10 @@ public class BusSupport implements IDispatcherDelegate {
             for (int i = 0, size = eventHandlers.size(); i < size; i++) {
                 handler = eventHandlers.get(i);
                 if (handler.eventHandlerReceiver != null) {
-                    handler.handleEvent(event);
+                    if (!TextUtils.isEmpty(handler.producer) && handler.producer.equals(event.sourceId)
+                            || TextUtils.isEmpty(handler.producer)) {
+                        handler.handleEvent(event);
+                    }
                 } else {
                     if (!TextUtils.isEmpty(handler.producer) && handler.producer.equals(event.sourceId)
                             || TextUtils.isEmpty(handler.producer)) {

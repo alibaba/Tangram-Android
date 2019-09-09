@@ -84,6 +84,15 @@ public class EventHandlerWrapper {
         this.eventHandlerReceiver = eventHandlerReceiver;
     }
 
+    public EventHandlerWrapper(String type, String producer, IEventHandlerReceiver eventHandlerReceiver) {
+        this.type = type;
+        this.producer = producer;
+        this.subscriber = null;
+        this.action = null;
+        this.handlerMethod = null;
+        this.eventHandlerReceiver = eventHandlerReceiver;
+    }
+
     final protected void handleEvent(@NonNull Event event) {
         if (handlerMethod != null) {
             try {
