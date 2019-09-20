@@ -60,6 +60,7 @@ import com.tmall.wireless.tangram3.util.Predicate;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -626,4 +627,21 @@ public class BaseTangramEngine<O, T> implements ServiceManager {
         }
     }
 
+    public <S> Map<Class<S>, S> getServices() {
+        Map<Class<S>, S> map = new HashMap<>();
+        for (Class<?> aClass : mServices.keySet()) {
+
+            S s = (S) getService(aClass);
+            map.put((Class<S>) aClass, s);
+        }
+        return map;
+    }
+
+    public <S> void copyServices(Map<Class<S>, S> services) {
+        for (Map.Entry<Class<S>, S> entry : services.entrySet()) {
+            if (!mServices.containsKey(entry.getKey())) {
+                register(entry.getKey(), entry.getValue());
+            }
+        }
+    }
 }
