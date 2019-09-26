@@ -80,8 +80,8 @@ public class LinearScrollCell extends BaseCell {
     public static final String KEY_MAX_ROWS = "maxRows";
     public static final String KEY_MAX_COLS = "maxCols";
 
-    public static final int DEFAULT_DEFAULT_INDICATOR_COLOR = Color.parseColor("#80ffffff");
-    public static final int DEFAULT_INDICATOR_COLOR = Color.parseColor("#ffffff");
+    public static final int DEFAULT_DEFAULT_INDICATOR_COLOR = -2130706433;  //#80ffffff
+    public static final int DEFAULT_INDICATOR_COLOR = -1;   //#ffffff
     public static final int DEFAULT_MAX_ROWS = 1;
     public static final int DEFAULT_INDICATOR_WIDTH = Style.parseSize("40rp", 0);
     public static final int DEFAULT_DEFAULT_INDICATOR_WIDTH = Style.parseSize("80rp", 0);

@@ -50,7 +50,6 @@ public class BannerCard extends Card {
             super.setCells(Collections.<BaseCell>singletonList(cell));
         }
 
-        notifyDataChange();
     }
 
     @Nullable
