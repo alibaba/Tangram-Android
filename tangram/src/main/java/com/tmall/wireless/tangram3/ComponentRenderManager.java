@@ -132,6 +132,9 @@ public class ComponentRenderManager {
     }
 
     public void putComponentInfo(ComponentInfo info) {
+        if (info == null) {
+            return;
+        }
         renderServiceMap.get(info.getType()).onParseComponentInfo(info);
         componentInfoMap.put(info.getId(), info);
     }
