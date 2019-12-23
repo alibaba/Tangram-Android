@@ -38,6 +38,14 @@ buildscript {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            exclude 'com/tmall/wireless/tangram/**'
+        }
+    }
+}
+
 repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
