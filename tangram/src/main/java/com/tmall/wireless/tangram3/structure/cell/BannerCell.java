@@ -131,6 +131,11 @@ public class BannerCell extends BaseCell {
             }
             super.destroyItem(container, position, object);
         }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
     }
 
     public void setAutoScrollInternal(int mAutoScroll_internal) {
