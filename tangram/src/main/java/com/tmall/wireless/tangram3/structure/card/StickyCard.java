@@ -48,6 +48,7 @@ public class StickyCard extends Card {
 
         if (serviceManager != null) {
             helper.setStickyListener(serviceManager.getService(StickyLayoutHelper.StickyListener.class));
+            helper.setStackable(serviceManager.getService(StickyLayoutHelper.Stackable.class));
         }
 
         if (style != null)
