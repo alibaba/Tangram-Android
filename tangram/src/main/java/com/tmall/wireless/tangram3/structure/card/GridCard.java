@@ -41,6 +41,7 @@ import com.tmall.wireless.tangram3.dataparser.concrete.Card;
 import com.tmall.wireless.tangram3.dataparser.concrete.Style;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 import com.tmall.wireless.tangram3.support.CardSupport;
+import com.tmall.wireless.tangram3.util.DarkModeHelper;
 
 import java.util.List;
 
@@ -166,7 +167,7 @@ public class GridCard extends Card {
         for (int i = 0, size = parentCard.getChildren().size(); i < size; i++) {
             Range<Integer> range = parentCard.getChildren().keyAt(i);
             Card child = parentCard.getChildren().valueAt(i);
-            Style style = child.style;
+            final Style style = child.style;
             if (style instanceof GridStyle && child instanceof GridCard) {
                 final GridStyle gridStyle = (GridStyle) style;
                 final GridCard gridCard = (GridCard) child;
@@ -201,18 +202,20 @@ public class GridCard extends Card {
                         style.margin[Style.MARGIN_RIGHT_INDEX], style.margin[Style.MARGIN_BOTTOM_INDEX]);
                 rangeStyle.setPadding(style.padding[Style.MARGIN_LEFT_INDEX], style.padding[Style.MARGIN_TOP_INDEX],
                         style.padding[Style.MARGIN_RIGHT_INDEX], style.padding[Style.MARGIN_BOTTOM_INDEX]);
-                if (!TextUtils.isEmpty(style.bgImgUrl)) {
+                if (!TextUtils.isEmpty(style.bgImgUrl) || style.bgColor != 0) {
                     if (serviceManager != null && serviceManager.getService(CardSupport.class) != null) {
                         final CardSupport support = serviceManager.getService(CardSupport.class);
                         rangeStyle.setLayoutViewBindListener(new BindListener(style) {
                             @Override
                             public void onBind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
+                                checkAndProcessDarkMode(layoutView, style);
                                 support.onBindBackgroundView(layoutView, gridCard);
                             }
                         });
                         rangeStyle.setLayoutViewUnBindListener(new UnbindListener(style) {
                             @Override
                             public void onUnbind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
+                                checkAndResetDarkMode(layoutView, style);
                                 support.onUnbindBackgroundView(layoutView, gridCard);
                             }
                         });

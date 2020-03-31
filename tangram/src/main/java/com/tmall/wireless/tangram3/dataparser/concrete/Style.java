@@ -57,6 +57,7 @@ public class Style {
     public static final String DEFAULT_BG_COLOR = "#00000000";
 
     public int bgColor;
+    public int darkModeBgColor = 0;
 
     /**
      * Alias of bgImgUrl, use {@link #bgImgUrl} instead
@@ -65,6 +66,8 @@ public class Style {
     public String bgImage;
 
     public String bgImgUrl;
+
+    public String darkModeBgImgUrl;
 
     public String forLabel;
 
@@ -121,6 +124,11 @@ public class Style {
     public void setBgColor(String bgColor) {
         this.bgColor = parseColor(bgColor);
     }
+
+    public void setDarkModeBgColor(String bgColor) {
+        this.darkModeBgColor = parseColor(bgColor);
+    }
+
 
     /**
      * Parse margin with string like '[10,10,10,10]'

@@ -74,8 +74,8 @@ def VERSION = System.properties['version'] ?: '10'
 def VERSION_NAME = System.properties['versionName'] ?: '0.1.0'
 
 android {
-    compileSdkVersion Integer.parseInt(System.properties['compileSdkVersion'] ?: '26')
-    buildToolsVersion System.properties['buildToolsVersion'] ?: '26.0.2'
+    compileSdkVersion Integer.parseInt(System.properties['compileSdkVersion'] ?: '29')
+    buildToolsVersion System.properties['buildToolsVersion'] ?: '29.0.2'
 
     defaultConfig {
         minSdkVersion 14

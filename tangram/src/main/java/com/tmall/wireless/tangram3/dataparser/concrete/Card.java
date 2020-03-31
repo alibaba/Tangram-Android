@@ -49,6 +49,7 @@ import com.tmall.wireless.tangram3.dataparser.DataParser;
 import com.tmall.wireless.tangram3.structure.BaseCell;
 import com.tmall.wireless.tangram3.support.CardSupport;
 import com.tmall.wireless.tangram3.support.ExposureSupport;
+import com.tmall.wireless.tangram3.util.DarkModeHelper;
 import com.tmall.wireless.tangram3.util.ImageUtils;
 import com.tmall.wireless.tangram3.util.Preconditions;
 
@@ -198,18 +199,20 @@ public abstract class Card extends ComponentLifecycle {
             if (helper instanceof BaseLayoutHelper) {
                 BaseLayoutHelper baseHelper = (BaseLayoutHelper) helper;
                 baseHelper.setBgColor(style.bgColor);
-                if (!TextUtils.isEmpty(style.bgImgUrl)) {
+                if (!TextUtils.isEmpty(style.bgImgUrl) || style.bgColor != 0) {
                     if (serviceManager != null && serviceManager.getService(CardSupport.class) != null) {
                         final CardSupport support = serviceManager.getService(CardSupport.class);
                         baseHelper.setLayoutViewBindListener(new BindListener(style) {
                             @Override
                             public void onBind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
+                                checkAndProcessDarkMode(layoutView, style);
                                 support.onBindBackgroundView(layoutView, Card.this);
                             }
                         });
                         baseHelper.setLayoutViewUnBindListener(new UnbindListener(style) {
                             @Override
                             public void onUnbind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
+                                checkAndResetDarkMode(layoutView, style);
                                 support.onUnbindBackgroundView(layoutView, Card.this);
                             }
                         });
@@ -284,13 +287,34 @@ public abstract class Card extends ComponentLifecycle {
 
         @Override
         public void onBind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
-            if (mStyle != null && !TextUtils.isEmpty(mStyle.bgImgUrl)) {
+            if (mStyle == null) {
+                return;
+            }
+            checkAndProcessDarkMode(layoutView, mStyle);
+            if (!TextUtils.isEmpty(mStyle.bgImgUrl)) {
                 if (layoutView instanceof ImageView) {
                     ImageUtils.doLoadImageUrl((ImageView) layoutView, mStyle.bgImgUrl);
                 }
             }
         }
     }
+
+    public static void checkAndProcessDarkMode(View layoutView, @NonNull Style style) {
+        if (!TextUtils.isEmpty(style.darkModeBgImgUrl) && DarkModeHelper.isDarkMode(layoutView.getContext())) {
+            style.bgImgUrl = style.darkModeBgImgUrl;
+            DarkModeHelper.disableForceDark(layoutView);
+        } else if (style.darkModeBgColor != 0 && DarkModeHelper.isDarkMode(layoutView.getContext())) {
+            style.bgColor = style.darkModeBgColor;
+            layoutView.setBackgroundColor(style.bgColor);
+        }
+    }
+
+    public static void checkAndResetDarkMode(View layoutView, @NonNull Style style) {
+        if (!TextUtils.isEmpty(style.darkModeBgImgUrl) && DarkModeHelper.isDarkMode(layoutView.getContext())) {
+            DarkModeHelper.enableForceDark(layoutView);
+        }
+    }
+
 
     public static class UnbindListener implements BaseLayoutHelper.LayoutViewUnBindListener {
         private Style mStyle;
@@ -301,6 +325,7 @@ public abstract class Card extends ComponentLifecycle {
 
         @Override
         public void onUnbind(View layoutView, BaseLayoutHelper baseLayoutHelper) {
+            checkAndResetDarkMode(layoutView, mStyle);
         }
     }
 

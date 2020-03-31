@@ -108,6 +108,7 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
     public static final String KEY_BG_COLOR = "bgColor";
 
     public static final String KEY_BACKGROUND_COLOR = "background-color";
+    public static final String KEY_BACKGROUND_COLOR_PROPERTIES = "background-color-properties";
 
     /**
      * Use {@link #KEY_BACKGROUND_IMAGE} instead
@@ -122,6 +123,8 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
     public static final String KEY_STYLE_BG_IMAGE = "bgImgUrl";
 
     public static final String KEY_BACKGROUND_IMAGE = "background-image";
+
+    public static final String KEY_BACKGROUND_IMAGE_PROPERTIES = "background-image-properties";
 
     public static final String KEY_MARGIN = "margin";
 
@@ -741,6 +744,8 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             style.bgImgUrl = backgroundImage;
         }
 
+        parseDarkModeProperties(style, data);
+
         Float aspectRatio = data.getFloat(KEY_ASPECT_RATIO);
         if (aspectRatio == null) {
             style.aspectRatio = Float.NaN;
@@ -795,6 +800,30 @@ public class PojoDataParser extends DataParser<JSONObject, JSONArray> {
             }
         }
         return style;
+    }
+
+    private void parseDarkModeProperties(Style style, JSONObject data) {
+        JSONObject imageProperties = data.getJSONObject(KEY_BACKGROUND_IMAGE_PROPERTIES);
+        if (imageProperties != null) {
+            if (imageProperties.containsKey("imageUrl")) {
+                style.bgImgUrl = imageProperties.getString("imageUrl");
+            }
+
+            if (imageProperties.containsKey("darkModeImageUrl")) {
+                style.darkModeBgImgUrl = imageProperties.getString("darkModeImageUrl");
+            }
+        }
+
+        JSONObject colorProperties = data.getJSONObject(KEY_BACKGROUND_COLOR_PROPERTIES);
+        if (colorProperties != null) {
+            if (colorProperties.containsKey("color")) {
+                style.setBgColor(colorProperties.getString("color"));
+            }
+
+            if (colorProperties.containsKey("darkModeColor")) {
+                style.setDarkModeBgColor(colorProperties.getString("darkModeColor"));
+            }
+        }
     }
 
     protected BaseCell createCell(@Nullable Card parent, @NonNull MVHelper resolver, @NonNull JSONObject cellData,

@@ -67,6 +67,8 @@ import com.tmall.wireless.tangram3.structure.card.TripleColumnCard;
 import com.tmall.wireless.tangram3.structure.view.SimpleEmptyView;
 import com.tmall.wireless.tangram3.structure.viewcreator.ViewHolderCreator;
 import com.tmall.wireless.tangram3.support.TimerSupport;
+import com.tmall.wireless.tangram3.util.DarkModeHelper;
+import com.tmall.wireless.tangram3.util.IDarkMode;
 import com.tmall.wireless.tangram3.util.IInnerImageSetter;
 import com.tmall.wireless.tangram3.util.ImageUtils;
 import com.tmall.wireless.tangram3.util.Preconditions;
@@ -465,6 +467,12 @@ public class TangramBuilder {
                 throw new IllegalArgumentException("Can not register duplicated render service.");
             }
             renderServiceMap.put(renderService.getSDKBizName(), renderService);
+        }
+
+        public void setDarkModeImpl(IDarkMode mode) {
+            if (mode != null) {
+                DarkModeHelper.setDarkModeImpl(mode);
+            }
         }
 
         /**
