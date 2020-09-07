@@ -29,7 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alibaba.android.vlayout.VirtualLayoutManager;
-import com.tmall.wireless.tangram.core.R;
+import com.tmall.wireless.tangram3.core.R;
 import com.tmall.wireless.tangram3.core.service.ServiceManager;
 import com.tmall.wireless.tangram3.dataparser.concrete.BaseCellBinderResolver;
 import com.tmall.wireless.tangram3.structure.BaseCell;
@@ -42,10 +42,10 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_BOTTOM_INDEX;
-import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_LEFT_INDEX;
-import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_RIGHT_INDEX;
-import static com.tmall.wireless.tangram.dataparser.concrete.Style.MARGIN_TOP_INDEX;
+import static com.tmall.wireless.tangram3.dataparser.concrete.Style.MARGIN_BOTTOM_INDEX;
+import static com.tmall.wireless.tangram3.dataparser.concrete.Style.MARGIN_LEFT_INDEX;
+import static com.tmall.wireless.tangram3.dataparser.concrete.Style.MARGIN_RIGHT_INDEX;
+import static com.tmall.wireless.tangram3.dataparser.concrete.Style.MARGIN_TOP_INDEX;
 
 /**
  * Created by mikeafc on 16/4/25.

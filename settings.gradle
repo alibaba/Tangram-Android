@@ -23,6 +23,7 @@
  */
 
 include ':tangram'
+include ':tangram3'
 include ':examples'
 
 File configFile = file('./config.gradle')

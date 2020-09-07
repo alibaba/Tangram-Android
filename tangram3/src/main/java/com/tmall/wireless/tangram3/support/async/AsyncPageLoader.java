@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  * Interface to provide load data async for a Card. The difference between this and {@link AsyncLoader} is that this one loads data with page which means the card has a long list of cell data that could not be loaded at once.
- * See default {@link AsyncPageLoader.LoadedCallback} implement in {@link CardLoadSupport}
+ * See default {@link LoadedCallback} implement in {@link CardLoadSupport}
  * <br />
  * Created by villadora on 15/12/3.
  */

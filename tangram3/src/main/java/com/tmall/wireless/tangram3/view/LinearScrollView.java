@@ -46,7 +46,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.tmall.wireless.tangram.core.R;
+import com.tmall.wireless.tangram3.core.R;
 import com.tmall.wireless.tangram3.TangramEngine;
 import com.tmall.wireless.tangram3.core.adapter.BinderViewHolder;
 import com.tmall.wireless.tangram3.core.adapter.GroupBasicAdapter;

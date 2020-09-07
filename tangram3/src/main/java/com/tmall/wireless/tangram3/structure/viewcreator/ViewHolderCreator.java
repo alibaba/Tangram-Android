@@ -32,7 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tmall.wireless.tangram.core.R;
+import com.tmall.wireless.tangram3.core.R;
 import com.tmall.wireless.tangram3.TangramBuilder;
 import com.tmall.wireless.tangram3.util.LogUtils;
 
@@ -74,7 +74,7 @@ public class ViewHolderCreator<T extends ViewHolderCreator.ViewHolder, V extends
 
     }
 
-    public static ViewHolderCreator.ViewHolder getViewHolderFromView(@NonNull View view) {
+    public static ViewHolder getViewHolderFromView(@NonNull View view) {
         Object holder = view.getTag(R.id.TANGRAM_VIEW_HOLDER_TAG);
         if (holder instanceof ViewHolder) {
             return (ViewHolder) holder;
