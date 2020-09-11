@@ -48,7 +48,7 @@ repositories {
 
 ext {
     bintrayRepo = 'Tangram'
-    bintrayName = 'Tangram-Android'
+    bintrayName = 'Tangram3-Android'
 
     publishedGroupId = project.hasProperty('GROUP') ? GROUP : ''
     libraryName = project.hasProperty('ARTIFACT') ? ARTIFACT : ''
