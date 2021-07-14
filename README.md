@@ -1,3 +1,5 @@
+# Attention. This project is not maintained any more !!!
+
 # Tangram for Android
 
 [中文文档](README-ch.md)
